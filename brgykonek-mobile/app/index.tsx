@@ -8,7 +8,7 @@ const RootPage: React.FC = () => {
   const router = useRouter();
   useEffect(() => {
     const timeout = setTimeout(() => {
-      router.replace('/auth/signin');
+      router.replace('/landing');
     }, 3000);
     return () => clearTimeout(timeout);
   }, [router]);
