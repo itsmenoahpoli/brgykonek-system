@@ -48,4 +48,7 @@ export class LandingComponent implements OnInit {
   navigateToAnnouncements() {
     this.router.navigate(['/announcements']);
   }
+  navigateToFileComplaint() {
+    this.router.navigate(['/login'], { queryParams: { redirect: '/resident/complaints' } });
+  }
 }

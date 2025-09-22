@@ -1,9 +1,70 @@
-<div
-  class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center"
->
-  <div class="text-center">
-    <h1 class="text-4xl font-bold text-gray-800 mb-4">
-      Page is still in development
-    </h1>
+<app-dashboard-layout title="My Account" subtitle="View and manage your profile">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold mb-4">Profile Information</h2>
+      <form [formGroup]="profileForm" class="space-y-4" (ngSubmit)="saveProfile()">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">First Name</label>
+            <input class="w-full border rounded px-3 py-2" formControlName="firstName" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">Last Name</label>
+            <input class="w-full border rounded px-3 py-2" formControlName="lastName" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">Mobile</label>
+            <input class="w-full border rounded px-3 py-2" formControlName="phone" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">Default Address</label>
+            <input class="w-full border rounded px-3 py-2" formControlName="address" placeholder="House No., Street, Sitio/Purok" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">City/Municipality</label>
+            <input class="w-full border rounded px-3 py-2" formControlName="city" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">Province</label>
+            <input class="w-full border rounded px-3 py-2" formControlName="province" />
+          </div>
+        </div>
+        <div class="flex justify-end">
+          <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded" [disabled]="profileForm.invalid || isSavingProfile">
+            {{ isSavingProfile ? 'Saving...' : 'Save Changes' }}
+          </button>
+        </div>
+        <div *ngIf="profileError" class="text-sm text-red-600">{{ profileError }}</div>
+      </form>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold mb-4">Change Password</h2>
+      <form [formGroup]="passwordForm" class="space-y-4" (ngSubmit)="changePassword()">
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">Current Password</label>
+          <input type="password" class="w-full border rounded px-3 py-2" formControlName="current_password" />
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">New Password</label>
+            <input type="password" class="w-full border rounded px-3 py-2" formControlName="new_password" />
+          </div>
+          <div>
+            <label class="block text-sm text-gray-700 mb-1">Confirm New Password</label>
+            <input type="password" class="w-full border rounded px-3 py-2" formControlName="confirm_new_password" />
+          </div>
+        </div>
+        <div class="flex justify-end">
+          <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded" [disabled]="passwordForm.invalid || isChangingPassword">
+            {{ isChangingPassword ? 'Updating...' : 'Update Password' }}
+          </button>
+        </div>
+        <div *ngIf="passwordError" class="text-sm text-red-600">{{ passwordError }}</div>
+      </form>
+    </div>
   </div>
-</div>
+
+  <app-status-modal [isVisible]="profileSuccess" type="success" title="Profile Updated" message="Your profile has been updated successfully." [autoCloseDelay]="2000" (modalClosed)="onProfileSuccessClosed()"></app-status-modal>
+  <app-status-modal [isVisible]="passwordSuccess" type="success" title="Password Changed" message="Your password has been changed successfully." [autoCloseDelay]="2000" (modalClosed)="onPasswordSuccessClosed()"></app-status-modal>
+</app-dashboard-layout>

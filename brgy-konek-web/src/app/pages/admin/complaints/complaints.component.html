@@ -2,6 +2,9 @@
   title="Complaints"
   subtitle="View and manage all resident complaints"
 >
+  <div class="flex justify-end mb-4">
+    <button class="bg-indigo-600 text-white px-4 py-2 rounded" (click)="openCreateModal()">Create Complaint (Walk-in)</button>
+  </div>
   <div class="overflow-x-auto">
     <table class="min-w-full border-separate border-spacing-0 bg-transparent">
       <thead>
@@ -94,14 +97,18 @@
             <td class="px-4 py-2">
               {{ complaint.updated_at | date : "medium" }}
             </td>
-            <td class="px-4 py-2">
-              <button
-                type="button"
-                class="bg-blue-600 text-white px-3 py-1 rounded"
-                (click)="openViewModal(complaint)"
-              >
-                View Complaint
-              </button>
+            <td class="px-4 py-2 space-x-2">
+              <button type="button" class="bg-blue-600 text-white px-3 py-1 rounded" (click)="openViewModal(complaint)">View</button>
+              <select class="border rounded px-2 py-1" (change)="updateComplaintStatus(complaint._id, $any($event.target).value)">
+                <option value="draft" [selected]="complaint.status==='draft'">Draft</option>
+                <option value="in_progress" [selected]="complaint.status==='in_progress'">In Progress</option>
+                <option value="resolved" [selected]="complaint.status==='resolved'">Resolved</option>
+              </select>
+              <select class="border rounded px-2 py-1" (change)="updateComplaintPriority(complaint._id, $any($event.target).value)">
+                <option value="low" [selected]="complaint.priority==='low'">Low</option>
+                <option value="medium" [selected]="complaint.priority!=='low' && complaint.priority!=='high'">Medium</option>
+                <option value="high" [selected]="complaint.priority==='high'">High/Urgent</option>
+              </select>
             </td>
           </tr>
         </ng-container>
@@ -167,6 +174,67 @@
         <div class="mt-2 p-4 border rounded bg-gray-50">
           {{ selectedComplaint?.complaint_content }}
         </div>
+      </div>
+      <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">Resolution Notes</label>
+          <textarea rows="3" class="w-full border rounded px-3 py-2" #resNote></textarea>
+        </div>
+        <div class="flex items-end">
+          <button class="bg-green-600 text-white px-4 py-2 rounded" (click)="updateComplaintResolution(selectedComplaint!._id, resNote.value)">Mark Resolved</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+    <div class="bg-white w-full max-w-2xl mx-auto p-6 relative rounded-lg shadow">
+      <button (click)="closeCreateModal()" class="absolute top-3 right-3 text-2xl text-gray-500">&times;</button>
+      <h3 class="text-lg font-semibold mb-4">Create Complaint (Walk-in)</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">Resident ID</label>
+          <input class="w-full border rounded px-3 py-2" [(ngModel)]="createForm.resident_id" />
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">Category</label>
+          <input class="w-full border rounded px-3 py-2" [(ngModel)]="createForm.category" />
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">Date of Report</label>
+          <input type="date" class="w-full border rounded px-3 py-2" [(ngModel)]="createForm.date_of_report" />
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">Location of Incident</label>
+          <input class="w-full border rounded px-3 py-2" [(ngModel)]="createForm.location_of_incident" />
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm text-gray-700 mb-1">Complaint Content</label>
+          <textarea rows="4" class="w-full border rounded px-3 py-2" [(ngModel)]="createForm.complaint_content"></textarea>
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">Priority</label>
+          <select class="w-full border rounded px-3 py-2" [(ngModel)]="createForm.priority">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High/Urgent</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-gray-700 mb-1">Status</label>
+          <select class="w-full border rounded px-3 py-2" [(ngModel)]="createForm.status">
+            <option value="draft">Draft</option>
+            <option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+          </select>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm text-gray-700 mb-1">Attachments</label>
+          <input type="file" multiple (change)="onFileChange($event)" />
+        </div>
+      </div>
+      <div class="flex justify-end mt-4">
+        <button class="bg-indigo-600 text-white px-4 py-2 rounded" (click)="createComplaint()">Create</button>
       </div>
     </div>
   </div>

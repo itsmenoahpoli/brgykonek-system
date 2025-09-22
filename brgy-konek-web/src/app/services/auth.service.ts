@@ -47,6 +47,31 @@ export class AuthService {
     }
   }
 
+  private getTrustedDeviceKey(email: string): string {
+    return `trustedDevice:${email}`;
+  }
+
+  isDeviceTrusted(email: string): boolean {
+    try {
+      const raw = localStorage.getItem(this.getTrustedDeviceKey(email));
+      if (!raw) return false;
+      const data = JSON.parse(raw) as { token: string; exp: number };
+      if (!data || !data.exp) return false;
+      return Date.now() < data.exp;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  trustDevice(email: string, days = 30): void {
+    const exp = Date.now() + days * 24 * 60 * 60 * 1000;
+    const token = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    localStorage.setItem(
+      this.getTrustedDeviceKey(email),
+      JSON.stringify({ token, exp })
+    );
+  }
+
   login(
     email: string,
     password: string
@@ -179,6 +204,14 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('currentUser');
+    const email = this.currentUserSubject.value?.email;
+    if (email) {
+      const key = this.getTrustedDeviceKey(email);
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        localStorage.removeItem(key);
+      }
+    }
     this.currentUserSubject.next(null);
   }
 

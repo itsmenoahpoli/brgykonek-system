@@ -23,6 +23,7 @@ import { ConfirmDeleteModalComponent } from '../../../components/shared/confirm-
 })
 export class AccountsComponent implements OnInit {
   users: User[] = [];
+  pendingUsers: User[] = [];
   currentUserId: string | undefined;
   searchTerm = '';
   isCreateUserModalVisible = false;
@@ -54,6 +55,7 @@ export class AccountsComponent implements OnInit {
   ) {}
   async ngOnInit(): Promise<void> {
     this.users = (await this.usersService.getUsers()) || [];
+    this.pendingUsers = this.users.filter(u => u.status === 'pending');
     const currentUser = this.authService.getCurrentUser();
     this.currentUserId = currentUser?.id;
   }
@@ -69,7 +71,9 @@ export class AccountsComponent implements OnInit {
   }
   editUser(user: User) {}
   deleteUser(user: User) {
-    this.openDeleteModal(user);
+    if (user.status === 'pending') {
+      this.openDeleteModal(user);
+    }
   }
   openCreateUserModal() {
     this.isCreateUserModalVisible = true;
@@ -252,5 +256,25 @@ export class AccountsComponent implements OnInit {
       this.createUserError = 'Failed to delete user.';
     }
     this.isSubmitting = false;
+  }
+
+  async toggleActive(user: User) {
+    if (!user._id) return;
+    const next = user.status === 'inactive' ? 'approved' : 'inactive';
+    const updated = await this.usersService.updateUser(user._id, { status: next });
+    if (updated) {
+      this.users = this.users.map((u) => (u._id === user._id ? { ...u, status: next } : u));
+      this.pendingUsers = this.users.filter((u) => u.status === 'pending');
+      this.statusModalType = 'success';
+      this.statusModalTitle = 'Status Updated';
+      this.statusModalMessage = `User has been set to ${next}.`;
+      this.showStatusModal = true;
+      setTimeout(() => this.closeStatusModal(), 1500);
+    } else {
+      this.statusModalType = 'error';
+      this.statusModalTitle = 'Update Failed';
+      this.statusModalMessage = 'Could not update user status.';
+      this.showStatusModal = true;
+    }
   }
 }

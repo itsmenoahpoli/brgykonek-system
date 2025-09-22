@@ -10,6 +10,7 @@ export interface User {
   address: string;
   birthdate: string;
   barangay_clearance: string;
+  status?: 'pending' | 'approved' | 'inactive';
   createdAt?: string;
   updatedAt?: string;
 }

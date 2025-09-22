@@ -50,7 +50,7 @@
           class="w-10 h-10 rounded-full bg-white"
         />
         <div>
-          <div class="font-bold text-lg">Barangay Mabuhay</div>
+          <div class="font-bold text-lg">Barangay Masaguisi</div>
           <div class="text-xs text-gray-300">Community Management System</div>
         </div>
       </div>
@@ -95,12 +95,11 @@
     </div>
     <div class="flex flex-col gap-2">
       <div class="font-bold text-base mb-2">Quick Links</div>
-      <a href="#" class="hover:underline text-sm">Home</a>
-      <a href="#" class="hover:underline text-sm">About Us</a>
-      <a href="#" class="hover:underline text-sm">Services</a>
-      <a href="#" class="hover:underline text-sm">Announcements</a>
-      <a href="#" class="hover:underline text-sm">File a Complaint</a>
-      <a href="#" class="hover:underline text-sm">Contact Us</a>
+      <a (click)="goHome()" class="hover:underline text-sm cursor-pointer">Home</a>
+      <a (click)="goServices()" class="hover:underline text-sm cursor-pointer">Services</a>
+      <a (click)="goContact()" class="hover:underline text-sm cursor-pointer">Contact</a>
+      <a (click)="goAnnouncements()" class="hover:underline text-sm cursor-pointer">Announcements</a>
+      <a (click)="goLogin()" class="hover:underline text-sm cursor-pointer">File a Complaint</a>
     </div>
     <div class="flex flex-col gap-2">
       <div class="font-bold text-base mb-2">Contact Information</div>
@@ -122,7 +121,7 @@
             stroke-linejoin="round"
             d="M15 11a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"
           /></svg
-        >123 Mabuhay Street, Mabuhay District, Metro Manila, Philippines
+        >Barangay Masaguisi, Gloria, Oriental Mindoro, Philippines
       </div>
       <div class="flex items-center gap-2 text-sm">
         <svg
@@ -138,7 +137,7 @@
             d="M3 5h2l3.6 7.59a1 1 0 0 0 .92.41h7.16a1 1 0 0 0 .92-.41L21 5H3z"
           />
           <circle cx="12" cy="19" r="2" /></svg
-        >(02) 8123-4567 / 0917-123-4567
+        >0917-123-4567
       </div>
       <div class="flex items-center gap-2 text-sm">
         <svg
@@ -153,7 +152,7 @@
             stroke-linejoin="round"
             d="M16 12H8m8 0a4 4 0 1 0-8 0 4 4 0 0 0 8 0zm-8 0v4a4 4 0 0 0 8 0v-4"
           /></svg
-        >mabuhay&#64;barangay.gov.ph
+        >masaguisi@barangay.gov.ph
       </div>
       <div class="flex items-center gap-2 text-sm">
         <svg

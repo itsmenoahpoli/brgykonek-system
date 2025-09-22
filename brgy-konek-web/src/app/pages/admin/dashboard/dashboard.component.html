@@ -4,7 +4,8 @@
 >
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
     <div
-      class="bg-white rounded-xl shadow p-6 flex flex-col relative overflow-hidden min-h-[140px]"
+      class="bg-white rounded-xl shadow p-6 flex flex-col relative overflow-hidden min-h-[140px] cursor-pointer"
+      (click)="openComplaints()"
     >
       <div
         class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/4 opacity-20 pointer-events-none select-none"
@@ -42,7 +43,8 @@
       </div>
     </div>
     <div
-      class="bg-white rounded-xl shadow p-6 flex flex-col relative overflow-hidden min-h-[140px]"
+      class="bg-white rounded-xl shadow p-6 flex flex-col relative overflow-hidden min-h-[140px] cursor-pointer"
+      (click)="openAnnouncements()"
     >
       <div
         class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/4 opacity-20 pointer-events-none select-none"
@@ -80,7 +82,8 @@
       </div>
     </div>
     <div
-      class="bg-white rounded-xl shadow p-6 flex flex-col relative overflow-hidden min-h-[140px]"
+      class="bg-white rounded-xl shadow p-6 flex flex-col relative overflow-hidden min-h-[140px] cursor-pointer"
+      (click)="openUsers()"
     >
       <div
         class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/4 opacity-20 pointer-events-none select-none"
@@ -110,7 +113,8 @@
       </div>
     </div>
     <div
-      class="bg-white rounded-xl shadow p-6 flex flex-col relative overflow-hidden min-h-[140px]"
+      class="bg-white rounded-xl shadow p-6 flex flex-col relative overflow-hidden min-h-[140px] cursor-pointer"
+      (click)="openResolvedComplaints()"
     >
       <div
         class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/4 opacity-20 pointer-events-none select-none"

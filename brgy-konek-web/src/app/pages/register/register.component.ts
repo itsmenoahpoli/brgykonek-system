@@ -74,6 +74,7 @@ export class RegisterComponent {
           '',
           [Validators.required, this.philippineMobileValidator],
         ],
+        address: [''],
         barangay_clearance: ['', [this.fileValidator]],
       },
       { validators: this.passwordMatchValidator }
@@ -211,6 +212,9 @@ export class RegisterComponent {
       formData.append('email', formValue.email);
       formData.append('password', formValue.password);
       formData.append('mobile_number', formValue.mobile_number);
+      if (formValue.address) {
+        formData.append('address', formValue.address);
+      }
 
       if (formValue.barangay_clearance) {
         formData.append('barangay_clearance', formValue.barangay_clearance);
@@ -224,8 +228,9 @@ export class RegisterComponent {
             this.showSuccessDialog = true;
             setTimeout(() => {
               this.showSuccessDialog = false;
-              this.router.navigate(['/login']);
-            }, 2000);
+              const email = formValue.email;
+              this.router.navigate(['/verify-otp'], { queryParams: { email, user_type: 'resident', remember: '1' } });
+            }, 1500);
           } else {
             this.errorMessage = response.message;
           }

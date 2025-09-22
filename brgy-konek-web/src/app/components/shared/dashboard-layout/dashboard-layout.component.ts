@@ -7,6 +7,7 @@ import {
   RouterModule,
 } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { NotificationsService, NotificationItem } from '../../../services/notifications.service';
 import { NgIcon } from '@ng-icons/core';
 import { UserAvatarDropdownComponent } from '../user-avatar-dropdown/user-avatar-dropdown.component';
 import { filter } from 'rxjs';
@@ -24,10 +25,13 @@ export class DashboardLayoutComponent {
   sidebarOpen = true;
   breadcrumbs: { label: string; url: string }[] = [];
   sidebarLinks: { label: string; icon: string; route: string }[] = [];
+  notifications: NotificationItem[] = [];
+  unreadCount = 0;
   constructor(
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private notificationsService: NotificationsService
   ) {
     const user = this.authService.getCurrentUser();
     if (user?.role === 'resident') {
@@ -81,6 +85,14 @@ export class DashboardLayoutComponent {
       .subscribe(() => {
         this.breadcrumbs = this.buildBreadcrumbs(this.route.root);
       });
+
+    const user = this.authService.getCurrentUser();
+    if (user?.id) {
+      this.notificationsService.getUserNotifications(user.id).then((items) => {
+        this.notifications = items || [];
+        this.unreadCount = (this.notifications || []).filter((n) => !n.read).length;
+      });
+    }
   }
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen;
@@ -88,6 +100,14 @@ export class DashboardLayoutComponent {
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
+  }
+  goNotifications() {
+    const user = this.authService.getCurrentUser();
+    if (!user) return;
+    for (const n of this.notifications) {
+      if (!n.read) this.notificationsService.markAsRead(n._id);
+    }
+    this.unreadCount = 0;
   }
   goToSidebarLink(link: any) {
     this.router.navigate([link.route]);

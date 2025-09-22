@@ -48,6 +48,7 @@ export class LoginComponent {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
+      rememberDevice: [false],
     });
   }
 
@@ -76,11 +77,14 @@ export class LoginComponent {
           if (response.success) {
             this.authService.resetLoginAttempts(email);
             const userType = response.user?.role || '';
-            if (userType === 'admin') {
-              this.router.navigate(['/admin/home']);
+            const trusted = this.authService.isDeviceTrusted(email);
+            const remember = this.loginForm.get('rememberDevice')?.value;
+            if (trusted || userType === 'admin') {
+              if (remember) this.authService.trustDevice(email);
+              this.router.navigate(['/home']);
               return;
             }
-            this.requestOTPAndRedirect(email, userType);
+            this.requestOTPAndRedirect(email, userType, remember);
           } else {
             this.authService.incrementLoginAttempts(email);
             const attempts = this.authService.getLoginAttempts(email);
@@ -147,7 +151,7 @@ export class LoginComponent {
     this.otpModal.resetForm();
   }
 
-  private requestOTPAndRedirect(email: string, userType: string): void {
+  private requestOTPAndRedirect(email: string, userType: string, remember?: boolean): void {
     this.showOtpLoadingModal = true;
     this.authService.sendOTP(email).subscribe({
       next: (otpResponse) => {
@@ -157,7 +161,7 @@ export class LoginComponent {
           setTimeout(() => {
             this.showOtpSuccessModal = false;
             this.router.navigate(['/verify-otp'], {
-              queryParams: { email, user_type: userType },
+              queryParams: { email, user_type: userType, remember: remember ? '1' : '0' },
             });
           }, 2000);
         } else {

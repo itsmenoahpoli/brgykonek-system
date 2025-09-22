@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { ChartConfiguration } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { DashboardLayoutComponent } from '../../../components/shared/dashboard-layout/dashboard-layout.component';
@@ -74,10 +75,23 @@ export class DashboardComponent implements OnInit {
     responsive: true,
   };
 
+  get topComplaintCategories(): { category: string; count: number }[] {
+    const counts = new Map<string, number>();
+    for (const c of this.recentComplaints) {
+      const key = c.category || 'Unknown';
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    return Array.from(counts.entries())
+      .map(([category, count]) => ({ category, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  }
+
   constructor(
     private dashboardService: DashboardService,
     private complaintsService: ComplaintsService,
-    private announcementsService: AnnouncementsService
+    private announcementsService: AnnouncementsService,
+    private router: Router
   ) {
     Chart.register(...registerables);
   }
@@ -139,5 +153,21 @@ export class DashboardComponent implements OnInit {
   getAnnouncementDate(announcement: any): string {
     const date = announcement.created_at || announcement.updated_at;
     return date ? new Date(date).toLocaleString() : '-';
+  }
+
+  openComplaints() {
+    this.router.navigate(['/admin/complaints']);
+  }
+
+  openAnnouncements() {
+    this.router.navigate(['/admin/announcements']);
+  }
+
+  openUsers() {
+    this.router.navigate(['/admin/accounts']);
+  }
+
+  openResolvedComplaints() {
+    this.router.navigate(['/admin/complaints'], { queryParams: { status: 'resolved' } });
   }
 }

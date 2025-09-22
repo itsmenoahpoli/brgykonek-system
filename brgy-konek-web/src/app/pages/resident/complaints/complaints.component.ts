@@ -38,6 +38,7 @@ export class ComplaintsComponent {
   complaintTitle = '';
   complaintCategory = '';
   complaintDate = '';
+  complaintLocation = '';
   complaintContent = '';
   complaintStatus = 'Published';
   showDeleteModal = false;
@@ -151,6 +152,7 @@ export class ComplaintsComponent {
       resident_id: user.id,
       category: this.complaintCategory,
       date_of_report: new Date(this.complaintDate).toISOString(),
+      location_of_incident: this.complaintLocation,
       complaint_content: this.complaintContent,
       attachments,
       status: this.complaintStatus.toLowerCase(),

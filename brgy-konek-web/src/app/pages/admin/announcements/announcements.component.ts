@@ -49,10 +49,14 @@ export class AnnouncementsComponent {
   ) {
     this.form = this.fb.group({
       banner_image: [''],
-      title: [''],
-      header: [''],
+      title: ['', { validators: [], nonNullable: false }],
+      header: ['', { validators: [], nonNullable: false }],
       body: [''],
-      status: [''],
+      status: ['draft'],
+      category: ['Events'],
+      audience: ['All Residents'],
+      publish_at: [''],
+      created_by: [''],
     });
     this.loadAnnouncements();
   }

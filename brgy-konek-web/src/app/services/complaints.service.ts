@@ -17,9 +17,12 @@ export interface Complaint {
   resident_id: Resident;
   category: string;
   date_of_report: string;
+  location_of_incident?: string;
   complaint_content: string;
   attachments: string[];
   status: string;
+  priority?: 'low' | 'medium' | 'high';
+  resolution_note?: string;
   created_at: string;
   updated_at: string;
 }
@@ -56,12 +59,24 @@ export class ComplaintsService {
     resident_id: string;
     category: string;
     date_of_report: string;
+    location_of_incident?: string;
     complaint_content: string;
     attachments: string[];
     status: string;
+    priority?: 'low' | 'medium' | 'high';
+    resolution_note?: string;
   }): Promise<Complaint | undefined> {
     try {
       const res = await apiClient.post<Complaint>(this.baseUrl, payload);
+      return res.data;
+    } catch (error) {
+      return undefined;
+    }
+  }
+
+  async updateComplaint(id: string, payload: Partial<Complaint>): Promise<Complaint | undefined> {
+    try {
+      const res = await apiClient.put<Complaint>(`${this.baseUrl}/${id}`, payload);
       return res.data;
     } catch (error) {
       return undefined;

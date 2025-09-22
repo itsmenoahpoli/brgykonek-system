@@ -35,6 +35,7 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
   errorModalMessage = '';
   email = '';
   userType = '';
+  remember = '0';
   countdownTimer = 0;
   canResendOTP = true;
   private countdownInterval: any;
@@ -57,6 +58,7 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
     this.route.queryParams.subscribe((params) => {
       this.email = params['email'] || '';
       this.userType = params['user_type'] || '';
+      this.remember = params['remember'] || '0';
       if (!this.email) {
         this.router.navigate(['/login']);
       }
@@ -87,6 +89,9 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
             this.isLoading = false;
             console.log('OTP verification response:', response);
             if (response.success) {
+              if (params['remember'] === '1') {
+                this.authService.trustDevice(emailFromUrl);
+              }
               this.showSuccessModal = true;
               setTimeout(() => {
                 if (
