@@ -25,4 +25,8 @@ export class LandingLayoutComponent {
   goLogin() {
     this.router.navigate(['/login']);
   }
+
+  goAnnouncements() {
+    this.router.navigate(['/announcements']);
+  }
 }

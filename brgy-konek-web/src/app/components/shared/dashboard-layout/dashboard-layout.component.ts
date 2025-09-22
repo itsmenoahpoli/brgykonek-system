@@ -33,8 +33,8 @@ export class DashboardLayoutComponent {
     private route: ActivatedRoute,
     private notificationsService: NotificationsService
   ) {
-    const user = this.authService.getCurrentUser();
-    if (user?.role === 'resident') {
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser?.role === 'resident') {
       this.sidebarLinks = [
         {
           label: 'Dashboard',
@@ -57,7 +57,7 @@ export class DashboardLayoutComponent {
           route: 'resident/list-of-reports',
         },
       ];
-    } else if (user?.role === 'admin' || user?.role === 'staff') {
+    } else if (currentUser?.role === 'admin' || currentUser?.role === 'staff') {
       this.sidebarLinks = [
         { label: 'Dashboard', icon: 'heroHome', route: 'admin/home' },
         {
@@ -86,9 +86,9 @@ export class DashboardLayoutComponent {
         this.breadcrumbs = this.buildBreadcrumbs(this.route.root);
       });
 
-    const user = this.authService.getCurrentUser();
-    if (user?.id) {
-      this.notificationsService.getUserNotifications(user.id).then((items) => {
+    const currentUserForNotifications = this.authService.getCurrentUser();
+    if (currentUserForNotifications?.id) {
+      this.notificationsService.getUserNotifications(currentUserForNotifications.id).then((items) => {
         this.notifications = items || [];
         this.unreadCount = (this.notifications || []).filter((n) => !n.read).length;
       });
@@ -102,8 +102,8 @@ export class DashboardLayoutComponent {
     this.router.navigate(['/login']);
   }
   goNotifications() {
-    const user = this.authService.getCurrentUser();
-    if (!user) return;
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) return;
     for (const n of this.notifications) {
       if (!n.read) this.notificationsService.markAsRead(n._id);
     }

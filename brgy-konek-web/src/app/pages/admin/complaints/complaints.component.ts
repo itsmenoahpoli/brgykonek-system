@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
   ComplaintsService,
   Complaint,
@@ -10,7 +11,7 @@ import { DashboardLayoutComponent } from '../../../components/shared/dashboard-l
 @Component({
   selector: 'app-complaints',
   standalone: true,
-  imports: [CommonModule, DashboardLayoutComponent],
+  imports: [CommonModule, FormsModule, DashboardLayoutComponent],
   templateUrl: './complaints.component.html',
   styleUrls: ['./complaints.component.scss'],
 })

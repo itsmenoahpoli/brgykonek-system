@@ -1,5 +1,5 @@
 import axios from 'axios';
-import CryptoJS from 'crypto-js';
+import CryptoJS from 'crypto-es';
 
 const SECRET_KEY = 'brgykonek_secret_key';
 
