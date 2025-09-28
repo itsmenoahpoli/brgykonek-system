@@ -48,18 +48,13 @@
           <th class="px-4 py-2 font-medium text-left">Mobile Number</th>
           <th class="px-4 py-2 font-medium text-left">User Type</th>
           <th class="px-4 py-2 font-medium text-left">Status</th>
-          <th class="px-4 py-2 font-medium text-left">Address</th>
-          <th class="px-4 py-2 font-medium text-left">Birthdate</th>
-          <th class="px-4 py-2 font-medium text-left">Barangay Clearance</th>
-          <th class="px-4 py-2 font-medium text-left">Created At</th>
-          <th class="px-4 py-2 font-medium text-left">Updated At</th>
           <th class="px-4 py-2 font-medium text-left">Actions</th>
         </tr>
       </thead>
       <tbody>
         <ng-container *ngIf="users as users">
           <tr *ngIf="filteredUsers.length === 0">
-            <td colspan="10" class="py-8 text-center text-gray-400">
+            <td colspan="6" class="py-8 text-center text-gray-400">
               <svg
                 width="48"
                 height="48"
@@ -103,12 +98,11 @@
               <span *ngIf="user.status === 'approved' || !user.status" class="px-2 py-1 rounded-full bg-green-100 text-green-800 border border-green-300 text-xs font-semibold">Approved</span>
               <span *ngIf="user.status === 'inactive'" class="px-2 py-1 rounded-full bg-gray-100 text-gray-700 border border-gray-300 text-xs font-semibold">Inactive</span>
             </td>
-            <td class="px-4 py-2">{{ user.address }}</td>
-            <td class="px-4 py-2">{{ user.birthdate | date : "longDate" }}</td>
-            <td class="px-4 py-2">{{ user.barangay_clearance }}</td>
-            <td class="px-4 py-2">{{ user.createdAt | date : "medium" }}</td>
-            <td class="px-4 py-2">{{ user.updatedAt | date : "medium" }}</td>
             <td class="px-4 py-2 flex items-center gap-3">
+              <button type="button" class="text-green-600 hover:underline" (click)="viewProfile(user)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                View
+              </button>
               <button type="button" class="text-blue-600 hover:underline" (click)="editUser(user)">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5h2m-1 14v-7m0 0L7 9m5 3l4-3"/></svg>
                 Edit
@@ -401,6 +395,67 @@
   [message]="statusModalMessage"
   (modalClosed)="closeStatusModal()"
 ></app-status-modal>
+
+<div *ngIf="showViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+  <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between p-6 border-b">
+      <h3 class="text-lg font-semibold text-gray-900">User Profile</h3>
+      <button type="button" class="text-gray-400 hover:text-gray-600" (click)="closeViewModal()">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="p-6" *ngIf="selectedUser">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+          <p class="text-gray-900">{{ selectedUser.name }}</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <p class="text-gray-900">{{ selectedUser.email }}</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
+          <p class="text-gray-900">{{ selectedUser.mobile_number }}</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">User Type</label>
+          <span class="inline-block px-2 py-1 text-yellow-700 border border-yellow-400 rounded-full bg-yellow-50 text-xs font-semibold capitalize">
+            {{ selectedUser.user_type }}
+          </span>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <span *ngIf="selectedUser.status === 'pending'" class="inline-block px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-300 text-xs font-semibold">Pending</span>
+          <span *ngIf="selectedUser.status === 'approved' || !selectedUser.status" class="inline-block px-2 py-1 rounded-full bg-green-100 text-green-800 border border-green-300 text-xs font-semibold">Approved</span>
+          <span *ngIf="selectedUser.status === 'inactive'" class="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-700 border border-gray-300 text-xs font-semibold">Inactive</span>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+          <p class="text-gray-900">{{ selectedUser.address }}</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Birthdate</label>
+          <p class="text-gray-900">{{ selectedUser.birthdate | date:'longDate' }}</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Barangay Clearance</label>
+          <p class="text-gray-900">{{ selectedUser.barangay_clearance }}</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Created At</label>
+          <p class="text-gray-900">{{ selectedUser.createdAt | date:'medium' }}</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Updated At</label>
+          <p class="text-gray-900">{{ selectedUser.updatedAt | date:'medium' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <app-confirm-delete-modal
   [visible]="isDeleteModalVisible"

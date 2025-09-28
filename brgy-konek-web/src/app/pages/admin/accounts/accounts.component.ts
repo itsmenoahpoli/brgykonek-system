@@ -48,6 +48,8 @@ export class AccountsComponent implements OnInit {
   statusModalMessage = '';
   isDeleteModalVisible = false;
   userToDelete: User | null = null;
+  showViewModal = false;
+  selectedUser: User | null = null;
 
   constructor(
     private usersService: UsersService,
@@ -233,6 +235,16 @@ export class AccountsComponent implements OnInit {
   closeDeleteModal() {
     this.isDeleteModalVisible = false;
     this.userToDelete = null;
+  }
+
+  viewProfile(user: User): void {
+    this.selectedUser = user;
+    this.showViewModal = true;
+  }
+
+  closeViewModal(): void {
+    this.showViewModal = false;
+    this.selectedUser = null;
   }
 
   async confirmDeleteUser() {

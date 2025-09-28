@@ -15,11 +15,17 @@ export class LandingLayoutComponent {
   }
 
   goContact() {
-    this.router.navigate(['/contact']);
+    const element = document.getElementById('about');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
   }
 
   goServices() {
-    this.router.navigate(['/services']);
+    const element = document.getElementById('services');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
   }
 
   goLogin() {

@@ -74,8 +74,12 @@ export class RegisterComponent {
           '',
           [Validators.required, this.philippineMobileValidator],
         ],
-        address: [''],
+        province: ['Oriental Mindoro'],
+        municipality: ['Bongabong'],
+        barangay: ['Masaguisi'],
+        sitio: ['', [Validators.required]],
         barangay_clearance: ['', [this.fileValidator]],
+        rememberDevice: [false],
       },
       { validators: this.passwordMatchValidator }
     );
@@ -212,9 +216,11 @@ export class RegisterComponent {
       formData.append('email', formValue.email);
       formData.append('password', formValue.password);
       formData.append('mobile_number', formValue.mobile_number);
-      if (formValue.address) {
-        formData.append('address', formValue.address);
-      }
+      formData.append('province', formValue.province);
+      formData.append('municipality', formValue.municipality);
+      formData.append('barangay', formValue.barangay);
+      formData.append('sitio', formValue.sitio);
+      formData.append('rememberDevice', formValue.rememberDevice ? '1' : '0');
 
       if (formValue.barangay_clearance) {
         formData.append('barangay_clearance', formValue.barangay_clearance);
@@ -229,7 +235,7 @@ export class RegisterComponent {
             setTimeout(() => {
               this.showSuccessDialog = false;
               const email = formValue.email;
-              this.router.navigate(['/verify-otp'], { queryParams: { email, user_type: 'resident', remember: '1' } });
+              this.router.navigate(['/verify-otp'], { queryParams: { email, user_type: 'resident', remember: formValue.rememberDevice ? '1' : '0' } });
             }, 1500);
           } else {
             this.errorMessage = response.message;

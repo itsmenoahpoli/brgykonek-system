@@ -7,6 +7,8 @@
         <option value="pending">Pending</option>
         <option value="in_progress">In-progress</option>
         <option value="resolved">Resolved</option>
+        <option value="received">Received</option>
+        <option value="seen">Seen by Staff</option>
       </select>
     </div>
     <button class="bg-indigo-600 text-white px-4 py-2 rounded" (click)="openRequestDoc()">Request Document</button>
@@ -35,6 +37,8 @@
               <span *ngIf="r.status === 'pending'" class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs">Pending</span>
               <span *ngIf="r.status === 'in_progress'" class="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs">In-progress</span>
               <span *ngIf="r.status === 'resolved'" class="px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs">Resolved</span>
+              <span *ngIf="r.status === 'received'" class="px-2 py-1 rounded-full bg-gray-100 text-gray-800 text-xs">Received</span>
+              <span *ngIf="r.status === 'seen'" class="px-2 py-1 rounded-full bg-purple-100 text-purple-800 text-xs">Seen by Staff</span>
             </td>
             <td class="px-4 py-2 text-sm text-gray-700">{{ r.resolution_note || '-' }}</td>
             <td class="px-4 py-2">{{ r.updated_at | date: 'medium' }}</td>

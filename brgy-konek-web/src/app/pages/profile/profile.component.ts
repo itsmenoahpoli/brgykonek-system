@@ -27,11 +27,13 @@ export class ProfileComponent {
     this.user = this.authService.getCurrentUser();
     this.profileForm = this.fb.group({
       firstName: [this.user?.firstName || '', [Validators.required, Validators.minLength(2)]],
-      lastName: [this.user?.lastName || ''],
-      phone: [this.user?.phone || ''],
-      address: [this.user?.address || ''],
-      city: [this.user?.city || ''],
-      province: [this.user?.province || ''],
+      middleName: [this.user?.middleName || ''],
+      lastName: [this.user?.lastName || '', [Validators.required, Validators.minLength(2)]],
+      email: [this.user?.email || ''],
+      phone: [this.user?.phone || '', [Validators.required]],
+      sitio: [this.user?.sitio || '', [Validators.required]],
+      municipality: ['Bongabong'],
+      province: ['Oriental Mindoro'],
     });
     this.passwordForm = this.fb.group({
       current_password: ['', [Validators.required, Validators.minLength(6)]],

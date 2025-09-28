@@ -14,9 +14,8 @@
           <th class="px-4 py-2 font-medium text-left">Date of Report</th>
           <th class="px-4 py-2 font-medium text-left">Content</th>
           <th class="px-4 py-2 font-medium text-left">Attachments</th>
+          <th class="px-4 py-2 font-medium text-left">Priority</th>
           <th class="px-4 py-2 font-medium text-left">Status</th>
-          <th class="px-4 py-2 font-medium text-left">Created At</th>
-          <th class="px-4 py-2 font-medium text-left">Updated At</th>
           <th class="px-4 py-2 font-medium text-left">Actions</th>
         </tr>
       </thead>
@@ -71,6 +70,14 @@
               <ng-template #noAttachments>-</ng-template>
             </td>
             <td class="px-4 py-2">
+              <span 
+                class="inline-block px-3 py-1 rounded-full text-xs font-semibold"
+                [class]="getPriorityClass(complaint.priority)"
+              >
+                {{ complaint.priority || 'Medium' }}
+              </span>
+            </td>
+            <td class="px-4 py-2">
               <ng-container
                 *ngIf="complaint.status === 'published'; else otherStatus"
               >
@@ -90,12 +97,6 @@
                 </ng-container>
                 <ng-template #plainStatus>{{ complaint.status }}</ng-template>
               </ng-template>
-            </td>
-            <td class="px-4 py-2">
-              {{ complaint.created_at | date : "medium" }}
-            </td>
-            <td class="px-4 py-2">
-              {{ complaint.updated_at | date : "medium" }}
             </td>
             <td class="px-4 py-2 space-x-2">
               <button type="button" class="bg-blue-600 text-white px-3 py-1 rounded" (click)="openViewModal(complaint)">View</button>

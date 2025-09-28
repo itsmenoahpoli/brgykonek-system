@@ -38,17 +38,8 @@ export class DashboardComponent implements OnInit {
 
   get resolvedComplaints(): number | string {
     if (!this.statistics) return '-';
-    const total = this.statistics.complaintsPerMonth.reduce(
-      (sum, m) => sum + m.count,
-      0
-    );
-    const latest =
-      this.statistics.complaintsPerMonth.length > 0
-        ? this.statistics.complaintsPerMonth[
-            this.statistics.complaintsPerMonth.length - 1
-          ].count
-        : 0;
-    return total - latest;
+    const resolvedCount = this.recentComplaints.filter(c => c.status === 'resolved').length;
+    return resolvedCount > 0 ? resolvedCount : '-';
   }
 
   complaintsLineChartData: ChartConfiguration<'line'>['data'] = {
@@ -83,6 +74,18 @@ export class DashboardComponent implements OnInit {
     }
     return Array.from(counts.entries())
       .map(([category, count]) => ({ category, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  }
+
+  getComplaintsBySitio(): { sitio: string; count: number }[] {
+    const counts = new Map<string, number>();
+    for (const c of this.recentComplaints) {
+      const key = (c as any).sitio || 'Unknown';
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    return Array.from(counts.entries())
+      .map(([sitio, count]) => ({ sitio, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
   }

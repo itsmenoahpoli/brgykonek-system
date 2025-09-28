@@ -1,0 +1,59 @@
+<app-dashboard-layout title="Notifications" subtitle="Stay updated with your community">
+  <div class="space-y-4">
+    <div class="flex items-center justify-between">
+      <h2 class="text-lg font-semibold">Your Notifications</h2>
+      <button 
+        class="text-sm text-blue-600 hover:text-blue-800"
+        (click)="markAllAsRead()"
+        *ngIf="hasUnreadNotifications"
+      >
+        Mark all as read
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="flex justify-center items-center h-32">
+      <span class="text-gray-500">Loading notifications...</span>
+    </div>
+
+    <div *ngIf="!loading && notifications.length === 0" class="text-center py-8">
+      <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.828 7l2.586 2.586a2 2 0 002.828 0L12.828 7H4.828z"></path>
+      </svg>
+      <p class="text-gray-500">No notifications yet</p>
+    </div>
+
+    <div *ngIf="!loading && notifications.length > 0" class="space-y-3">
+      <div 
+        *ngFor="let notification of notifications" 
+        class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 cursor-pointer hover:shadow-md transition-shadow"
+        [class.bg-blue-50]="!notification.read"
+        (click)="markAsRead(notification)"
+      >
+        <div class="flex items-start space-x-3">
+          <div class="flex-shrink-0">
+            <div 
+              class="w-8 h-8 rounded-full flex items-center justify-center"
+              [class]="getNotificationIconClass(notification.type)"
+            >
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path *ngIf="notification.type === 'announcement'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path>
+                <path *ngIf="notification.type === 'complaint_update'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2.25m0 4.5h.008v.008H12v-.008zm0 0h.008v.008H12v-.008zm0 0a6.75 6.75 0 100-13.5 6.75 6.75 0 000 13.5zm0 0h.008v.008H12v-.008zm0 0h.008v.008H12v-.008z"></path>
+                <path *ngIf="notification.type === 'document_update'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-medium text-gray-900">{{ notification.title }}</h3>
+              <div class="flex items-center space-x-2">
+                <span class="text-xs text-gray-500">{{ notification.created_at | date:'short' }}</span>
+                <div *ngIf="!notification.read" class="w-2 h-2 bg-blue-500 rounded-full"></div>
+              </div>
+            </div>
+            <p class="text-sm text-gray-600 mt-1">{{ notification.message }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-dashboard-layout>

@@ -1,3 +1,136 @@
 <app-dashboard-layout>
-  <div>Development in progress</div>
+  <div class="space-y-6">
+    <div class="bg-white rounded-lg shadow p-6">
+      <h1 class="text-2xl font-bold text-gray-900 mb-4">Welcome to Your Dashboard</h1>
+      <p class="text-gray-600 mb-6">Stay connected with your community and access services easily.</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+          <div class="flex items-center">
+            <div class="p-2 bg-blue-500 rounded-lg">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-blue-900">Pending Complaints</p>
+              <p class="text-2xl font-bold text-blue-600">3</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-green-50 rounded-lg p-4 border border-green-200">
+          <div class="flex items-center">
+            <div class="p-2 bg-green-500 rounded-lg">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-green-900">Resolved Issues</p>
+              <p class="text-2xl font-bold text-green-600">12</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+          <div class="flex items-center">
+            <div class="p-2 bg-yellow-500 rounded-lg">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.828 7l2.586 2.586a2 2 0 002.828 0L12.828 7H4.828z"></path>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-yellow-900">Document Requests</p>
+              <p class="text-2xl font-bold text-yellow-600">2</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-purple-50 rounded-lg p-4 border border-purple-200">
+          <div class="flex items-center">
+            <div class="p-2 bg-purple-500 rounded-lg">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.828 7l2.586 2.586a2 2 0 002.828 0L12.828 7H4.828z"></path>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-purple-900">Notifications</p>
+              <p class="text-2xl font-bold text-purple-600">5</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Announcements</h2>
+        <div class="space-y-3">
+          <div class="border-l-4 border-blue-500 pl-4">
+            <h3 class="font-medium text-gray-900">Community Clean-up Drive</h3>
+            <p class="text-sm text-gray-600">Join us this Saturday for our monthly community clean-up drive...</p>
+            <p class="text-xs text-gray-500 mt-1">2 days ago</p>
+          </div>
+          <div class="border-l-4 border-green-500 pl-4">
+            <h3 class="font-medium text-gray-900">Health Center Schedule</h3>
+            <p class="text-sm text-gray-600">Updated schedule for health center services this week...</p>
+            <p class="text-xs text-gray-500 mt-1">5 days ago</p>
+          </div>
+        </div>
+        <button class="mt-4 text-blue-600 hover:text-blue-800 text-sm font-medium">View All Announcements →</button>
+      </div>
+
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+        <div class="space-y-3">
+          <button class="w-full flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+            <svg class="w-5 h-5 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="text-blue-900 font-medium">File a Complaint</span>
+          </button>
+          <button class="w-full flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+            <svg class="w-5 h-5 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span class="text-green-900 font-medium">Request Documents</span>
+          </button>
+          <button class="w-full flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+            <svg class="w-5 h-5 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.828 7l2.586 2.586a2 2 0 002.828 0L12.828 7H4.828z"></path>
+            </svg>
+            <span class="text-purple-900 font-medium">View My Reports</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
+      <div class="space-y-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+          <div class="flex-1">
+            <p class="text-sm text-gray-900">Complaint #12345 has been received and is under review</p>
+            <p class="text-xs text-gray-500">1 hour ago</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+          <div class="flex-1">
+            <p class="text-sm text-gray-900">Your barangay clearance request has been approved</p>
+            <p class="text-xs text-gray-500">2 days ago</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+          <div class="flex-1">
+            <p class="text-sm text-gray-900">New announcement: Community meeting scheduled</p>
+            <p class="text-xs text-gray-500">3 days ago</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </app-dashboard-layout>

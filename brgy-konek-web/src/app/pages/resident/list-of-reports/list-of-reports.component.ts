@@ -12,7 +12,7 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class ListOfReportsComponent {
   reports: ReportItem[] = [];
-  statusFilter: '' | 'pending' | 'in_progress' | 'resolved' = '';
+  statusFilter: '' | 'pending' | 'in_progress' | 'resolved' | 'received' | 'seen' = '';
   showRequestDoc = false;
   docForm: FormGroup;
   isSubmitting = false;

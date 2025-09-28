@@ -56,6 +56,11 @@ export class DashboardLayoutComponent {
           icon: 'heroCog',
           route: 'resident/list-of-reports',
         },
+        {
+          label: 'Profile',
+          icon: 'heroUser',
+          route: 'profile',
+        },
       ];
     } else if (currentUser?.role === 'admin' || currentUser?.role === 'staff') {
       this.sidebarLinks = [
@@ -75,6 +80,11 @@ export class DashboardLayoutComponent {
           label: 'Manage Accounts',
           icon: 'heroUserCircle',
           route: 'admin/accounts',
+        },
+        {
+          label: 'Profile',
+          icon: 'heroUser',
+          route: 'admin/profile',
         },
       ];
     } else {
