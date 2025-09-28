@@ -6,12 +6,14 @@ export interface User {
   id: string;
   email: string;
   firstName: string;
+  middleName?: string;
   lastName: string;
   phone?: string;
   address?: string;
   barangay?: string;
   city?: string;
   province?: string;
+  sitio?: string;
   role?: string;
 }
 

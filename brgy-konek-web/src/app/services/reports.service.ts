@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import apiClient from '../utils/api.util';
 
-export type ReportStatus = 'pending' | 'in_progress' | 'resolved';
+export type ReportStatus = 'pending' | 'in_progress' | 'resolved' | 'received' | 'seen';
 
 export interface ReportItem {
   _id: string;

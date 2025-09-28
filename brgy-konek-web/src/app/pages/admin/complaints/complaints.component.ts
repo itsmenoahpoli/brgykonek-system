@@ -156,7 +156,7 @@ export class ComplaintsComponent implements OnInit {
     });
   }
 
-  getPriorityClass(priority: string): string {
+  getPriorityClass(priority?: string): string {
     switch (priority) {
       case 'low':
         return 'bg-green-100 text-green-800 border-green-300';
