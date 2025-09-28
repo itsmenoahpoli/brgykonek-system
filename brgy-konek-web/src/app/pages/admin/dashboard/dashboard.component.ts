@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChartConfiguration } from 'chart.js';
+import { BaseChartDirective } from 'ng2-charts';
 import { DashboardLayoutComponent } from '../../../components/shared/dashboard-layout/dashboard-layout.component';
-import { ChartModule } from '../../../components/shared/chart.module';
 import {
   DashboardService,
   OverviewStatistics,
@@ -25,7 +25,7 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./dashboard.component.scss'],
   imports: [
     CommonModule,
-    ChartModule,
+    BaseChartDirective,
     DashboardLayoutComponent,
     DatePipe,
   ],
