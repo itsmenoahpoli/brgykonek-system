@@ -13,6 +13,9 @@ export interface IUser extends Document {
   address_municipality?: string;
   address_province?: string;
   barangay_clearance?: string;
+  approved?: boolean;
+  approvedAt?: Date;
+  approvedBy?: string;
 }
 
 const userSchema = new Schema<IUser>(
@@ -84,6 +87,19 @@ const userSchema = new Schema<IUser>(
     barangay_clearance: {
       type: String,
       required: false,
+    },
+    approved: {
+      type: Boolean,
+      default: false,
+    },
+    approvedAt: {
+      type: Date,
+      default: null,
+    },
+    approvedBy: {
+      type: String,
+      ref: 'User',
+      default: null,
     },
   },
   {

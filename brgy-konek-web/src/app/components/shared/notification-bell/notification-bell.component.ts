@@ -1,22 +1,20 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NotificationService, Notification } from '../../../services/notification.service';
-import { DashboardLayoutComponent } from '../../../components/shared/dashboard-layout/dashboard-layout.component';
 import { Observable, Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-notifications',
+  selector: 'app-notification-bell',
   standalone: true,
-  imports: [CommonModule, FormsModule, DashboardLayoutComponent],
-  templateUrl: './notifications.component.html',
-  styleUrls: ['./notifications.component.scss']
+  imports: [CommonModule],
+  templateUrl: './notification-bell.component.html',
+  styleUrls: ['./notification-bell.component.scss']
 })
-export class NotificationsComponent implements OnInit, OnDestroy {
+export class NotificationBellComponent implements OnInit, OnDestroy {
   notifications$: Observable<Notification[]>;
   unreadCount$: Observable<number>;
-  selectedFilter: 'all' | 'unread' | 'announcement' | 'complaint' | 'document_request' = 'all';
+  showDropdown = false;
   private subscriptions: Subscription[] = [];
 
   constructor(
@@ -37,6 +35,10 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
+  toggleDropdown(): void {
+    this.showDropdown = !this.showDropdown;
+  }
+
   markAsRead(notification: Notification): void {
     if (!notification.isRead) {
       this.notificationService.markAsRead(notification.id);
@@ -49,6 +51,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   handleNotificationClick(notification: Notification): void {
     this.markAsRead(notification);
+    this.showDropdown = false;
     
     // Navigate based on notification type
     switch (notification.type) {
@@ -90,37 +93,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     }
   }
 
-  getFilteredNotifications(notifications: Notification[]): Notification[] {
-    if (this.selectedFilter === 'all') {
-      return notifications;
-    } else if (this.selectedFilter === 'unread') {
-      return notifications.filter(n => !n.isRead);
-    } else {
-      return notifications.filter(n => n.type === this.selectedFilter);
-    }
-  }
-
-  getNotificationTypeLabel(type: string): string {
-    switch (type) {
-      case 'announcement':
-        return 'Announcement';
-      case 'complaint':
-        return 'Complaint';
-      case 'document_request':
-        return 'Document Request';
-      default:
-        return 'Notification';
-    }
-  }
-
   trackByNotificationId(index: number, notification: Notification): string {
     return notification.id;
-  }
-
-  getDocumentRequestCount(): number {
-    // This would be calculated from the notifications observable
-    // For now, return 0 as a placeholder - in a real implementation,
-    // you would subscribe to notifications$ and filter by type
-    return 0;
   }
 }

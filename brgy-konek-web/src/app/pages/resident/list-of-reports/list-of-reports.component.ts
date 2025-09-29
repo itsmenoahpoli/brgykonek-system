@@ -16,6 +16,9 @@ export class ListOfReportsComponent {
   showRequestDoc = false;
   docForm: FormGroup;
   isSubmitting = false;
+  showAlert = false;
+  alertMessage = '';
+  alertType: 'success' | 'error' = 'success';
 
   constructor(private reportsService: ReportsService, private authService: AuthService, private fb: FormBuilder) {
     this.docForm = this.fb.group({
@@ -55,11 +58,35 @@ export class ListOfReportsComponent {
       document_type: this.docForm.get('document_type')?.value,
       notes: this.docForm.get('notes')?.value,
     } as any;
-    const res = await this.reportsService.requestDocument(payload);
-    this.isSubmitting = false;
-    if (res?.success) {
-      this.closeRequestDoc();
-      this.loadReports();
+    
+    try {
+      const res = await this.reportsService.requestDocument(payload);
+      this.isSubmitting = false;
+      
+      if (res?.success) {
+        this.showAlertMessage('Document request submitted successfully! You will be notified when staff processes your request.', 'success');
+        this.closeRequestDoc();
+        this.loadReports();
+      } else {
+        this.showAlertMessage('Failed to submit document request. Please try again.', 'error');
+      }
+    } catch (error) {
+      this.isSubmitting = false;
+      this.showAlertMessage('An error occurred while submitting your request. Please try again.', 'error');
     }
+  }
+
+  showAlertMessage(message: string, type: 'success' | 'error') {
+    this.alertMessage = message;
+    this.alertType = type;
+    this.showAlert = true;
+    
+    setTimeout(() => {
+      this.showAlert = false;
+    }, 5000);
+  }
+
+  closeAlert() {
+    this.showAlert = false;
   }
 }

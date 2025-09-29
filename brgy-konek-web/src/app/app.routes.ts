@@ -114,6 +114,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'resident/notifications',
+    loadComponent: () =>
+      import('./pages/resident/notifications/notifications.component').then(
+        (m) => m.NotificationsComponent
+      ),
+  },
+  {
     path: 'announcements',
     loadComponent: () =>
       import('./pages/announcements/announcements.component').then(

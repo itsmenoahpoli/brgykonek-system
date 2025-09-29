@@ -49,10 +49,7 @@
       style="left: auto"
     >
       <span class="font-semibold text-gray-700">Web Dashboard v1.0.0</span>
-      <button class="relative mr-4" (click)="goNotifications()">
-        <ng-icon name="heroBell" class="w-6 h-6 text-gray-600"></ng-icon>
-        <span *ngIf="unreadCount > 0" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ unreadCount }}</span>
-      </button>
+      <app-notification-bell class="mr-4"></app-notification-bell>
       <app-user-avatar-dropdown
         class="ml-auto"
         (logout)="logout()"

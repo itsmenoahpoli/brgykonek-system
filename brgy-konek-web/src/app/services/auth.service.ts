@@ -15,6 +15,7 @@ export interface User {
   province?: string;
   sitio?: string;
   role?: string;
+  approved?: boolean;
 }
 
 interface ApiUser {
@@ -182,26 +183,58 @@ export class AuthService {
   }
 
   updateProfile(
-    userData: Partial<User>
+    userData: {
+      name: string;
+      mobile_number: string;
+      address_sitio: string;
+      address_barangay: string;
+      address_municipality: string;
+      address_province: string;
+    }
   ): Observable<{ success: boolean; message: string; user?: User }> {
-    return new Observable((observer) => {
-      setTimeout(() => {
-        const currentUser = this.currentUserSubject.value;
-        if (currentUser) {
-          const updatedUser = { ...currentUser, ...userData };
-          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-          this.currentUserSubject.next(updatedUser);
-          observer.next({
-            success: true,
-            message: 'Profile updated successfully',
-            user: updatedUser,
-          });
-        } else {
-          observer.next({ success: false, message: 'No user logged in' });
-        }
-        observer.complete();
-      }, 1000);
-    });
+    return from(
+      apiClient
+        .put('/auth/update-profile', userData)
+        .then((response) => {
+          const data = response.data;
+          if (data && data.user) {
+            const user = data.user;
+            const nameParts = user.name?.split(' ') || ['', '', ''];
+            const updatedUser: User = {
+              id: user.id,
+              email: user.email,
+              firstName: nameParts[0] || '',
+              middleName: nameParts[1] || '',
+              lastName: nameParts.slice(2).join(' ') || '',
+              phone: user.mobile_number,
+              address: user.address,
+              barangay: user.address_barangay || '',
+              city: user.address_municipality || '',
+              province: user.address_province || '',
+              sitio: user.address_sitio || '',
+              role: user.user_type,
+            };
+            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+            this.currentUserSubject.next(updatedUser);
+            return {
+              success: true,
+              message: data.message || 'Profile updated successfully',
+              user: updatedUser,
+            };
+          } else {
+            return {
+              success: false,
+              message: data?.message || 'Failed to update profile',
+            };
+          }
+        })
+        .catch((error) => {
+          return {
+            success: false,
+            message: error.response?.data?.message || 'Network error occurred',
+          };
+        })
+    );
   }
 
   logout(): void {
@@ -292,6 +325,58 @@ export class AuthService {
             success: data.success,
             message: data.message || 'OTP verified successfully',
           };
+        })
+        .catch((error) => {
+          return {
+            success: false,
+            message: error.response?.data?.message || 'Network error occurred',
+          };
+        })
+    );
+  }
+
+  changePassword(
+    current_password: string,
+    new_password: string
+  ): Observable<{ success: boolean; message: string; user?: User }> {
+    return from(
+      apiClient
+        .put('/auth/change-password', {
+          current_password,
+          new_password,
+        })
+        .then((response) => {
+          const data = response.data;
+          if (data && data.user) {
+            const user = data.user;
+            const nameParts = user.name?.split(' ') || ['', '', ''];
+            const updatedUser: User = {
+              id: user.id,
+              email: user.email,
+              firstName: nameParts[0] || '',
+              middleName: nameParts[1] || '',
+              lastName: nameParts.slice(2).join(' ') || '',
+              phone: user.mobile_number,
+              address: user.address,
+              barangay: user.address_barangay || '',
+              city: user.address_municipality || '',
+              province: user.address_province || '',
+              sitio: user.address_sitio || '',
+              role: user.user_type,
+            };
+            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+            this.currentUserSubject.next(updatedUser);
+            return {
+              success: true,
+              message: data.message || 'Password changed successfully',
+              user: updatedUser,
+            };
+          } else {
+            return {
+              success: false,
+              message: data?.message || 'Failed to change password',
+            };
+          }
         })
         .catch((error) => {
           return {

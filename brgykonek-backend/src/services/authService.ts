@@ -3,6 +3,7 @@ import User, { IUser } from "../models/User";
 import { emailService } from "./emailService";
 import Otp from "../models/Otp";
 import argon2 from "argon2";
+import { deviceService, DeviceInfo } from "./deviceService";
 
 export interface RegisterData {
   name: string;
@@ -22,6 +23,8 @@ export interface RegisterData {
 export interface LoginData {
   email: string;
   password: string;
+  deviceInfo?: DeviceInfo;
+  rememberDevice?: boolean;
 }
 
 export interface UpdateProfileData {
@@ -80,6 +83,7 @@ export const authService = {
       address_municipality: data.address_municipality,
       address_province: data.address_province,
       barangay_clearance: data.barangay_clearance,
+      approved: data.user_type === "admin" || data.user_type === "staff", // Auto-approve staff and admin
     });
 
     await user.save();
@@ -138,6 +142,20 @@ export const authService = {
     if (!userId) {
       throw new Error("User ID not found");
     }
+
+    // Handle device tracking if device info is provided
+    if (data.deviceInfo) {
+      const deviceTrust = await deviceService.checkDeviceTrust(userId, data.deviceInfo);
+      
+      if (!deviceTrust.isTrusted && data.rememberDevice) {
+        // Create new trusted device
+        await deviceService.createDevice(userId, data.deviceInfo, true);
+      } else if (deviceTrust.isTrusted) {
+        // Update last used for trusted device
+        await deviceService.updateDeviceLastUsed(data.deviceInfo.deviceId);
+      }
+    }
+
     const token = jwt.sign({ userId }, jwtSecret, {
       expiresIn: (process.env.JWT_EXPIRES_IN as string) || "7d",
     } as SignOptions);
@@ -284,6 +302,37 @@ export const authService = {
     };
   },
 
+  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    const user = (await User.findById(userId).exec()) as IUser | null;
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const isCurrentPasswordValid = await argon2.verify(user.password, currentPassword);
+    if (!isCurrentPasswordValid) {
+      throw new Error("Current password is incorrect");
+    }
+
+    const hashedNewPassword = await argon2.hash(newPassword);
+    user.password = hashedNewPassword;
+    await user.save();
+
+    return {
+      id: user._id?.toString(),
+      name: user.name,
+      email: user.email,
+      mobile_number: user.mobile_number,
+      user_type: user.user_type,
+      address: user.address,
+      birthdate: user.birthdate,
+      address_sitio: user.address_sitio,
+      address_barangay: user.address_barangay,
+      address_municipality: user.address_municipality,
+      address_province: user.address_province,
+      barangay_clearance: user.barangay_clearance,
+    };
+  },
+
   async resetPassword(data: ResetPasswordData): Promise<void> {
     const user = await User.findOne({ email: data.email });
     if (!user) {
@@ -335,5 +384,50 @@ export const authService = {
 
   async deleteUserById(userId: string) {
     return User.findByIdAndDelete(userId);
+  },
+
+  // Device management methods
+  async getTrustedDevices(userId: string) {
+    return deviceService.getTrustedDevices(userId);
+  },
+
+  async revokeDevice(deviceId: string, userId: string) {
+    return deviceService.revokeDevice(deviceId, userId);
+  },
+
+  async revokeAllDevices(userId: string) {
+    return deviceService.revokeAllDevices(userId);
+  },
+
+  // User approval methods
+  async getPendingUsers() {
+    return User.find({ 
+      approved: false, 
+      user_type: "resident" 
+    }).select("-password");
+  },
+
+  async approveUser(userId: string, approvedBy: string) {
+    return User.findByIdAndUpdate(
+      userId,
+      { 
+        approved: true, 
+        approvedAt: new Date(), 
+        approvedBy 
+      },
+      { new: true }
+    ).select("-password");
+  },
+
+  async rejectUser(userId: string, approvedBy: string) {
+    return User.findByIdAndUpdate(
+      userId,
+      { 
+        approved: false, 
+        approvedAt: new Date(), 
+        approvedBy 
+      },
+      { new: true }
+    ).select("-password");
   },
 };

@@ -6,6 +6,7 @@ import {
   requestOTP,
   verifyOTP,
   updateProfile,
+  changePassword,
   resetPassword,
   listUsers,
   getUserById,
@@ -507,6 +508,70 @@ router.put(
   updateProfileValidation,
   validateRequest,
   updateProfile
+);
+
+/**
+ * @swagger
+ * /api/auth/change-password:
+ *   put:
+ *     summary: Change authenticated user's password
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - current_password
+ *               - new_password
+ *             properties:
+ *               current_password:
+ *                 type: string
+ *                 description: Current password
+ *               new_password:
+ *                 type: string
+ *                 description: New password
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Invalid current password or validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         description: Unauthorized
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+router.put(
+  "/change-password",
+  authenticateToken,
+  changePassword
 );
 
 /**

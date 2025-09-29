@@ -47,9 +47,14 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password } = req.body;
+    const { email, password, deviceInfo, rememberDevice } = req.body;
 
-    const result = await authService.login({ email, password });
+    const result = await authService.login({ 
+      email, 
+      password, 
+      deviceInfo, 
+      rememberDevice 
+    });
 
     res.status(200).json({
       message: "Login successful",
@@ -169,25 +174,73 @@ export const updateProfile = async (
       return;
     }
 
-    const { name, mobile_number, address, birthdate } = req.body;
+    const { 
+      name, 
+      mobile_number, 
+      address, 
+      birthdate,
+      address_sitio,
+      address_barangay,
+      address_municipality,
+      address_province
+    } = req.body;
 
     const result = await authService.updateProfile(req.user.id, {
       name,
       mobile_number,
       address,
       birthdate,
+      address_sitio,
+      address_barangay,
+      address_municipality,
+      address_province,
     });
 
     res.status(200).json({
+      success: true,
       message: "Profile updated successfully",
       user: result,
     });
   } catch (error) {
     const errorMessage = (error as Error).message;
     if (errorMessage === "User not found") {
-      res.status(404).json({ message: errorMessage });
+      res.status(404).json({ success: false, message: errorMessage });
     } else {
-      res.status(500).json({ message: "Server error", error: errorMessage });
+      res.status(500).json({ success: false, message: "Server error", error: errorMessage });
+    }
+  }
+};
+
+export const changePassword = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ success: false, message: "User not authenticated" });
+      return;
+    }
+
+    const { current_password, new_password } = req.body;
+
+    if (!current_password || !new_password) {
+      res.status(400).json({ success: false, message: "Current password and new password are required" });
+      return;
+    }
+
+    const result = await authService.changePassword(req.user.id, current_password, new_password);
+
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully",
+      user: result,
+    });
+  } catch (error) {
+    const errorMessage = (error as Error).message;
+    if (errorMessage === "User not found" || errorMessage === "Current password is incorrect") {
+      res.status(400).json({ success: false, message: errorMessage });
+    } else {
+      res.status(500).json({ success: false, message: "Server error", error: errorMessage });
     }
   }
 };
@@ -273,6 +326,141 @@ export const deleteUserById = async (
       return;
     }
     res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+// Device management endpoints
+export const getTrustedDevices = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ message: "User not authenticated" });
+      return;
+    }
+
+    const devices = await authService.getTrustedDevices(req.user.id);
+    res.status(200).json({
+      message: "Trusted devices retrieved successfully",
+      devices,
+    });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const revokeDevice = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ message: "User not authenticated" });
+      return;
+    }
+
+    const { deviceId } = req.params;
+    await authService.revokeDevice(deviceId, req.user.id);
+    res.status(200).json({
+      message: "Device revoked successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const revokeAllDevices = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ message: "User not authenticated" });
+      return;
+    }
+
+    await authService.revokeAllDevices(req.user.id);
+    res.status(200).json({
+      message: "All devices revoked successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+// User approval endpoints
+export const getPendingUsers = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ message: "User not authenticated" });
+      return;
+    }
+
+    const users = await authService.getPendingUsers();
+    res.status(200).json({
+      message: "Pending users retrieved successfully",
+      users,
+    });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const approveUser = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ message: "User not authenticated" });
+      return;
+    }
+
+    const { userId } = req.params;
+    const user = await authService.approveUser(userId, req.user.id);
+    
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    res.status(200).json({
+      message: "User approved successfully",
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const rejectUser = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ message: "User not authenticated" });
+      return;
+    }
+
+    const { userId } = req.params;
+    const user = await authService.rejectUser(userId, req.user.id);
+    
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    res.status(200).json({
+      message: "User rejected successfully",
+      user,
+    });
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }

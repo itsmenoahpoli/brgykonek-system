@@ -28,8 +28,33 @@ export class ReportsService {
 
   async getReportsByResident(residentId: string): Promise<ReportItem[] | undefined> {
     try {
-      const res = await apiClient.get(`${this.baseUrl}/resident/${residentId}`);
-      return res?.data || [];
+      const complaintsRes = await apiClient.get(`/complaints/resident/${residentId}`);
+      const documentsRes = await apiClient.get(`/documents/requests/resident/${residentId}`);
+      
+      const complaints = complaintsRes?.data?.map((complaint: any) => ({
+        _id: complaint._id,
+        type: 'complaint' as const,
+        title: complaint.complaint_content.substring(0, 50) + '...',
+        description: complaint.complaint_content,
+        status: complaint.status === 'published' ? 'pending' : 'received',
+        attachments: complaint.attachments,
+        created_at: complaint.created_at,
+        updated_at: complaint.updated_at
+      })) || [];
+      
+      const documents = documentsRes?.data?.map((doc: any) => ({
+        _id: doc._id,
+        type: 'document_request' as const,
+        title: doc.document_type,
+        description: doc.notes || 'Document request',
+        status: doc.status,
+        resolution_note: doc.staff_notes,
+        created_at: doc.created_at,
+        updated_at: doc.updated_at
+      })) || [];
+      
+      const allReports = [...complaints, ...documents];
+      return allReports.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     } catch (e) {
       return undefined;
     }
