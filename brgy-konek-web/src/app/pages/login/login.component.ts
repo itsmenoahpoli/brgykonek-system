@@ -64,8 +64,9 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
 
+      // Skip account lock check for residents - they don't use OTP
       if (this.authService.isAccountLocked(email)) {
-        this.showOtpModal = true;
+        this.errorMessage = 'Too many failed login attempts. Please try again later.';
         return;
       }
 
@@ -81,6 +82,16 @@ export class LoginComponent {
             const userType = response.user?.role || '';
             const trusted = this.authService.isDeviceTrusted(email);
             const remember = this.loginForm.get('rememberDevice')?.value;
+            
+            // Skip OTP for residents - direct login
+            if (userType === 'resident') {
+              if (remember) this.authService.trustDevice(email);
+              const route = this.getHomeRoute(userType);
+              this.router.navigate([route]);
+              return;
+            }
+            
+            // OTP flow for admin and staff only
             if (trusted || userType === 'admin') {
               if (remember) this.authService.trustDevice(email);
               const route = this.getHomeRoute(userType);
@@ -104,8 +115,9 @@ export class LoginComponent {
           this.authService.incrementLoginAttempts(email);
           const attempts = this.authService.getLoginAttempts(email);
 
+          // Skip OTP modal for residents even after failed attempts
           if (attempts.count >= 3) {
-            this.showOtpModal = true;
+            this.errorMessage = 'Too many failed login attempts. Please try again later.';
           } else {
             this.errorMessage = 'An error occurred during login';
           }
