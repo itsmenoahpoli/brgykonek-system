@@ -10,13 +10,12 @@ import { AuthService } from '../../../services/auth.service';
 import { NotificationsService, NotificationItem } from '../../../services/notifications.service';
 import { NgIcon } from '@ng-icons/core';
 import { UserAvatarDropdownComponent } from '../user-avatar-dropdown/user-avatar-dropdown.component';
-import { NotificationBellComponent } from '../notification-bell/notification-bell.component';
 import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard-layout',
   standalone: true,
-  imports: [CommonModule, NgIcon, UserAvatarDropdownComponent, NotificationBellComponent, RouterModule],
+  imports: [CommonModule, NgIcon, UserAvatarDropdownComponent, RouterModule],
   templateUrl: './dashboard-layout.component.html',
   styleUrls: ['./dashboard-layout.component.scss'],
 })
@@ -44,23 +43,18 @@ export class DashboardLayoutComponent {
         },
         {
           label: 'Complaints',
-          icon: 'heroCog',
+          icon: 'heroExclamationTriangle',
           route: 'resident/complaints',
         },
         {
           label: 'Announcements',
-          icon: 'heroUser',
+          icon: 'heroSpeakerWave',
           route: 'resident/announcements',
         },
         {
           label: 'List of Reports',
-          icon: 'heroCog',
+          icon: 'heroDocumentText',
           route: 'resident/list-of-reports',
-        },
-        {
-          label: 'Notifications',
-          icon: 'heroBell',
-          route: 'resident/notifications',
         },
         {
           label: 'Profile',
@@ -73,18 +67,18 @@ export class DashboardLayoutComponent {
         { label: 'Dashboard', icon: 'heroHome', route: 'admin/home' },
         {
           label: 'Pending Approval',
-          icon: 'heroUser',
+          icon: 'heroClock',
           route: 'admin/pending-approval',
         },
-        { label: 'Complaints', icon: 'heroCog', route: 'admin/complaints' },
+        { label: 'Complaints', icon: 'heroExclamationTriangle', route: 'admin/complaints' },
         {
           label: 'Announcements',
-          icon: 'heroEye',
+          icon: 'heroSpeakerWave',
           route: 'admin/announcements',
         },
         {
           label: 'Manage Accounts',
-          icon: 'heroUserCircle',
+          icon: 'heroUsers',
           route: 'admin/accounts',
         },
         {

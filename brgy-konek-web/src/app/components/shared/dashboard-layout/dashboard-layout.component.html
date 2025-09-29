@@ -49,11 +49,11 @@
       style="left: auto"
     >
       <span class="font-semibold text-gray-700">Web Dashboard v1.0.0</span>
-      <app-notification-bell class="mr-4"></app-notification-bell>
-      <app-user-avatar-dropdown
-        class="ml-auto"
-        (logout)="logout()"
-      ></app-user-avatar-dropdown>
+      <div class="flex items-center space-x-4">
+        <app-user-avatar-dropdown
+          (logout)="logout()"
+        ></app-user-avatar-dropdown>
+      </div>
     </nav>
     <main
       class="flex-1 p-6 bg-gradient-to-br from-blue-50 to-indigo-100 overflow-y-auto mt-16"
