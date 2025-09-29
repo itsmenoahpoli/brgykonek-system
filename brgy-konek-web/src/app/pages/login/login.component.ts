@@ -54,7 +54,9 @@ export class LoginComponent {
 
   ngOnInit(): void {
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/home']);
+      const user = this.authService.getCurrentUser();
+      const route = this.getHomeRoute(user?.role);
+      this.router.navigate([route]);
     }
   }
 
@@ -81,7 +83,8 @@ export class LoginComponent {
             const remember = this.loginForm.get('rememberDevice')?.value;
             if (trusted || userType === 'admin') {
               if (remember) this.authService.trustDevice(email);
-              this.router.navigate(['/home']);
+              const route = this.getHomeRoute(userType);
+              this.router.navigate([route]);
               return;
             }
             this.requestOTPAndRedirect(email, userType, remember);
@@ -133,7 +136,9 @@ export class LoginComponent {
           this.authService.resetLoginAttempts(data.email);
           this.showOtpModal = false;
           this.otpModal.resetForm();
-          this.router.navigate(['/home']);
+          const user = this.authService.getCurrentUser();
+          const route = this.getHomeRoute(user?.role);
+          this.router.navigate([route]);
         } else {
           this.otpModal.setError(
             response.message || 'Invalid OTP. Please try again.'
@@ -181,7 +186,9 @@ export class LoginComponent {
 
   onSuccessModalClosed(): void {
     this.showSuccessModal = false;
-    this.router.navigate(['/home']);
+    const user = this.authService.getCurrentUser();
+    const route = this.getHomeRoute(user?.role);
+    this.router.navigate([route]);
   }
 
   onOtpSuccessModalClosed(): void {
@@ -207,5 +214,16 @@ export class LoginComponent {
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
+  }
+
+  private getHomeRoute(role?: string): string {
+    switch (role) {
+      case 'admin':
+        return '/admin/home';
+      case 'resident':
+        return '/resident/home';
+      default:
+        return '/resident/home';
+    }
   }
 }
