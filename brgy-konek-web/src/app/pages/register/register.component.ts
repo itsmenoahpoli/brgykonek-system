@@ -64,6 +64,7 @@ export class RegisterComponent {
         first_name: ['', [Validators.required, Validators.minLength(2)]],
         middle_name: [''],
         last_name: ['', [Validators.required, Validators.minLength(2)]],
+        birthdate: ['', [Validators.required]],
         email: [
           '',
           [Validators.required, Validators.email, this.gmailOnlyValidator],
@@ -213,6 +214,7 @@ export class RegisterComponent {
         `${formValue.first_name} ${formValue.middle_name} ${formValue.last_name}`
       );
       formData.append('last_name', formValue.last_name);
+      formData.append('birthdate', formValue.birthdate);
       formData.append('email', formValue.email);
       formData.append('password', formValue.password);
       formData.append('mobile_number', formValue.mobile_number);
@@ -305,16 +307,4 @@ export class RegisterComponent {
     this.registerForm.get('barangay_clearance')?.markAsTouched();
   }
 
-  testModal(): void {
-    console.log('Testing modal, showSuccessDialog:', this.showSuccessDialog);
-    this.showSuccessDialog = true;
-    console.log(
-      'Modal should be visible now, showSuccessDialog:',
-      this.showSuccessDialog
-    );
-    setTimeout(() => {
-      this.showSuccessDialog = false;
-      console.log('Modal hidden');
-    }, 2000);
-  }
 }
