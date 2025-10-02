@@ -249,7 +249,6 @@ export const authService = {
     otp.verified = true;
     await otp.save();
 
-    const user = await User.findOne({ email });
     if (user && deviceInfo && rememberDevice) {
       await deviceService.createDevice(user._id!.toString(), deviceInfo, true);
     }

@@ -15,8 +15,8 @@
           <option value="all">All Notifications</option>
           <option value="unread">Unread Only</option>
           <option value="announcement">Announcements</option>
-          <option value="complaint">Complaints</option>
-          <option value="document_request">Document Requests</option>
+          <option value="complaint_update">Complaints</option>
+          <option value="document_request_update">Document Requests</option>
         </select>
       </div>
       
@@ -46,9 +46,9 @@
             *ngFor="let notification of getFilteredNotifications(notifications); trackBy: trackByNotificationId"
             (click)="handleNotificationClick(notification)"
             class="p-6 hover:bg-gray-50 cursor-pointer transition-colors duration-200"
-            [class.bg-blue-50]="!notification.isRead"
-            [class.border-l-4]="!notification.isRead"
-            [class.border-indigo-500]="!notification.isRead"
+            [class.bg-blue-50]="!notification.read"
+            [class.border-l-4]="!notification.read"
+            [class.border-indigo-500]="!notification.read"
           >
             <div class="flex items-start space-x-4">
               <div class="flex-shrink-0">
@@ -86,9 +86,9 @@
                   
                   <div class="flex items-center space-x-2">
                     <span class="text-xs text-gray-500">
-                      {{ notification.createdAt | date:'short' }}
+                      {{ notification.created_at | date:'short' }}
                     </span>
-                    <div *ngIf="!notification.isRead" class="w-2 h-2 bg-indigo-600 rounded-full"></div>
+                    <div *ngIf="!notification.read" class="w-2 h-2 bg-indigo-600 rounded-full"></div>
                   </div>
                 </div>
                 
@@ -96,9 +96,9 @@
                   {{ notification.message }}
                 </p>
                 
-                <div *ngIf="notification.data" class="mt-2 text-xs text-gray-500">
-                  <span *ngIf="notification.data.complaintId">Complaint #{{ notification.data.complaintId }}</span>
-                  <span *ngIf="notification.data.documentType">Document: {{ notification.data.documentType }}</span>
+                <div *ngIf="notification.payload" class="mt-2 text-xs text-gray-500">
+                  <span *ngIf="notification.payload['complaintId']">Complaint #{{ notification.payload['complaintId'] }}</span>
+                  <span *ngIf="notification.payload['documentType']">Document: {{ notification.payload['documentType'] }}</span>
                 </div>
               </div>
             </div>

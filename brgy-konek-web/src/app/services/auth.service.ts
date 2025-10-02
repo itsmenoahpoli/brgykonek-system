@@ -200,32 +200,7 @@ export class AuthService {
     );
   }
 
-  sendOTP(email: string, type: 'registration' | 'password_reset' = 'password_reset') {
-    return from(
-      apiClient
-        .post('/auth/request-otp', { email, type })
-        .then(() => ({ success: true, message: 'OTP sent' }))
-        .catch((error) => ({ success: false, message: error.response?.data?.message || 'Failed to send OTP' }))
-    );
-  }
-
-  verifyOTP(email: string, otp: string, rememberDevice = false) {
-    return from(
-      apiClient
-        .post('/auth/verify-otp', { email, otp_code: otp, deviceInfo: this.getDeviceInfo(), rememberDevice, type: 'registration' })
-        .then(() => ({ success: true, message: 'OTP verified' }))
-        .catch((error) => ({ success: false, message: error.response?.data?.message || 'Failed to verify OTP' }))
-    );
-  }
-
-  resetPassword(email: string, otp: string, newPassword: string) {
-    return from(
-      apiClient
-        .post('/auth/reset-password', { email, otp_code: otp, new_password: newPassword })
-        .then(() => ({ success: true, message: 'Password reset successfully' }))
-        .catch((error) => ({ success: false, message: error.response?.data?.message || 'Failed to reset password' }))
-    );
-  }
+  
 
   updateProfile(
     userData: {
