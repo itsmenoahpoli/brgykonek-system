@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { NotificationService, Notification } from '../../../services/notification.service';
+import { NotificationService, NotificationItem } from '../../../services/notification.service';
 import { DashboardLayoutComponent } from '../../../components/shared/dashboard-layout/dashboard-layout.component';
 import { Observable, Subscription } from 'rxjs';
 
@@ -14,22 +14,22 @@ import { Observable, Subscription } from 'rxjs';
   styleUrls: ['./notifications.component.scss']
 })
 export class NotificationsComponent implements OnInit, OnDestroy {
-  notifications$: Observable<Notification[]>;
+  notifications$: Observable<NotificationItem[]>;
   unreadCount$: Observable<number>;
-  selectedFilter: 'all' | 'unread' | 'announcement' | 'complaint' | 'document_request' = 'all';
+  selectedFilter: 'all' | 'unread' | 'announcement' | 'complaint_update' | 'document_request_update' = 'all';
   private subscriptions: Subscription[] = [];
 
   constructor(
     private notificationService: NotificationService,
     private router: Router
   ) {
-    this.notifications$ = this.notificationService.getNotifications();
-    this.unreadCount$ = this.notificationService.getUnreadCount();
+    this.notifications$ = this.notificationService.notifications$;
+    this.unreadCount$ = this.notificationService.unreadCount$;
   }
 
   ngOnInit(): void {
-    // Subscribe to notifications to handle real-time updates
     const notificationSub = this.notifications$.subscribe();
+    this.notificationService.refresh();
     this.subscriptions.push(notificationSub);
   }
 
@@ -37,9 +37,9 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  markAsRead(notification: Notification): void {
-    if (!notification.isRead) {
-      this.notificationService.markAsRead(notification.id);
+  markAsRead(notification: NotificationItem): void {
+    if (!notification.read) {
+      this.notificationService.markAsRead(notification._id);
     }
   }
 
@@ -47,7 +47,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     this.notificationService.markAllAsRead();
   }
 
-  handleNotificationClick(notification: Notification): void {
+  handleNotificationClick(notification: NotificationItem): void {
     this.markAsRead(notification);
     
     // Navigate based on notification type
@@ -55,10 +55,10 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       case 'announcement':
         this.router.navigate(['/announcements']);
         break;
-      case 'complaint':
+      case 'complaint_update':
         this.router.navigate(['/resident/complaints']);
         break;
-      case 'document_request':
+      case 'document_request_update':
         this.router.navigate(['/resident/list-of-reports']);
         break;
     }
@@ -81,20 +81,20 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     switch (type) {
       case 'announcement':
         return 'text-blue-600';
-      case 'complaint':
+      case 'complaint_update':
         return 'text-red-600';
-      case 'document_request':
+      case 'document_request_update':
         return 'text-green-600';
       default:
         return 'text-gray-600';
     }
   }
 
-  getFilteredNotifications(notifications: Notification[]): Notification[] {
+  getFilteredNotifications(notifications: NotificationItem[]): NotificationItem[] {
     if (this.selectedFilter === 'all') {
       return notifications;
     } else if (this.selectedFilter === 'unread') {
-      return notifications.filter(n => !n.isRead);
+      return notifications.filter(n => !n.read);
     } else {
       return notifications.filter(n => n.type === this.selectedFilter);
     }
@@ -104,17 +104,17 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     switch (type) {
       case 'announcement':
         return 'Announcement';
-      case 'complaint':
+      case 'complaint_update':
         return 'Complaint';
-      case 'document_request':
+      case 'document_request_update':
         return 'Document Request';
       default:
         return 'Notification';
     }
   }
 
-  trackByNotificationId(index: number, notification: Notification): string {
-    return notification.id;
+  trackByNotificationId(index: number, notification: NotificationItem): string {
+    return notification._id;
   }
 
   getDocumentRequestCount(): number {
