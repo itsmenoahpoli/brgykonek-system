@@ -71,6 +71,12 @@ export class AnnouncementsComponent {
       return matchesTitle && matchesStatus;
     });
   }
+  get pendingAnnouncements() {
+    return this.announcements.filter((a) => a.status === 'draft');
+  }
+  get publishedAnnouncements() {
+    return this.announcements.filter((a) => a.status === 'published');
+  }
   async loadAnnouncements() {
     const data = await this.announcementsService.getAnnouncements();
     this.announcements = data || [];
@@ -113,6 +119,16 @@ export class AnnouncementsComponent {
       this.statusModalTitle = 'Announcement Created';
       this.statusModalMessage = 'The announcement was created successfully.';
       this.statusModalVisible = true;
+    }
+  }
+  async approveAnnouncement(announcement: Announcement) {
+    const updated = await this.announcementsService.updateAnnouncement(announcement._id, {
+      ...announcement,
+      status: 'published',
+      publish_at: new Date().toISOString(),
+    });
+    if (updated) {
+      await this.loadAnnouncements();
     }
   }
   edit(announcement: Announcement) {

@@ -36,9 +36,9 @@ export class ComplaintsComponent implements OnInit {
     'date_of_report',
     'complaint_content',
     'attachments',
+    'priority',
     'status',
-    'created_at',
-    'updated_at',
+    'actions',
   ];
   constructor(private complaintsService: ComplaintsService) {}
   async ngOnInit(): Promise<void> {
@@ -107,18 +107,18 @@ export class ComplaintsComponent implements OnInit {
   }
 
   async createComplaint() {
-    const attachments = await this.mockUploadFiles(this.createForm.attachments);
-    const payload: any = {
-      resident_id: this.createForm.resident_id,
-      category: this.createForm.category,
-      date_of_report: new Date(this.createForm.date_of_report).toISOString(),
-      location_of_incident: this.createForm.location_of_incident,
-      complaint_content: this.createForm.complaint_content,
-      attachments,
-      status: this.createForm.status,
-      priority: this.createForm.priority,
-    };
-    await this.complaintsService.createComplaint(payload);
+    const formData = new FormData();
+    formData.append('resident_id', this.createForm.resident_id);
+    formData.append('category', this.createForm.category);
+    formData.append('date_of_report', new Date(this.createForm.date_of_report).toISOString());
+    formData.append('location_of_incident', this.createForm.location_of_incident);
+    formData.append('complaint_content', this.createForm.complaint_content);
+    formData.append('status', this.createForm.status);
+    formData.append('priority', this.createForm.priority);
+    for (const f of this.createForm.attachments) {
+      formData.append('attachments', f);
+    }
+    await this.complaintsService.createComplaint(formData);
     this.closeCreateModal();
     await this.ngOnInit();
   }
@@ -138,23 +138,8 @@ export class ComplaintsComponent implements OnInit {
     await this.ngOnInit();
   }
 
-  async mockUploadFiles(files: File[]): Promise<string[]> {
-    const results: string[] = [];
-    for (const file of files) {
-      const base64 = await this.fileToBase64(file);
-      results.push(base64 as string);
-    }
-    return results;
-  }
-
-  fileToBase64(file: File): Promise<string | ArrayBuffer | null> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
+  async mockUploadFiles(files: File[]): Promise<string[]> { return []; }
+  fileToBase64(file: File): Promise<string | ArrayBuffer | null> { return Promise.resolve(null); }
 
   getPriorityClass(priority?: string): string {
     switch (priority) {

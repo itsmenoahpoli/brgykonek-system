@@ -9,6 +9,7 @@ import { connectDB } from "./config/database";
 import authRoutes from "./routes/auth";
 import complaintRoutes from "./routes/complaint";
 import announcementRoutes from "./routes/announcement";
+import notificationRoutes from "./routes/notification";
 import administratorRoutes from "./routes/administrator";
 import documentRequestRoutes from "./routes/documentRequest";
 import { swaggerOptions } from "./config/swagger";
@@ -46,6 +47,7 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(specs, swaggerUiOptions));
 app.use("/api/auth", authRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/announcements", announcementRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/administrator", administratorRoutes);
 app.use("/api/documents", documentRequestRoutes);
 

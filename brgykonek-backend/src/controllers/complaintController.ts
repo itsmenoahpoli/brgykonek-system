@@ -75,3 +75,24 @@ export const getComplaintsByResidentId = async (
     res.status(500).json({ error: error.message });
   }
 };
+
+export const createAdminComplaint = async (req: Request, res: Response) => {
+  try {
+    const user: any = (req as any).user;
+    let data: any = { ...req.body };
+    if (!data.title) {
+      const baseTitle = data.category || "Complaint";
+      data.title = `${baseTitle}`;
+    }
+    data.created_by_admin = true;
+    data.admin_id = user?._id;
+    if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+      data.attachments = (req.files as any[]).map((file: any) => file.path);
+    }
+    const complaint = await complaintService.createAdminComplaint(data);
+    res.status(201).json(complaint);
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error("Unknown error");
+    res.status(400).json({ error: error.message });
+  }
+};

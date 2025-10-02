@@ -52,6 +52,16 @@ const ComplaintSchema = new mongoose.Schema(
       required: false,
       trim: true,
     },
+  created_by_admin: {
+    type: Boolean,
+    default: false,
+    required: false,
+  },
+  admin_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: false,
+  },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },

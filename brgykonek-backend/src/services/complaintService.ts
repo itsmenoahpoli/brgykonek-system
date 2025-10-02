@@ -16,6 +16,11 @@ export const createComplaint = async (data: Record<string, any>) => {
   return c;
 };
 
+export const createAdminComplaint = async (data: Record<string, any>) => {
+  const c = await Complaint.create({ ...data, created_by_admin: true });
+  return c;
+};
+
 export const getComplaints = async (filter: FilterQuery<Document> = {}) => {
   return await Complaint.find({ ...filter })
     .sort({ created_at: -1 })

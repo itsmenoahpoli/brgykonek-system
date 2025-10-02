@@ -64,6 +64,7 @@ import { Router } from "express";
 import * as complaintController from "../controllers/complaintController";
 import multer, { FileFilterCallback } from "multer";
 import { Request } from "express";
+import { authenticateToken, isAdmin } from "../middleware/auth";
 
 const router = Router();
 
@@ -149,6 +150,14 @@ router.post(
   "/",
   upload.array("attachments", 10),
   complaintController.createComplaint
+);
+
+router.post(
+  "/admin",
+  authenticateToken,
+  isAdmin,
+  upload.array("attachments", 10),
+  complaintController.createAdminComplaint
 );
 
 /**
