@@ -34,10 +34,11 @@ export class ReportsService {
       const complaints = complaintsRes?.data?.map((complaint: any) => ({
         _id: complaint._id,
         type: 'complaint' as const,
-        title: complaint.complaint_content.substring(0, 50) + '...',
+        title: complaint.title || (complaint.complaint_content?.substring(0, 50) + '...'),
         description: complaint.complaint_content,
-        status: complaint.status === 'published' ? 'pending' : 'received',
+        status: complaint.status,
         attachments: complaint.attachments,
+        resolution_note: complaint.resolution_note,
         created_at: complaint.created_at,
         updated_at: complaint.updated_at
       })) || [];
@@ -47,7 +48,7 @@ export class ReportsService {
         type: 'document_request' as const,
         title: doc.document_type,
         description: doc.notes || 'Document request',
-        status: doc.status,
+        status: doc.status === 'seen_by_staff' ? 'seen' : doc.status,
         resolution_note: doc.staff_notes,
         created_at: doc.created_at,
         updated_at: doc.updated_at

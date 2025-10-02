@@ -15,6 +15,7 @@ export interface Resident {
 export interface Complaint {
   _id: string;
   resident_id: Resident;
+  title?: string;
   category: string;
   date_of_report: string;
   location_of_incident?: string;
@@ -55,19 +56,11 @@ export class ComplaintsService {
     }
   }
 
-  async createComplaint(payload: {
-    resident_id: string;
-    category: string;
-    date_of_report: string;
-    location_of_incident?: string;
-    complaint_content: string;
-    attachments: string[];
-    status: string;
-    priority?: 'low' | 'medium' | 'high';
-    resolution_note?: string;
-  }): Promise<Complaint | undefined> {
+  async createComplaint(formData: FormData): Promise<Complaint | undefined> {
     try {
-      const res = await apiClient.post<Complaint>(this.baseUrl, payload);
+      const res = await apiClient.post<Complaint>(this.baseUrl, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       return res.data;
     } catch (error) {
       return undefined;

@@ -28,7 +28,7 @@ import { StatusModalComponent } from '../../../components/shared/status-modal/st
 })
 export class ComplaintsComponent {
   complaints: Complaint[] = [];
-  statusList = ['Pending', 'In Progress', 'Resolved', 'Rejected'];
+  statusList = ['pending', 'in_progress', 'resolved', 'rejected'];
   categoryList = ['Noise', 'Garbage', 'Vandalism', 'Other'];
   selectedStatus = '';
   selectedCategory = '';
@@ -40,7 +40,8 @@ export class ComplaintsComponent {
   complaintDate = '';
   complaintLocation = '';
   complaintContent = '';
-  complaintStatus = 'Published';
+  complaintStatus = 'pending';
+  complaintPriority: 'low' | 'medium' | 'high' = 'low';
   showDeleteModal = false;
   complaintToDelete: Complaint | null = null;
   showSuccessModal = false;
@@ -147,36 +148,22 @@ export class ComplaintsComponent {
   async submitComplaint() {
     const user = this.authService.getCurrentUser();
     if (!user) return;
-    const attachments = await this.mockUploadFiles(this.uploadedFiles);
-    const payload = {
-      resident_id: user.id,
-      category: this.complaintCategory,
-      date_of_report: new Date(this.complaintDate).toISOString(),
-      location_of_incident: this.complaintLocation,
-      complaint_content: this.complaintContent,
-      attachments,
-      status: this.complaintStatus.toLowerCase(),
-    };
-    await this.complaintsService.createComplaint(payload);
+    const formData = new FormData();
+    formData.append('resident_id', user.id);
+    formData.append('title', this.complaintTitle);
+    formData.append('category', this.complaintCategory);
+    formData.append('date_of_report', new Date(this.complaintDate).toISOString());
+    formData.append('location_of_incident', this.complaintLocation);
+    formData.append('complaint_content', this.complaintContent);
+    formData.append('status', this.complaintStatus);
+    formData.append('priority', this.complaintPriority);
+    for (const f of this.uploadedFiles) {
+      formData.append('attachments', f);
+    }
+    await this.complaintsService.createComplaint(formData);
     this.closeCreateModal();
     this.loadComplaints();
   }
 
-  async mockUploadFiles(files: File[]): Promise<string[]> {
-    const results: string[] = [];
-    for (const file of files) {
-      const base64 = await this.fileToBase64(file);
-      results.push(base64 as string);
-    }
-    return results;
-  }
-
-  fileToBase64(file: File): Promise<string | ArrayBuffer | null> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
+  // Removed base64 mock uploader in favor of multipart form upload
 }

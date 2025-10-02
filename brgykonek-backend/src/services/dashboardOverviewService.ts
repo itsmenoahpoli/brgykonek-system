@@ -81,6 +81,18 @@ export const getOverviewStatistics = async (
     count: item.count,
   }));
 
+  const complaintsBySitio = await Complaint.aggregate([
+    { $group: { _id: "$address_sitio", count: { $sum: 1 } } },
+    { $project: { sitio: "$_id", count: 1, _id: 0 } },
+    { $sort: { count: -1 } },
+  ]);
+
+  const complaintsByCategory = await Complaint.aggregate([
+    { $group: { _id: "$category", count: { $sum: 1 } } },
+    { $project: { category: "$_id", count: 1, _id: 0 } },
+    { $sort: { count: -1 } },
+  ]);
+
   return {
     totalComplaints,
     totalActiveAnnouncements,
@@ -88,5 +100,7 @@ export const getOverviewStatistics = async (
     complaintsPerMonth,
     announcementsPerMonth,
     usersPerMonth,
+    complaintsBySitio,
+    complaintsByCategory,
   };
 };

@@ -169,6 +169,13 @@ router.get(
   documentRequestController.getDocumentRequestsByResidentId
 );
 
+// Update status endpoints (received / seen_by_staff / in_progress / completed / rejected)
+router.put(
+  "/requests/:id/status",
+  authenticateToken,
+  documentRequestController.updateDocumentRequestStatus
+);
+
 /**
  * @swagger
  * /api/documents/requests/{id}:

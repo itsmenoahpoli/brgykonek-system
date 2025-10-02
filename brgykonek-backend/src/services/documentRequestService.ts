@@ -1,4 +1,5 @@
 import DocumentRequest from "../models/DocumentRequest";
+import Notification from "../models/Notification";
 import { logger } from "../utils/logger";
 
 export const createDocumentRequest = async (data: {
@@ -10,6 +11,15 @@ export const createDocumentRequest = async (data: {
     const documentRequest = new DocumentRequest(data);
     await documentRequest.save();
     logger.info("Document request created successfully", { documentRequestId: documentRequest._id });
+    try {
+      await Notification.create({
+        recipient_id: data.resident_id,
+        type: "document_request_update",
+        title: "Document request received",
+        message: `Your request for ${data.document_type} was received`,
+        payload: { documentRequestId: documentRequest._id, status: documentRequest.status },
+      });
+    } catch {}
     return documentRequest;
   } catch (error) {
     logger.error("Error creating document request", { error });
@@ -62,6 +72,15 @@ export const updateDocumentRequestStatus = async (id: string, data: {
     }
     
     logger.info("Document request status updated successfully", { documentRequestId: id, status: data.status });
+    try {
+      await Notification.create({
+        recipient_id: String(documentRequest.resident_id?._id || documentRequest.resident_id),
+        type: "document_request_update",
+        title: `Document request ${data.status.replace('_', ' ')}`,
+        message: `Your document request has been marked as ${data.status.replace('_', ' ')}`,
+        payload: { documentRequestId: documentRequest._id, status: documentRequest.status },
+      });
+    } catch {}
     return documentRequest;
   } catch (error) {
     logger.error("Error updating document request status", { error });
