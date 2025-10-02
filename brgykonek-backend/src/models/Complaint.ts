@@ -7,6 +7,12 @@ const ComplaintSchema = new mongoose.Schema(
       required: true,
       ref: "User",
     },
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 200,
+    },
     category: {
       type: String,
       required: true,
@@ -14,6 +20,12 @@ const ComplaintSchema = new mongoose.Schema(
     date_of_report: {
       type: Date,
       required: true,
+    },
+    location_of_incident: {
+      type: String,
+      required: false,
+      trim: true,
+      maxlength: 300,
     },
     complaint_content: {
       type: String,
@@ -25,9 +37,20 @@ const ComplaintSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["published", "draft"],
-      default: "draft",
+      enum: ["pending", "in_progress", "resolved", "rejected"],
+      default: "pending",
       required: true,
+    },
+    priority: {
+      type: String,
+      enum: ["low", "medium", "high"],
+      default: "low",
+      required: true,
+    },
+    resolution_note: {
+      type: String,
+      required: false,
+      trim: true,
     },
   },
   {

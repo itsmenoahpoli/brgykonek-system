@@ -73,33 +73,21 @@ export class LoginComponent {
       this.isLoading = true;
       this.errorMessage = '';
 
-      this.authService.login(email, password).subscribe({
+      const remember = this.loginForm.get('rememberDevice')?.value;
+      this.authService.login(email, password, remember).subscribe({
         next: (response) => {
           console.log(response);
           this.isLoading = false;
           if (response.success) {
             this.authService.resetLoginAttempts(email);
             const userType = response.user?.role || '';
-            const trusted = this.authService.isDeviceTrusted(email);
-            const remember = this.loginForm.get('rememberDevice')?.value;
-            
-            // Skip OTP for residents - direct login
-            if (userType === 'resident') {
-              if (remember) this.authService.trustDevice(email);
-              const route = this.getHomeRoute(userType);
-              this.router.navigate([route]);
-              return;
-            }
-            
-            // OTP flow for admin and staff only
-            if (trusted || userType === 'admin') {
-              if (remember) this.authService.trustDevice(email);
-              const route = this.getHomeRoute(userType);
-              this.router.navigate([route]);
-              return;
-            }
-            this.requestOTPAndRedirect(email, userType, remember);
+            const route = this.getHomeRoute(userType);
+            this.router.navigate([route]);
           } else {
+            if (response.requiresOTP) {
+              this.requestOTPAndRedirect(email, response.user?.role || '', remember);
+              return;
+            }
             this.authService.incrementLoginAttempts(email);
             const attempts = this.authService.getLoginAttempts(email);
 

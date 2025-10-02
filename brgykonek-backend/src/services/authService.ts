@@ -41,12 +41,14 @@ export interface UpdateProfileData {
 
 export interface ResetPasswordData {
   email: string;
+  otp_code: string;
   new_password: string;
 }
 
 export interface AuthResult {
-  token: string;
-  user: {
+  token?: string;
+  requiresOTP?: boolean;
+  user?: {
     id: string;
     name: string;
     email: string;
@@ -87,6 +89,8 @@ export const authService = {
     });
 
     await user.save();
+
+    await this.requestOTP(user.email, "registration");
 
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
@@ -143,17 +147,13 @@ export const authService = {
       throw new Error("User ID not found");
     }
 
-    // Handle device tracking if device info is provided
     if (data.deviceInfo) {
       const deviceTrust = await deviceService.checkDeviceTrust(userId, data.deviceInfo);
-      
-      if (!deviceTrust.isTrusted && data.rememberDevice) {
-        // Create new trusted device
-        await deviceService.createDevice(userId, data.deviceInfo, true);
-      } else if (deviceTrust.isTrusted) {
-        // Update last used for trusted device
-        await deviceService.updateDeviceLastUsed(data.deviceInfo.deviceId);
+      if (!deviceTrust.isTrusted) {
+        await this.requestOTP(user.email);
+        return { requiresOTP: true };
       }
+      await deviceService.updateDeviceLastUsed(data.deviceInfo.deviceId);
     }
 
     const token = jwt.sign({ userId }, jwtSecret, {
@@ -200,7 +200,7 @@ export const authService = {
     };
   },
 
-  async requestOTP(email: string): Promise<void> {
+  async requestOTP(email: string, type: "registration" | "password_reset" = "registration"): Promise<void> {
     const user = await User.findOne({ email });
     if (!user) {
       throw new Error("User not found");
@@ -210,20 +210,20 @@ export const authService = {
     const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     // Remove any previous OTPs for this email
-    await Otp.deleteMany({ email });
+    await Otp.deleteMany({ email, type });
 
     await Otp.create({
       email,
       code: otpCode,
       expires_at: otpExpiresAt,
       verified: false,
-      type: "email_verification",
+      type,
     });
 
     await emailService.sendOTP(email, otpCode);
   },
 
-  async verifyOTP(email: string, otpCode: string): Promise<void> {
+  async verifyOTP(email: string, otpCode: string, deviceInfo?: DeviceInfo, rememberDevice?: boolean, type: "registration" | "password_reset" = "registration"): Promise<void> {
     const user = await User.findOne({ email });
     if (!user) {
       throw new Error("User not found");
@@ -232,7 +232,7 @@ export const authService = {
     const otp = await Otp.findOne({
       email,
       code: otpCode,
-      type: "email_verification",
+      type,
     });
     if (!otp) {
       throw new Error("Invalid OTP code");
@@ -248,6 +248,11 @@ export const authService = {
 
     otp.verified = true;
     await otp.save();
+
+    const user = await User.findOne({ email });
+    if (user && deviceInfo && rememberDevice) {
+      await deviceService.createDevice(user._id!.toString(), deviceInfo, true);
+    }
   },
 
   async updateProfile(userId: string, data: UpdateProfileData) {
@@ -338,6 +343,23 @@ export const authService = {
     if (!user) {
       throw new Error("User not found");
     }
+
+    const otp = await Otp.findOne({
+      email: data.email,
+      code: data.otp_code,
+      type: "password_reset",
+    });
+    if (!otp) {
+      throw new Error("Invalid OTP code");
+    }
+    if (new Date() > otp.expires_at) {
+      throw new Error("OTP code has expired");
+    }
+    if (otp.verified) {
+      throw new Error("OTP already used");
+    }
+    otp.verified = true;
+    await otp.save();
 
     user.password = await argon2.hash(data.new_password);
     await user.save();

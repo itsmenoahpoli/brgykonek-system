@@ -18,7 +18,7 @@ const DocumentRequestSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "in_progress", "completed", "rejected"],
+      enum: ["pending", "received", "seen_by_staff", "in_progress", "completed", "rejected"],
       default: "pending",
       required: true,
     },

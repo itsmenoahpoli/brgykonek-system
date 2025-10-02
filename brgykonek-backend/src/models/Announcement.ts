@@ -9,6 +9,9 @@ export interface IAnnouncement extends Document {
   status: "published" | "draft";
   created_at: Date;
   posted_by: string;
+  category?: string;
+  audience?: string;
+  publish_at?: Date;
 }
 
 const announcementSchema = new Schema<IAnnouncement>(
@@ -41,11 +44,27 @@ const announcementSchema = new Schema<IAnnouncement>(
       required: false,
       trim: true,
     },
+    category: {
+      type: String,
+      required: false,
+      trim: true,
+      maxlength: 100,
+    },
+    audience: {
+      type: String,
+      enum: ["all_residents", "specific_zone", "staff_only"],
+      required: false,
+      default: "all_residents",
+    },
     status: {
       type: String,
       enum: ["published", "draft"],
       required: true,
       default: "draft",
+    },
+    publish_at: {
+      type: Date,
+      required: false,
     },
     created_at: {
       type: Date,

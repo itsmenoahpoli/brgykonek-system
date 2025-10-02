@@ -30,6 +30,7 @@ interface ApiUser {
     address?: string;
     birthdate?: string;
   };
+  requiresOTP?: boolean;
 }
 
 @Injectable({
@@ -75,15 +76,32 @@ export class AuthService {
     );
   }
 
+  private getDeviceInfo() {
+    return {
+      deviceId: localStorage.getItem('deviceId') || ((): string => {
+        const id = crypto.getRandomValues(new Uint8Array(16)).reduce((p, c) => p + c.toString(16).padStart(2, '0'), '');
+        localStorage.setItem('deviceId', id);
+        return id;
+      })(),
+      deviceName: navigator.platform || 'web',
+      userAgent: navigator.userAgent,
+      ipAddress: ''
+    };
+  }
+
   login(
     email: string,
-    password: string
-  ): Observable<{ success: boolean; message: string; user?: User }> {
+    password: string,
+    rememberDevice = false
+  ): Observable<{ success: boolean; message: string; user?: User; requiresOTP?: boolean }> {
     return from(
       apiClient
-        .post<ApiUser>('/auth/login', { email, password })
+        .post<ApiUser>('/auth/login', { email, password, deviceInfo: this.getDeviceInfo(), rememberDevice })
         .then((response) => {
           const data = response.data;
+          if (data?.requiresOTP) {
+            return { success: false, message: data.message || 'OTP required', requiresOTP: true };
+          }
           if (data && data.token) {
             localStorage.setItem('accessToken', encrypt(data.token));
           }
@@ -179,6 +197,33 @@ export class AuthService {
           message: error.response?.data?.message || 'Network error occurred',
         };
       })
+    );
+  }
+
+  sendOTP(email: string, type: 'registration' | 'password_reset' = 'password_reset') {
+    return from(
+      apiClient
+        .post('/auth/request-otp', { email, type })
+        .then(() => ({ success: true, message: 'OTP sent' }))
+        .catch((error) => ({ success: false, message: error.response?.data?.message || 'Failed to send OTP' }))
+    );
+  }
+
+  verifyOTP(email: string, otp: string, rememberDevice = false) {
+    return from(
+      apiClient
+        .post('/auth/verify-otp', { email, otp_code: otp, deviceInfo: this.getDeviceInfo(), rememberDevice, type: 'registration' })
+        .then(() => ({ success: true, message: 'OTP verified' }))
+        .catch((error) => ({ success: false, message: error.response?.data?.message || 'Failed to verify OTP' }))
+    );
+  }
+
+  resetPassword(email: string, otp: string, newPassword: string) {
+    return from(
+      apiClient
+        .post('/auth/reset-password', { email, otp_code: otp, new_password: newPassword })
+        .then(() => ({ success: true, message: 'Password reset successfully' }))
+        .catch((error) => ({ success: false, message: error.response?.data?.message || 'Failed to reset password' }))
     );
   }
 

@@ -29,7 +29,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     });
 
     res.status(201).json({
-      message: "User registered successfully",
+      message: "User registered successfully. OTP sent to email for verification.",
       token: result.token,
       user: result.user,
     });
@@ -55,6 +55,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       deviceInfo, 
       rememberDevice 
     });
+
+    if (result.requiresOTP) {
+      res.status(200).json({
+        message: "OTP required",
+        requiresOTP: true
+      });
+      return;
+    }
 
     res.status(200).json({
       message: "Login successful",
@@ -104,14 +112,14 @@ export const requestOTP = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { email } = req.body;
+    const { email, type } = req.body;
 
     if (!email) {
       res.status(400).json({ message: "Email is required" });
       return;
     }
 
-    await authService.requestOTP(email);
+    await authService.requestOTP(email, type || "registration");
 
     res.status(200).json({
       success: true,
@@ -131,7 +139,7 @@ export const requestOTP = async (
 
 export const verifyOTP = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, otp_code } = req.body;
+    const { email, otp_code, deviceInfo, rememberDevice, type } = req.body;
 
     if (!email || !otp_code) {
       res
@@ -140,7 +148,7 @@ export const verifyOTP = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    await authService.verifyOTP(email, otp_code);
+    await authService.verifyOTP(email, otp_code, deviceInfo, rememberDevice, type || "registration");
 
     res.status(200).json({
       success: true,
