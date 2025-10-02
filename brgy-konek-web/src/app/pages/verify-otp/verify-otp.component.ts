@@ -36,9 +36,11 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
   email = '';
   userType = '';
   remember = '0';
+  type: 'registration' | 'password_reset' | '' = '';
   countdownTimer = 0;
   canResendOTP = true;
   private countdownInterval: any;
+  private hasNavigated = false;
 
   constructor(
     private fb: FormBuilder,
@@ -59,6 +61,7 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
       this.email = params['email'] || '';
       this.userType = params['user_type'] || '';
       this.remember = params['remember'] || '0';
+      this.type = (params['type'] as 'registration' | 'password_reset') || '';
       if (!this.email) {
         this.router.navigate(['/login']);
       }
@@ -93,18 +96,7 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
                 this.authService.trustDevice(emailFromUrl);
               }
               this.showSuccessModal = true;
-              setTimeout(() => {
-                if (
-                  userTypeFromUrl === 'admin' ||
-                  userTypeFromUrl === 'staff'
-                ) {
-                  this.router.navigate(['/admin/dashboard']);
-                } else if (userTypeFromUrl === 'resident') {
-                  this.router.navigate(['/resident/home']);
-                } else {
-                  this.router.navigate(['/home']);
-                }
-              }, 3000);
+              this.navigateAfterSuccess(userTypeFromUrl);
             } else {
               this.errorMessage =
                 response.message || 'Invalid OTP. Please try again.';
@@ -119,7 +111,7 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
               );
               this.showSuccessModal = true;
               setTimeout(() => {
-                this.router.navigate(['/home']);
+                this.router.navigate(['/resident/home']);
               }, 3000);
             } else if (
               error.error &&
@@ -182,13 +174,7 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
 
   onSuccessModalClosed(): void {
     this.showSuccessModal = false;
-    if (this.userType === 'admin' || this.userType === 'staff') {
-      this.router.navigate(['/admin/dashboard']);
-    } else if (this.userType === 'resident') {
-      this.router.navigate(['/resident/home']);
-    } else {
-      this.router.navigate(['/home']);
-    }
+    this.navigateAfterSuccess(this.userType);
   }
 
   onErrorModalClosed(): void {
@@ -212,5 +198,24 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
         this.countdownTimer = 0;
       }
     }, 1000);
+  }
+
+  private navigateAfterSuccess(userType: string): void {
+    if (this.hasNavigated) {
+      return;
+    }
+    this.hasNavigated = true;
+    const effectiveRole = userType || this.authService.getCurrentUser()?.role || 'resident';
+    if (this.type === 'password_reset') {
+      this.router.navigate(['/login']);
+      return;
+    }
+    if (effectiveRole === 'admin' || effectiveRole === 'staff') {
+      this.router.navigate(['/admin/home']);
+    } else if (effectiveRole === 'resident') {
+      this.router.navigate(['/resident/home']);
+    } else {
+      this.router.navigate(['/resident/home']);
+    }
   }
 }

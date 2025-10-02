@@ -58,7 +58,7 @@ export class ForgotPasswordComponent {
             setTimeout(() => {
               this.showSuccessModal = false;
               this.router.navigate(['/reset-password'], {
-                queryParams: { email: email },
+                queryParams: { email },
               });
             }, 2000);
           } else {

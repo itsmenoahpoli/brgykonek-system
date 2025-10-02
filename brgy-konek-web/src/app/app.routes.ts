@@ -65,13 +65,6 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'admin/accounts',
-    loadComponent: () =>
-      import('./pages/admin/accounts/accounts.component').then(
-        (m) => m.AccountsComponent
-      ),
-  },
-  {
     path: 'admin/announcements',
     loadComponent: () =>
       import('./pages/admin/announcements/announcements.component').then(
@@ -79,10 +72,25 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'admin/pending-approval',
+    loadComponent: () =>
+      import('./pages/admin/accounts/accounts.component').then(
+        (m) => m.AccountsComponent
+      ),
+    data: { mode: 'pending' },
+  },
+  {
     path: 'admin/complaints',
     loadComponent: () =>
       import('./pages/admin/complaints/complaints.component').then(
         (m) => m.ComplaintsComponent
+      ),
+  },
+  {
+    path: 'admin/notifications',
+    loadComponent: () =>
+      import('./pages/resident/notifications/notifications.component').then(
+        (m) => m.NotificationsComponent
       ),
   },
   {

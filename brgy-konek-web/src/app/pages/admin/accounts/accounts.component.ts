@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { UsersService, User } from '../../../services/users.service';
 import { DashboardLayoutComponent } from '../../../components/shared/dashboard-layout/dashboard-layout.component';
@@ -27,6 +28,9 @@ export class AccountsComponent implements OnInit {
   currentUserId: string | undefined;
   searchTerm = '';
   isCreateUserModalVisible = false;
+  mode: 'pending' | 'all' = 'all';
+  pageTitle = 'Accounts';
+  pageSubtitle = 'View and manage user accounts';
   createUserForm = {
     name: '',
     email: '',
@@ -53,17 +57,31 @@ export class AccountsComponent implements OnInit {
 
   constructor(
     private usersService: UsersService,
-    private authService: AuthService
+    private authService: AuthService,
+    private route: ActivatedRoute
   ) {}
   async ngOnInit(): Promise<void> {
-    this.users = (await this.usersService.getUsers()) || [];
-    this.pendingUsers = this.users.filter(u => u.status === 'pending');
+    this.users = ((await this.usersService.getUsers()) || []).filter(u => u.user_type === 'resident');
+    this.pendingUsers = this.users.filter(u => u.approved === false || u.status === 'pending');
     const currentUser = this.authService.getCurrentUser();
     this.currentUserId = currentUser?.id;
+    const mode = this.route.snapshot.data?.['mode'] as 'pending' | 'all' | undefined;
+    if (mode === 'pending') {
+      this.mode = 'pending';
+      this.pageTitle = 'Pending Accounts';
+      this.pageSubtitle = 'Review and approve new resident accounts';
+      this.users = this.pendingUsers;
+    } else {
+      this.mode = 'all';
+      this.pageTitle = 'Accounts';
+      this.pageSubtitle = 'View and manage user accounts';
+    }
   }
   get filteredUsers(): User[] {
     const term = this.searchTerm.toLowerCase();
-    return this.users.filter(
+    return this.users
+      .filter(user => user.user_type === 'resident')
+      .filter(
       (user) =>
         !term ||
         user.name.toLowerCase().includes(term) ||
@@ -71,7 +89,9 @@ export class AccountsComponent implements OnInit {
         user.mobile_number.includes(term)
     );
   }
-  editUser(user: User) {}
+  editUser(user: User) {
+    this.viewProfile(user);
+  }
   deleteUser(user: User) {
     if (user.status === 'pending') {
       this.openDeleteModal(user);
@@ -276,7 +296,7 @@ export class AccountsComponent implements OnInit {
     const updated = await this.usersService.updateUser(user._id, { status: next });
     if (updated) {
       this.users = this.users.map((u) => (u._id === user._id ? { ...u, status: next } : u));
-      this.pendingUsers = this.users.filter((u) => u.status === 'pending');
+      this.pendingUsers = this.users.filter((u) => (u.approved === false || u.status === 'pending') && u.user_type === 'resident');
       this.statusModalType = 'success';
       this.statusModalTitle = 'Status Updated';
       this.statusModalMessage = `User has been set to ${next}.`;
@@ -286,6 +306,25 @@ export class AccountsComponent implements OnInit {
       this.statusModalType = 'error';
       this.statusModalTitle = 'Update Failed';
       this.statusModalMessage = 'Could not update user status.';
+      this.showStatusModal = true;
+    }
+  }
+
+  async approve(user: User) {
+    if (!user._id) return;
+    const updated = await this.usersService.approveUser(user._id);
+    if (updated) {
+      this.users = this.users.map((u) => (u._id === user._id ? { ...u, approved: true, status: 'approved' } : u));
+      this.pendingUsers = this.users.filter((u) => (u.approved === false || u.status === 'pending') && u.user_type === 'resident');
+      this.statusModalType = 'success';
+      this.statusModalTitle = 'User Approved';
+      this.statusModalMessage = 'The user has been approved.';
+      this.showStatusModal = true;
+      setTimeout(() => this.closeStatusModal(), 1500);
+    } else {
+      this.statusModalType = 'error';
+      this.statusModalTitle = 'Approval Failed';
+      this.statusModalMessage = 'Could not approve user.';
       this.showStatusModal = true;
     }
   }

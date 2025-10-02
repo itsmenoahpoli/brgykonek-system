@@ -33,3 +33,13 @@ export const markAllAsRead = async (req: any, res: Response) => {
 };
 
 
+export const getNotificationsByUserId = async (req: any, res: Response) => {
+  try {
+    const { id } = req.params;
+    const notifications = await Notification.find({ recipient_id: String(id) }).sort({ created_at: -1 });
+    res.json(notifications);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch notifications" });
+  }
+};
+

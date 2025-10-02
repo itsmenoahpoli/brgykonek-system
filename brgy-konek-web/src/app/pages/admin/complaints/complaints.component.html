@@ -2,6 +2,13 @@
   title="Complaints"
   subtitle="View and manage all resident complaints"
 >
+  <app-status-modal
+    [isVisible]="showSuccessModal"
+    type="success"
+    [title]="successTitle"
+    [message]="successMessage"
+    (modalClosed)="onSuccessModalClosed()"
+  ></app-status-modal>
   <div class="flex justify-end mb-4">
     <button class="bg-indigo-600 text-white px-4 py-2 rounded" (click)="openCreateModal()">Create Complaint (Walk-in)</button>
   </div>

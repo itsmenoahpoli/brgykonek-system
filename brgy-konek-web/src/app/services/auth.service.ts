@@ -29,6 +29,7 @@ interface ApiUser {
     user_type?: string;
     address?: string;
     birthdate?: string;
+    approved?: boolean;
   };
   requiresOTP?: boolean;
 }
@@ -96,12 +97,9 @@ export class AuthService {
   ): Observable<{ success: boolean; message: string; user?: User; requiresOTP?: boolean }> {
     return from(
       apiClient
-        .post<ApiUser>('/auth/login', { email, password, deviceInfo: this.getDeviceInfo(), rememberDevice })
+        .post<ApiUser>('/auth/login', { email, password })
         .then((response) => {
           const data = response.data;
-          if (data?.requiresOTP) {
-            return { success: false, message: data.message || 'OTP required', requiresOTP: true };
-          }
           if (data && data.token) {
             localStorage.setItem('accessToken', encrypt(data.token));
           }
@@ -117,6 +115,7 @@ export class AuthService {
               city: '',
               province: '',
               role: data.user.user_type,
+              approved: data.user.approved,
             };
             localStorage.setItem('currentUser', JSON.stringify(user));
             this.currentUserSubject.next(user);
@@ -276,6 +275,31 @@ export class AuthService {
 
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
+  }
+
+  fetchProfile(): Observable<User> {
+    return from(
+      apiClient.get('/auth/profile').then((response) => {
+        const user = response.data;
+        const updatedUser: User = {
+          id: user.id,
+          email: user.email,
+          firstName: (user.name || '').split(' ')[0] || '',
+          lastName: (user.name || '').split(' ').slice(1).join(' ') || '',
+          phone: user.mobile_number,
+          address: user.address,
+          barangay: user.address_barangay || '',
+          city: user.address_municipality || '',
+          province: user.address_province || '',
+          sitio: user.address_sitio || '',
+          role: user.user_type,
+          approved: user.approved ?? this.currentUserSubject.value?.approved,
+        };
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        this.currentUserSubject.next(updatedUser);
+        return updatedUser;
+      })
+    );
   }
 
   getLoginAttempts(email: string): { count: number; lockedUntil?: number } {

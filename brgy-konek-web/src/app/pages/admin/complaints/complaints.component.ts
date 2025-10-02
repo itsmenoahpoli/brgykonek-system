@@ -7,11 +7,12 @@ import {
 } from '../../../services/complaints.service';
 import { Observable } from 'rxjs';
 import { DashboardLayoutComponent } from '../../../components/shared/dashboard-layout/dashboard-layout.component';
+import { StatusModalComponent } from '../../../components/shared/status-modal/status-modal.component';
 
 @Component({
   selector: 'app-complaints',
   standalone: true,
-  imports: [CommonModule, FormsModule, DashboardLayoutComponent],
+  imports: [CommonModule, FormsModule, DashboardLayoutComponent, StatusModalComponent],
   templateUrl: './complaints.component.html',
   styleUrls: ['./complaints.component.scss'],
 })
@@ -20,6 +21,9 @@ export class ComplaintsComponent implements OnInit {
   showViewModal = false;
   selectedComplaint: Complaint | null = null;
   showCreateModal = false;
+  showSuccessModal = false;
+  successTitle = '';
+  successMessage = '';
   createForm = {
     resident_id: '',
     category: '',
@@ -130,11 +134,19 @@ export class ComplaintsComponent implements OnInit {
 
   async updateComplaintResolution(id: string, note: string) {
     await this.complaintsService.updateComplaint(id, { resolution_note: note, status: 'resolved' });
+    this.showViewModal = false;
+    this.selectedComplaint = null;
+    this.successTitle = 'Complaint Resolved';
+    this.successMessage = 'Complaint marked as resolved successfully.';
+    this.showSuccessModal = true;
     await this.ngOnInit();
   }
 
   async updateComplaintPriority(id: string, priority: 'low' | 'medium' | 'high') {
     await this.complaintsService.updateComplaint(id, { priority });
+    this.successTitle = 'Priority Updated';
+    this.successMessage = 'Complaint priority updated successfully.';
+    this.showSuccessModal = true;
     await this.ngOnInit();
   }
 
@@ -152,5 +164,9 @@ export class ComplaintsComponent implements OnInit {
       default:
         return 'bg-gray-100 text-gray-800 border-gray-300';
     }
+  }
+
+  onSuccessModalClosed(): void {
+    this.showSuccessModal = false;
   }
 }

@@ -120,6 +120,7 @@ export const authService = {
         address_municipality: user.address_municipality,
         address_province: user.address_province,
         barangay_clearance: user.barangay_clearance,
+        approved: user.approved,
       },
     };
   },
@@ -151,7 +152,23 @@ export const authService = {
       const deviceTrust = await deviceService.checkDeviceTrust(userId, data.deviceInfo);
       if (!deviceTrust.isTrusted) {
         await this.requestOTP(user.email);
-        return { requiresOTP: true };
+        return {
+          requiresOTP: true,
+          user: {
+            id: userId,
+            name: user.name,
+            email: user.email,
+            mobile_number: user.mobile_number,
+            user_type: user.user_type,
+            address: user.address,
+            birthdate: user.birthdate,
+            address_sitio: user.address_sitio,
+            address_barangay: user.address_barangay,
+            address_municipality: user.address_municipality,
+            address_province: user.address_province,
+            approved: user.approved,
+          },
+        };
       }
       await deviceService.updateDeviceLastUsed(data.deviceInfo.deviceId);
     }
@@ -174,6 +191,7 @@ export const authService = {
         address_barangay: user.address_barangay,
         address_municipality: user.address_municipality,
         address_province: user.address_province,
+        approved: user.approved,
       },
     };
   },
@@ -197,6 +215,7 @@ export const authService = {
       address_municipality: user.address_municipality,
       address_province: user.address_province,
       barangay_clearance: user.barangay_clearance,
+      approved: user.approved,
     };
   },
 

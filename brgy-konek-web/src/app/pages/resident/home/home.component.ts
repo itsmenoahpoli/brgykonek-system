@@ -19,6 +19,12 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
     this.checkPendingStatus();
+    this.authService.fetchProfile().subscribe({
+      next: (user) => {
+        this.currentUser = user;
+        this.checkPendingStatus();
+      },
+    });
   }
 
   private checkPendingStatus(): void {

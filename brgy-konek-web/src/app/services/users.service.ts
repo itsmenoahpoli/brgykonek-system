@@ -10,6 +10,7 @@ export interface User {
   address: string;
   birthdate: string;
   barangay_clearance: string;
+  approved?: boolean;
   status?: 'pending' | 'approved' | 'inactive';
   createdAt?: string;
   updatedAt?: string;
@@ -70,6 +71,10 @@ export class UsersService {
     } catch (error) {
       return undefined;
     }
+  }
+
+  async approveUser(id: string): Promise<User | undefined> {
+    return this.updateUser(id, { approved: true, status: 'approved' as any });
   }
 
   async deleteUser(id: string): Promise<boolean> {

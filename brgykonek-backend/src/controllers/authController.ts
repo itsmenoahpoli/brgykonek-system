@@ -59,7 +59,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     if (result.requiresOTP) {
       res.status(200).json({
         message: "OTP required",
-        requiresOTP: true
+        requiresOTP: true,
+        user: result.user,
       });
       return;
     }

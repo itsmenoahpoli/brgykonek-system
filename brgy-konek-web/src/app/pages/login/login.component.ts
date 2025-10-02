@@ -10,7 +10,6 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { AuthLayoutComponent } from '../../components/shared/auth-layout/auth-layout.component';
 import { StatusModalComponent } from '../../components/shared/status-modal/status-modal.component';
-import { OtpModalComponent } from '../../components/shared/otp-modal/otp-modal.component';
 import { NgIcon } from '@ng-icons/core';
 
 @Component({
@@ -22,14 +21,12 @@ import { NgIcon } from '@ng-icons/core';
     RouterModule,
     AuthLayoutComponent,
     StatusModalComponent,
-    OtpModalComponent,
     NgIcon,
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
-  @ViewChild(OtpModalComponent) otpModal!: OtpModalComponent;
 
   loginForm: FormGroup;
   isLoading = false;
@@ -64,7 +61,6 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
 
-      // Skip account lock check for residents - they don't use OTP
       if (this.authService.isAccountLocked(email)) {
         this.errorMessage = 'Too many failed login attempts. Please try again later.';
         return;
@@ -84,18 +80,10 @@ export class LoginComponent {
             const route = this.getHomeRoute(userType);
             this.router.navigate([route]);
           } else {
-            if (response.requiresOTP) {
-              this.requestOTPAndRedirect(email, response.user?.role || '', remember);
-              return;
-            }
             this.authService.incrementLoginAttempts(email);
             const attempts = this.authService.getLoginAttempts(email);
 
-            if (attempts.count >= 3) {
-              this.showOtpModal = true;
-            } else {
-              this.errorMessage = response.message;
-            }
+            this.errorMessage = response.message;
           }
         },
         error: (error) => {
@@ -103,81 +91,10 @@ export class LoginComponent {
           this.authService.incrementLoginAttempts(email);
           const attempts = this.authService.getLoginAttempts(email);
 
-          // Skip OTP modal for residents even after failed attempts
-          if (attempts.count >= 3) {
-            this.errorMessage = 'Too many failed login attempts. Please try again later.';
-          } else {
-            this.errorMessage = 'An error occurred during login';
-          }
+          this.errorMessage = 'An error occurred during login';
         },
       });
     }
-  }
-
-  onOtpRequested(email: string): void {
-    this.authService.sendOTP(email).subscribe({
-      next: (otpResponse) => {
-        if (otpResponse.success) {
-          this.otpModal.setOtpRequested();
-        } else {
-          this.otpModal.setError('Failed to send OTP. Please try again.');
-        }
-      },
-      error: (error) => {
-        this.otpModal.setError('Failed to send OTP. Please try again.');
-      },
-    });
-  }
-
-  onOtpVerified(data: { email: string; otp: string }): void {
-    this.authService.verifyOTP(data.email, data.otp).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.authService.resetLoginAttempts(data.email);
-          this.showOtpModal = false;
-          this.otpModal.resetForm();
-          const user = this.authService.getCurrentUser();
-          const route = this.getHomeRoute(user?.role);
-          this.router.navigate([route]);
-        } else {
-          this.otpModal.setError(
-            response.message || 'Invalid OTP. Please try again.'
-          );
-        }
-      },
-      error: (error) => {
-        this.otpModal.setError('Failed to verify OTP. Please try again.');
-      },
-    });
-  }
-
-  onOtpModalClosed(): void {
-    this.showOtpModal = false;
-    this.otpModal.resetForm();
-  }
-
-  private requestOTPAndRedirect(email: string, userType: string, remember?: boolean): void {
-    this.showOtpLoadingModal = true;
-    this.authService.sendOTP(email).subscribe({
-      next: (otpResponse) => {
-        this.showOtpLoadingModal = false;
-        if (otpResponse.success) {
-          this.showOtpSuccessModal = true;
-          setTimeout(() => {
-            this.showOtpSuccessModal = false;
-            this.router.navigate(['/verify-otp'], {
-              queryParams: { email, user_type: userType, remember: remember ? '1' : '0' },
-            });
-          }, 2000);
-        } else {
-          this.errorMessage = 'Failed to send OTP. Please try again.';
-        }
-      },
-      error: (error) => {
-        this.showOtpLoadingModal = false;
-        this.errorMessage = 'Failed to send OTP. Please try again.';
-      },
-    });
   }
 
   goToRegister(): void {
@@ -191,26 +108,6 @@ export class LoginComponent {
     this.router.navigate([route]);
   }
 
-  onOtpSuccessModalClosed(): void {
-    console.log('OTP success modal closed, redirecting to verify-otp');
-    this.showOtpSuccessModal = false;
-    const email = this.loginForm.get('email')?.value;
-    const userType = this.authService.getCurrentUser()?.role || '';
-    console.log('Redirecting to verify-otp with email:', email);
-    this.router.navigate(['/verify-otp'], {
-      queryParams: { email, user_type: userType },
-    });
-  }
-
-  testRedirect(): void {
-    console.log('Test redirect clicked');
-    const email = this.loginForm.get('email')?.value || 'test@example.com';
-    const userType = this.authService.getCurrentUser()?.role || '';
-    console.log('Testing redirect to verify-otp with email:', email);
-    this.router.navigate(['/verify-otp'], {
-      queryParams: { email, user_type: userType },
-    });
-  }
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;

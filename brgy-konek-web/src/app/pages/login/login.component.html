@@ -143,32 +143,6 @@
   </form>
 </app-auth-layout>
 
-<div
-  *ngIf="showOtpLoadingModal"
-  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center"
->
-  <div class="relative mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-    <div class="mt-3 text-center">
-      <div
-        class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100"
-      >
-        <ng-icon
-          name="featherLoader"
-          class="animate-spin h-6 w-6 text-indigo-600"
-        ></ng-icon>
-      </div>
-      <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">
-        Sending OTP
-      </h3>
-      <div class="mt-2 px-7 py-3">
-        <p class="text-sm text-gray-500">
-          Please wait while we send the verification code to your email...
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
 <app-status-modal
   [isVisible]="showSuccessModal"
   type="success"
@@ -177,19 +151,3 @@
   [autoCloseDelay]="2000"
   (modalClosed)="onSuccessModalClosed()"
 ></app-status-modal>
-
-<app-status-modal
-  [isVisible]="showOtpSuccessModal"
-  type="success"
-  title="OTP Sent Successfully!"
-  message="Verification code has been sent to your email. Redirecting to verification page..."
-  [autoCloseDelay]="2000"
-  (modalClosed)="onOtpSuccessModalClosed()"
-></app-status-modal>
-
-<app-otp-modal
-  [isVisible]="showOtpModal"
-  (otpRequested)="onOtpRequested($event)"
-  (otpVerified)="onOtpVerified($event)"
-  (modalClosed)="onOtpModalClosed()"
-></app-otp-modal>

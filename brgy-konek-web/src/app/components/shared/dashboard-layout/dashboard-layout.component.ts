@@ -52,6 +52,11 @@ export class DashboardLayoutComponent {
           route: 'resident/announcements',
         },
         {
+          label: 'Notifications',
+          icon: 'heroBell',
+          route: 'resident/notifications',
+        },
+        {
           label: 'List of Reports',
           icon: 'heroDocumentText',
           route: 'resident/list-of-reports',
@@ -77,9 +82,9 @@ export class DashboardLayoutComponent {
           route: 'admin/announcements',
         },
         {
-          label: 'Manage Accounts',
-          icon: 'heroUsers',
-          route: 'admin/accounts',
+          label: 'Notifications',
+          icon: 'heroBell',
+          route: 'admin/notifications',
         },
         {
           label: 'Profile',
