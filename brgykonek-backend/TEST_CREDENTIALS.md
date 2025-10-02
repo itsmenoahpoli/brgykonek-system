@@ -20,6 +20,14 @@ npm run migrate
 - **Mobile:** 09991234567
 - **Address:** Barangay Hall
 
+### Staff User
+- **Email:** staff@example.com
+- **Password:** staffpass
+- **User Type:** staff
+- **Name:** Staff User
+- **Mobile:** 09881234567
+- **Address:** Barangay Hall
+
 ### Resident Users
 
 #### Juan Dela Cruz
@@ -81,6 +89,11 @@ POST /api/auth/login
 - Can view all complaints
 - Can access admin dashboard
 
+### Staff
+- Can access admin dashboard
+- Can manage pending approvals and complaints
+- Limited administrative privileges compared to admin
+
 ### Resident
 - Can view announcements
 - Can submit complaints
@@ -122,6 +135,16 @@ curl -X POST http://localhost:3000/api/auth/login \
   }'
 ```
 
+#### Login as Staff
+```bash
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "staff@example.com",
+    "password": "staffpass"
+  }'
+```
+
 #### Login as Resident
 ```bash
 curl -X POST http://localhost:3000/api/auth/login \
@@ -144,6 +167,7 @@ curl -X GET http://localhost:3000/api/auth/my-profile \
 2. Set up environment variables:
    - `base_url`: http://localhost:3000
    - `admin_token`: (get from login response)
+   - `staff_token`: (get from login response)
    - `resident_token`: (get from login response)
 
 ## 🗑️ Clean Up Test Data
@@ -155,7 +179,7 @@ npm run migrate:rollback
 ```
 
 This will remove:
-- Test users (admin@example.com, juan@example.com, maria@example.com)
+- Test users (admin@example.com, staff@example.com, juan@example.com, maria@example.com)
 - Test complaints
 - Test announcements
 
@@ -205,5 +229,5 @@ npm run migrate
 
 ---
 
-**Last Updated:** $(date)
-**Version:** 1.0.0
+**Last Updated:** 2025-10-02
+**Version:** 1.1.0

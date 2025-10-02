@@ -229,14 +229,31 @@ const migrations: Migration[] = [
       ];
       let complaints = [];
       for (let i = 0; i < 30; i++) {
+        const category = complaintCategories[i % complaintCategories.length];
+        const status = ((): string => {
+          const mod = i % 4;
+          if (mod === 0) return "pending";
+          if (mod === 1) return "in_progress";
+          if (mod === 2) return "resolved";
+          return "rejected";
+        })();
+        const priority = ((): string => {
+          const mod = i % 3;
+          if (mod === 0) return "low";
+          if (mod === 1) return "medium";
+          return "high";
+        })();
         complaints.push({
           resident_id: createdResidents[i % createdResidents.length]._id,
-          category: complaintCategories[i % complaintCategories.length],
+          title: `${category} Issue #${i + 1}`,
+          category,
           date_of_report: new Date(Date.now() - i * 86400000),
+          location_of_incident: "",
           complaint_content:
             complaintContents[i % complaintContents.length] + ` [${i + 1}]`,
           attachments: [],
-          status: i % 2 === 0 ? "published" : "draft",
+          status,
+          priority,
         });
       }
       await Complaint.insertMany(complaints);
@@ -265,6 +282,33 @@ const migrations: Migration[] = [
           ],
         },
       });
+    },
+  },
+  {
+    id: "004_seed_staff_user",
+    name: "Seed a default staff user",
+    up: async () => {
+      const existing = await User.findOne({ email: "staff@example.com" });
+      if (existing) {
+        console.log("Staff user already exists, skipping seeding.");
+        return;
+      }
+      const passwordHash = await argon2.hash("staffpass");
+      await User.create({
+        name: "Staff User",
+        email: "staff@example.com",
+        password: passwordHash,
+        user_type: "staff",
+        address: "Barangay Hall",
+        birthdate: new Date("1988-06-15").toISOString(),
+        mobile_number: "09881234567",
+        approved: true,
+      });
+      console.log("✓ Staff user seeded successfully");
+    },
+    down: async () => {
+      await User.deleteOne({ email: "staff@example.com" });
+      console.log("✓ Staff user removed successfully");
     },
   },
 ];
