@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { authService } from "../services/authService";
-import { userAccountService } from "../services/userAccountService";
+import * as userAccountService from "../services/userAccountService";
 
 interface AuthRequest extends Request {
   user?: any;

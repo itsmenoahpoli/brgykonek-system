@@ -5,8 +5,7 @@ import {
   getAccountStatus,
   getDisabledAccounts,
 } from "../controllers/userAccountController";
-import { authenticateToken } from "../middleware/auth";
-import { isAdmin } from "../middleware/admin";
+import { authenticateToken, isAdmin } from "../middleware/auth";
 
 const router = express.Router();
 

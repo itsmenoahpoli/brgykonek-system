@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
-import { userAccountService } from "../services/userAccountService";
+import * as userAccountService from "../services/userAccountService";
 import { logger } from "../utils/logger";
 
-export const disableAccount = async (req: Request, res: Response): Promise<void> => {
+interface AuthRequest extends Request {
+  user?: any;
+}
+
+export const disableAccount = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { userId, reason } = req.body;
     const disabledBy = req.user ? String(req.user._id) : "admin";
@@ -49,7 +53,7 @@ export const disableAccount = async (req: Request, res: Response): Promise<void>
   }
 };
 
-export const enableAccount = async (req: Request, res: Response): Promise<void> => {
+export const enableAccount = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { userId } = req.body;
     const enabledBy = req.user ? String(req.user._id) : "admin";

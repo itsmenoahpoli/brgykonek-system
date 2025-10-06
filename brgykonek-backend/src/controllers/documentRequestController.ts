@@ -2,6 +2,10 @@ import { Request, Response } from "express";
 import * as documentRequestService from "../services/documentRequestService";
 import { logger } from "../utils/logger";
 
+interface AuthRequest extends Request {
+  user?: any;
+}
+
 export const createDocumentRequest = async (req: Request, res: Response) => {
   try {
     const { resident_id, document_type, notes } = req.body;
@@ -60,7 +64,7 @@ export const getDocumentRequestsByResidentId = async (req: Request, res: Respons
   }
 };
 
-export const getAllDocumentRequests = async (req: Request, res: Response) => {
+export const getAllDocumentRequests = async (req: AuthRequest, res: Response) => {
   try {
     const adminUserId = req.user ? String(req.user._id) : undefined;
     const documentRequests = await documentRequestService.getAllDocumentRequests(adminUserId);

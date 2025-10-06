@@ -53,7 +53,10 @@ export const updateComplaint = async (req: Request, res: Response) => {
 export const deleteComplaint = async (req: Request, res: Response) => {
   try {
     const complaint = await complaintService.deleteComplaint(req.params.id);
-    if (!complaint) return res.status(404).json({ error: "Not found" });
+    if (!complaint) {
+      res.status(404).json({ error: "Not found" });
+      return;
+    }
     res.status(204).send();
   } catch (err) {
     const error = err instanceof Error ? err : new Error("Unknown error");

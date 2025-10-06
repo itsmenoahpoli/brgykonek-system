@@ -114,9 +114,9 @@ export const incrementLoginAttempts = async (email: string) => {
     }
 
     // If login attempts reach 3, disable the account
-    if (user.loginAttempts >= 3) {
+    if (user.loginAttempts && user.loginAttempts >= 3) {
       await disableUserAccount({
-        userId: user._id.toString(),
+        userId: String(user._id),
         disabledBy: "system",
         reason: "Maximum login attempts exceeded"
       });

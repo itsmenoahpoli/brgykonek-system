@@ -61,6 +61,7 @@ export interface AuthResult {
     address_municipality?: string;
     address_province?: string;
     barangay_clearance?: string;
+    approved?: boolean;
   };
 }
 

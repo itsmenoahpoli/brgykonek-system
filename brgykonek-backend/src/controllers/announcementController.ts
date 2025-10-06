@@ -27,8 +27,10 @@ export const getById = async (req: Request, res: Response) => {
     const announcement = await announcementService.getAnnouncementById(
       req.params.id
     );
-    if (!announcement)
-      return res.status(404).json({ error: "Announcement not found" });
+    if (!announcement) {
+      res.status(404).json({ error: "Announcement not found" });
+      return;
+    }
     res.status(200).json(announcement);
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
