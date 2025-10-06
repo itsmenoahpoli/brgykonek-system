@@ -336,10 +336,10 @@ export class AuthService {
     return false;
   }
 
-  sendOTP(email: string): Observable<{ success: boolean; message: string }> {
+  sendOTP(email: string, type: string = 'password_reset'): Observable<{ success: boolean; message: string }> {
     return from(
       apiClient
-        .post('/auth/request-otp', { email })
+        .post('/auth/request-otp', { email, type })
         .then((response) => {
           const data = response.data;
           return {

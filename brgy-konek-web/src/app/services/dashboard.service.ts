@@ -14,6 +14,8 @@ export interface OverviewStatistics {
   complaintsPerMonth: MonthlyCount[];
   announcementsPerMonth: MonthlyCount[];
   usersPerMonth: MonthlyCount[];
+  complaintsBySitio: { sitio: string; count: number }[];
+  complaintsByCategory: { category: string; count: number }[];
 }
 
 @Injectable({ providedIn: 'root' })

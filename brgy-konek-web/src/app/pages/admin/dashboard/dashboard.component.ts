@@ -66,29 +66,6 @@ export class DashboardComponent implements OnInit {
     responsive: true,
   };
 
-  get topComplaintCategories(): { category: string; count: number }[] {
-    const counts = new Map<string, number>();
-    for (const c of this.recentComplaints) {
-      const key = c.category || 'Unknown';
-      counts.set(key, (counts.get(key) || 0) + 1);
-    }
-    return Array.from(counts.entries())
-      .map(([category, count]) => ({ category, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
-  }
-
-  getComplaintsBySitio(): { sitio: string; count: number }[] {
-    const counts = new Map<string, number>();
-    for (const c of this.recentComplaints) {
-      const key = (c as any).sitio || 'Unknown';
-      counts.set(key, (counts.get(key) || 0) + 1);
-    }
-    return Array.from(counts.entries())
-      .map(([sitio, count]) => ({ sitio, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
-  }
 
   constructor(
     private dashboardService: DashboardService,
@@ -172,5 +149,15 @@ export class DashboardComponent implements OnInit {
 
   openResolvedComplaints() {
     this.router.navigate(['/admin/complaints'], { queryParams: { status: 'resolved' } });
+  }
+
+  getComplaintsBySitio() {
+    if (!this.statistics?.complaintsBySitio) return [];
+    return this.statistics.complaintsBySitio.slice(0, 5);
+  }
+
+  get topComplaintCategories() {
+    if (!this.statistics?.complaintsByCategory) return [];
+    return this.statistics.complaintsByCategory.slice(0, 5);
   }
 }

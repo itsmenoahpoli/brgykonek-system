@@ -33,7 +33,6 @@ export class RegisterComponent {
   selectedFileName = '';
   showSuccessDialog = false;
   showPassword = false;
-  showConfirmPassword = false;
 
   get passwordValidationStatus() {
     const password = this.registerForm.get('password')?.value || '';
@@ -48,10 +47,6 @@ export class RegisterComponent {
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
-  }
-
-  toggleConfirmPasswordVisibility() {
-    this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   constructor(
@@ -211,17 +206,18 @@ export class RegisterComponent {
 
       formData.append(
         'name',
-        `${formValue.first_name} ${formValue.middle_name} ${formValue.last_name}`
+        `${formValue.first_name} ${formValue.middle_name} ${formValue.last_name}`.trim()
       );
-      formData.append('last_name', formValue.last_name);
-      formData.append('birthdate', formValue.birthdate);
       formData.append('email', formValue.email);
       formData.append('password', formValue.password);
       formData.append('mobile_number', formValue.mobile_number);
-      formData.append('province', formValue.province);
-      formData.append('municipality', formValue.municipality);
-      formData.append('barangay', formValue.barangay);
-      formData.append('sitio', formValue.sitio);
+      formData.append('user_type', 'resident');
+      formData.append('address', `${formValue.sitio}, ${formValue.barangay}, ${formValue.municipality}, ${formValue.province}`);
+      formData.append('birthdate', formValue.birthdate);
+      formData.append('address_sitio', formValue.sitio);
+      formData.append('address_barangay', formValue.barangay);
+      formData.append('address_municipality', formValue.municipality);
+      formData.append('address_province', formValue.province);
       formData.append('rememberDevice', formValue.rememberDevice ? '1' : '0');
 
       if (formValue.barangay_clearance) {

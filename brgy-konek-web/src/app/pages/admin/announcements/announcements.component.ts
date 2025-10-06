@@ -43,6 +43,7 @@ export class AnnouncementsComponent {
   statusModalMessage = '';
   confirmDeleteVisible = false;
   deleteId: string | null = null;
+  expandedAnnouncements = new Set<string>();
   constructor(
     private announcementsService: AnnouncementsService,
     private fb: FormBuilder
@@ -180,5 +181,13 @@ export class AnnouncementsComponent {
   }
   onStatusModalClosed() {
     this.statusModalVisible = false;
+  }
+
+  toggleReadMore(announcementId: string) {
+    if (this.expandedAnnouncements.has(announcementId)) {
+      this.expandedAnnouncements.delete(announcementId);
+    } else {
+      this.expandedAnnouncements.add(announcementId);
+    }
   }
 }

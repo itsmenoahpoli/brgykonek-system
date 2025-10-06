@@ -259,16 +259,16 @@ export const resetPassword = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { email, new_password } = req.body;
+    const { email, otp_code, new_password } = req.body;
 
-    if (!email || !new_password) {
+    if (!email || !otp_code || !new_password) {
       res.status(400).json({
-        message: "Email and new password are required",
+        message: "Email, OTP code, and new password are required",
       });
       return;
     }
 
-    await authService.resetPassword({ email, new_password });
+    await authService.resetPassword({ email, otp_code, new_password });
 
     res.status(200).json({
       message: "Password reset successfully",
@@ -277,6 +277,12 @@ export const resetPassword = async (
     const errorMessage = (error as Error).message;
     if (errorMessage === "User not found") {
       res.status(404).json({ message: errorMessage });
+    } else if (errorMessage === "Invalid OTP code") {
+      res.status(400).json({ message: errorMessage });
+    } else if (errorMessage === "OTP code has expired") {
+      res.status(400).json({ message: errorMessage });
+    } else if (errorMessage === "OTP already used") {
+      res.status(400).json({ message: errorMessage });
     } else {
       res.status(500).json({ message: "Server error", error: errorMessage });
     }

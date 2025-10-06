@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgIcon } from '@ng-icons/core';
 
@@ -11,6 +11,7 @@ import { NgIcon } from '@ng-icons/core';
 })
 export class UserAvatarDropdownComponent {
   dropdownOpen = false;
+  @Input() userRole: string = '';
   @Output() logout = new EventEmitter<void>();
   @Output() myAccount = new EventEmitter<void>();
   @Output() updatePassword = new EventEmitter<void>();

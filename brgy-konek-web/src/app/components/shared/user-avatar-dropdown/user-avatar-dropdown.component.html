@@ -12,6 +12,7 @@
     class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-50"
   >
     <button
+      *ngIf="userRole !== 'resident'"
       (click)="onMyAccount($event)"
       class="w-full text-left text-sm px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
     >
@@ -19,6 +20,7 @@
       My Account
     </button>
     <button
+      *ngIf="userRole !== 'resident'"
       (click)="onUpdatePassword($event)"
       class="w-full text-left text-sm px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
     >

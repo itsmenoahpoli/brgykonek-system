@@ -50,7 +50,9 @@
     >
       <span class="font-semibold text-gray-700">Web Dashboard v1.0.0</span>
       <div class="flex items-center space-x-4">
+        <app-notification-bell></app-notification-bell>
         <app-user-avatar-dropdown
+          [userRole]="authService.getCurrentUser()?.role || ''"
           (logout)="logout()"
         ></app-user-avatar-dropdown>
       </div>

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardLayoutComponent } from '../../../components/shared/dashboard-layout/dashboard-layout.component';
 import { AuthService, User } from '../../../services/auth.service';
+import { ResidentDashboardService, ResidentDashboardStats } from '../../../services/resident-dashboard.service';
 
 @Component({
   selector: 'app-home',
@@ -13,26 +14,53 @@ import { AuthService, User } from '../../../services/auth.service';
 export class HomeComponent implements OnInit {
   isPendingApproval = false;
   currentUser: User | null = null;
+  dashboardStats: ResidentDashboardStats = {
+    pendingComplaints: 0,
+    resolvedComplaints: 0,
+    documentRequests: 0
+  };
+  isLoading = true;
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private dashboardService: ResidentDashboardService
+  ) {}
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
     this.checkPendingStatus();
+    this.loadDashboardData();
+    
     this.authService.fetchProfile().subscribe({
       next: (user) => {
         this.currentUser = user;
         this.checkPendingStatus();
+        this.loadDashboardData();
       },
     });
   }
 
   private checkPendingStatus(): void {
     if (this.currentUser) {
-      // Check if user is pending approval
-      // This would typically come from the backend, but for now we'll simulate it
-      // In a real implementation, you'd check the user's status from the API
       this.isPendingApproval = this.currentUser.role === 'resident' && !this.currentUser.approved;
+    }
+  }
+
+  private async loadDashboardData(): Promise<void> {
+    if (!this.currentUser?.id) {
+      this.isLoading = false;
+      return;
+    }
+
+    try {
+      const stats = await this.dashboardService.getDashboardStats(this.currentUser.id);
+      if (stats) {
+        this.dashboardStats = stats;
+      }
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    } finally {
+      this.isLoading = false;
     }
   }
 }

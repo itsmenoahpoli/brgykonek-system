@@ -31,7 +31,7 @@ export class ComplaintsComponent implements OnInit {
     location_of_incident: '',
     complaint_content: '',
     priority: 'medium' as 'low' | 'medium' | 'high',
-    status: 'draft',
+    status: 'pending',
     attachments: [] as File[],
   };
   displayedColumns = [
@@ -94,7 +94,7 @@ export class ComplaintsComponent implements OnInit {
       location_of_incident: '',
       complaint_content: '',
       priority: 'medium',
-      status: 'draft',
+      status: 'pending',
       attachments: [],
     };
   }
@@ -127,11 +127,6 @@ export class ComplaintsComponent implements OnInit {
     await this.ngOnInit();
   }
 
-  async updateComplaintStatus(id: string, status: string) {
-    await this.complaintsService.updateComplaint(id, { status });
-    await this.ngOnInit();
-  }
-
   async updateComplaintResolution(id: string, note: string) {
     await this.complaintsService.updateComplaint(id, { resolution_note: note, status: 'resolved' });
     this.showViewModal = false;
@@ -146,6 +141,14 @@ export class ComplaintsComponent implements OnInit {
     await this.complaintsService.updateComplaint(id, { priority });
     this.successTitle = 'Priority Updated';
     this.successMessage = 'Complaint priority updated successfully.';
+    this.showSuccessModal = true;
+    await this.ngOnInit();
+  }
+
+  async updateComplaintStatus(id: string, status: string) {
+    await this.complaintsService.updateComplaint(id, { status });
+    this.successTitle = 'Status Updated';
+    this.successMessage = 'Complaint status updated successfully.';
     this.showSuccessModal = true;
     await this.ngOnInit();
   }

@@ -48,7 +48,7 @@ export class ForgotPasswordComponent {
       this.errorMessage = '';
       this.successMessage = '';
       const email = this.forgotPasswordForm.get('email')?.value;
-      this.authService.sendOTP(email).subscribe({
+      this.authService.sendOTP(email, 'password_reset').subscribe({
         next: (response) => {
           this.isLoading = false;
           if (response.success) {

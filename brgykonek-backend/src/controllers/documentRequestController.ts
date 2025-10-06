@@ -62,7 +62,8 @@ export const getDocumentRequestsByResidentId = async (req: Request, res: Respons
 
 export const getAllDocumentRequests = async (req: Request, res: Response) => {
   try {
-    const documentRequests = await documentRequestService.getAllDocumentRequests();
+    const adminUserId = req.user ? String(req.user._id) : undefined;
+    const documentRequests = await documentRequestService.getAllDocumentRequests(adminUserId);
 
     res.status(200).json({
       success: true,

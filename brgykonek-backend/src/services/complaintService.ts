@@ -1,6 +1,24 @@
 import Complaint from "../models/Complaint";
 import Notification from "../models/Notification";
+import User from "../models/User";
 import { Document, FilterQuery } from "mongoose";
+
+const notifyAdmins = async (type: string, title: string, message: string, payload: any) => {
+  try {
+    const admins = await User.find({ user_type: 'admin' }).select('_id');
+    for (const admin of admins) {
+      await Notification.create({
+        recipient_id: String(admin._id),
+        type: type,
+        title: title,
+        message: message,
+        payload: payload,
+      });
+    }
+  } catch (error) {
+    console.error('Error notifying admins:', error);
+  }
+};
 
 export const createComplaint = async (data: Record<string, any>) => {
   const c = await Complaint.create(data);
@@ -13,6 +31,15 @@ export const createComplaint = async (data: Record<string, any>) => {
       payload: { complaintId: c._id, status: c.status },
     });
   } catch {}
+  
+  // Notify admins about new complaint
+  await notifyAdmins(
+    "complaint_update",
+    "New Complaint Submitted",
+    "A new complaint has been submitted and requires review",
+    { complaintId: c._id, status: c.status }
+  );
+  
   return c;
 };
 

@@ -10,12 +10,13 @@ import { AuthService } from '../../../services/auth.service';
 import { NotificationsService, NotificationItem } from '../../../services/notifications.service';
 import { NgIcon } from '@ng-icons/core';
 import { UserAvatarDropdownComponent } from '../user-avatar-dropdown/user-avatar-dropdown.component';
+import { NotificationBellComponent } from '../notification-bell/notification-bell.component';
 import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard-layout',
   standalone: true,
-  imports: [CommonModule, NgIcon, UserAvatarDropdownComponent, RouterModule],
+  imports: [CommonModule, NgIcon, UserAvatarDropdownComponent, NotificationBellComponent, RouterModule],
   templateUrl: './dashboard-layout.component.html',
   styleUrls: ['./dashboard-layout.component.scss'],
 })
@@ -28,7 +29,7 @@ export class DashboardLayoutComponent {
   notifications: NotificationItem[] = [];
   unreadCount = 0;
   constructor(
-    private authService: AuthService,
+    public authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
     private notificationsService: NotificationsService

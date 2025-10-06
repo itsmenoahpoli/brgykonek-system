@@ -32,7 +32,7 @@
             </div>
             <div class="ml-3">
               <p class="text-sm font-medium text-blue-900">Pending Complaints</p>
-              <p class="text-2xl font-bold text-blue-600">3</p>
+              <p class="text-2xl font-bold text-blue-600">{{ isLoading ? '...' : dashboardStats.pendingComplaints }}</p>
             </div>
           </div>
         </div>
@@ -46,7 +46,7 @@
             </div>
             <div class="ml-3">
               <p class="text-sm font-medium text-green-900">Resolved Issues</p>
-              <p class="text-2xl font-bold text-green-600">12</p>
+              <p class="text-2xl font-bold text-green-600">{{ isLoading ? '...' : dashboardStats.resolvedComplaints }}</p>
             </div>
           </div>
         </div>
@@ -60,7 +60,7 @@
             </div>
             <div class="ml-3">
               <p class="text-sm font-medium text-yellow-900">Document Requests</p>
-              <p class="text-2xl font-bold text-yellow-600">2</p>
+              <p class="text-2xl font-bold text-yellow-600">{{ isLoading ? '...' : dashboardStats.documentRequests }}</p>
             </div>
           </div>
         </div>

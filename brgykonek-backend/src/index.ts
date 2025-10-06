@@ -34,6 +34,7 @@ app.use(limiter);
 app.use(requestLogger);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
+app.use('/api/uploads', express.static('uploads'));
 
 const specs = swaggerJsdoc(swaggerOptions);
 

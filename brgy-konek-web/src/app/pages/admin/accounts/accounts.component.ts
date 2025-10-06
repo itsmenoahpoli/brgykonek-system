@@ -328,4 +328,20 @@ export class AccountsComponent implements OnInit {
       this.showStatusModal = true;
     }
   }
+
+  isImageFile(filename: string): boolean {
+    if (!filename) return false;
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
+    const extension = filename.toLowerCase().substring(filename.lastIndexOf('.'));
+    return imageExtensions.includes(extension);
+  }
+
+  getImageUrl(filename: string): string {
+    if (!filename) return '';
+    return `/api/uploads/${filename}`;
+  }
+
+  onImageError(event: any) {
+    event.target.style.display = 'none';
+  }
 }
