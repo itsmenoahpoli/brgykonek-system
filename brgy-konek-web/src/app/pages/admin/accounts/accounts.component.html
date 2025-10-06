@@ -40,6 +40,40 @@
       </tbody>
     </table>
   </div>
+  
+  <!-- Disabled Accounts Section -->
+  <div class="mt-6 bg-white rounded-xl shadow p-6" *ngIf="mode === 'all' && disabledAccounts.length > 0">
+    <div class="font-semibold text-lg mb-3 text-red-600">Disabled Accounts (Login Locked)</div>
+    <table class="min-w-full border-separate border-spacing-0 bg-transparent text-sm">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 text-left">Name</th>
+          <th class="px-4 py-2 text-left">Email</th>
+          <th class="px-4 py-2 text-left">Disabled Date</th>
+          <th class="px-4 py-2 text-left">Login Attempts</th>
+          <th class="px-4 py-2 text-left">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let account of disabledAccounts" class="hover:bg-gray-50">
+          <td class="px-4 py-2">{{ account.name }}</td>
+          <td class="px-4 py-2">{{ account.email }}</td>
+          <td class="px-4 py-2">{{ account.loginDisabledAt | date:'short' }}</td>
+          <td class="px-4 py-2 text-red-600 font-semibold">{{ account.loginAttempts }}/3</td>
+          <td class="px-4 py-2">
+            <button 
+              type="button" 
+              class="text-green-600 hover:text-green-800 hover:underline"
+              (click)="enableAccount(account._id)"
+            >
+              Enable Account
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
   <div class="overflow-x-auto mt-6">
     <table class="min-w-full border-separate border-spacing-0 bg-transparent">
       <thead>

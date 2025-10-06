@@ -4,6 +4,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { UsersService, User } from '../../../services/users.service';
 import { DashboardLayoutComponent } from '../../../components/shared/dashboard-layout/dashboard-layout.component';
 import { AuthService } from '../../../services/auth.service';
+import apiClient from '../../../utils/api.util';
 import { FormsModule } from '@angular/forms';
 import { StatusModalComponent } from '../../../components/shared/status-modal/status-modal.component';
 import { ConfirmDeleteModalComponent } from '../../../components/shared/confirm-delete-modal.component';
@@ -25,6 +26,7 @@ import { ConfirmDeleteModalComponent } from '../../../components/shared/confirm-
 export class AccountsComponent implements OnInit {
   users: User[] = [];
   pendingUsers: User[] = [];
+  disabledAccounts: any[] = [];
   currentUserId: string | undefined;
   searchTerm = '';
   isCreateUserModalVisible = false;
@@ -63,6 +65,7 @@ export class AccountsComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.users = ((await this.usersService.getUsers()) || []).filter(u => u.user_type === 'resident');
     this.pendingUsers = this.users.filter(u => u.approved === false || u.status === 'pending');
+    await this.loadDisabledAccounts();
     const currentUser = this.authService.getCurrentUser();
     this.currentUserId = currentUser?.id;
     const mode = this.route.snapshot.data?.['mode'] as 'pending' | 'all' | undefined;
@@ -343,5 +346,32 @@ export class AccountsComponent implements OnInit {
 
   onImageError(event: any) {
     event.target.style.display = 'none';
+  }
+
+  async loadDisabledAccounts(): Promise<void> {
+    try {
+      const response = await apiClient.get('/user-accounts/disabled');
+      if (response.data.success) {
+        this.disabledAccounts = response.data.data || [];
+      }
+    } catch (error) {
+      console.error('Error loading disabled accounts:', error);
+      this.disabledAccounts = [];
+    }
+  }
+
+  async enableAccount(userId: string): Promise<void> {
+    try {
+      const response = await apiClient.post('/user-accounts/enable', { userId });
+      if (response.data.success) {
+        // Remove from disabled accounts list
+        this.disabledAccounts = this.disabledAccounts.filter(account => account._id !== userId);
+        // Show success message
+        alert('Account enabled successfully');
+      }
+    } catch (error) {
+      console.error('Error enabling account:', error);
+      alert('Failed to enable account');
+    }
   }
 }

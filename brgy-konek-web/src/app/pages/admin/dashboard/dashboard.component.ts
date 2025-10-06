@@ -35,7 +35,7 @@ export class DashboardComponent implements OnInit {
   statistics: OverviewStatistics | null = null;
   recentComplaints: Complaint[] = [];
   recentAnnouncements: Announcement[] = [];
-
+  
   get resolvedComplaints(): number | string {
     if (!this.statistics) return '-';
     const resolvedCount = this.recentComplaints.filter(c => c.status === 'resolved').length;

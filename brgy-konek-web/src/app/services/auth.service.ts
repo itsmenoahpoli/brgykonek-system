@@ -50,6 +50,8 @@ export class AuthService {
     if (storedUser) {
       this.currentUserSubject.next(JSON.parse(storedUser));
     }
+    // Load login attempts from localStorage
+    this.loadLoginAttemptsFromStorage();
   }
 
   private getTrustedDeviceKey(email: string): string {
@@ -312,16 +314,37 @@ export class AuthService {
 
     if (attempts.count >= 3) {
       attempts.lockedUntil = Date.now() + 5 * 60 * 1000;
+      // Save email to localStorage for persistent lockout
+      const lockedEmails = JSON.parse(localStorage.getItem('lockedEmails') || '[]');
+      if (!lockedEmails.includes(email)) {
+        lockedEmails.push(email);
+        localStorage.setItem('lockedEmails', JSON.stringify(lockedEmails));
+      }
     }
 
     this.loginAttempts.set(email, attempts);
+    // Save attempts to localStorage for persistence
+    this.saveLoginAttemptsToStorage();
   }
 
   resetLoginAttempts(email: string): void {
     this.loginAttempts.delete(email);
+    // Remove from locked emails list
+    const lockedEmails = JSON.parse(localStorage.getItem('lockedEmails') || '[]');
+    const updatedLockedEmails = lockedEmails.filter((e: string) => e !== email);
+    localStorage.setItem('lockedEmails', JSON.stringify(updatedLockedEmails));
+    // Save updated attempts to localStorage
+    this.saveLoginAttemptsToStorage();
   }
 
   isAccountLocked(email: string): boolean {
+    // Check if email is in locked emails list (persistent lockout)
+    const lockedEmails = JSON.parse(localStorage.getItem('lockedEmails') || '[]');
+    if (lockedEmails.includes(email)) {
+      return true;
+    }
+
+    // Check temporary lockout from current session
     const attempts = this.loginAttempts.get(email);
     if (!attempts) return false;
 
@@ -452,5 +475,23 @@ export class AuthService {
               : 'Password reset failed'),
         }))
     );
+  }
+
+  private saveLoginAttemptsToStorage(): void {
+    const attemptsObj = Object.fromEntries(this.loginAttempts);
+    localStorage.setItem('loginAttempts', JSON.stringify(attemptsObj));
+  }
+
+  private loadLoginAttemptsFromStorage(): void {
+    const stored = localStorage.getItem('loginAttempts');
+    if (stored) {
+      try {
+        const attemptsObj = JSON.parse(stored);
+        this.loginAttempts = new Map(Object.entries(attemptsObj));
+      } catch (error) {
+        console.error('Error loading login attempts from storage:', error);
+        localStorage.removeItem('loginAttempts');
+      }
+    }
   }
 }

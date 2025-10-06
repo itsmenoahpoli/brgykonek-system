@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { authService } from "../services/authService";
+import { userAccountService } from "../services/userAccountService";
 
 interface AuthRequest extends Request {
   user?: any;
@@ -49,12 +50,26 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password, deviceInfo, rememberDevice } = req.body;
 
+    // Check if account is disabled
+    const User = require("../models/User").default;
+    const user = await User.findOne({ email });
+    
+    if (user && user.loginDisabled) {
+      res.status(403).json({ 
+        message: "Your account has been disabled temporarily. Max login attempt reached, please contact admin to enable your account" 
+      });
+      return;
+    }
+
     const result = await authService.login({ 
       email, 
       password, 
       deviceInfo, 
       rememberDevice 
     });
+
+    // Reset login attempts on successful login
+    await userAccountService.resetLoginAttempts(email);
 
     if (result.requiresOTP) {
       res.status(200).json({
@@ -73,6 +88,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     const errorMessage = (error as Error).message;
     if (errorMessage === "Invalid credentials") {
+      // Increment login attempts on failed login
+      await userAccountService.incrementLoginAttempts(req.body.email);
       res.status(400).json({ message: errorMessage });
     } else if (errorMessage === "JWT secret not configured") {
       res.status(500).json({ message: errorMessage });

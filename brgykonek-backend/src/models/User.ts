@@ -16,6 +16,11 @@ export interface IUser extends Document {
   approved?: boolean;
   approvedAt?: Date;
   approvedBy?: string;
+  loginDisabled?: boolean;
+  loginDisabledAt?: Date;
+  loginDisabledBy?: string;
+  loginAttempts?: number;
+  lastFailedLogin?: Date;
 }
 
 const userSchema = new Schema<IUser>(
@@ -99,6 +104,27 @@ const userSchema = new Schema<IUser>(
     approvedBy: {
       type: String,
       ref: 'User',
+      default: null,
+    },
+    loginDisabled: {
+      type: Boolean,
+      default: false,
+    },
+    loginDisabledAt: {
+      type: Date,
+      default: null,
+    },
+    loginDisabledBy: {
+      type: String,
+      ref: 'User',
+      default: null,
+    },
+    loginAttempts: {
+      type: Number,
+      default: 0,
+    },
+    lastFailedLogin: {
+      type: Date,
       default: null,
     },
   },

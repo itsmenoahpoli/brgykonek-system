@@ -62,7 +62,7 @@ export class LoginComponent {
       const { email, password } = this.loginForm.value;
 
       if (this.authService.isAccountLocked(email)) {
-        this.errorMessage = 'Too many failed login attempts. Please try again later.';
+        this.errorMessage = 'Your account has been disabled temporarily. Max login attempt reached, please contact admin to enable your account';
         return;
       }
 
