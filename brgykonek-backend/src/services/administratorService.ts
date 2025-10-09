@@ -58,3 +58,7 @@ export const createUser = async (data: Partial<IUser>) => {
   await user.save();
   return User.findById(user._id).select("-password");
 };
+
+export const getResidents = async () => {
+  return User.find({ user_type: "resident" }).select("-password");
+};

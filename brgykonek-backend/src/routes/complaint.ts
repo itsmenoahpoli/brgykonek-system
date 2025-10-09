@@ -66,8 +66,18 @@ import multer, { FileFilterCallback } from "multer";
 import { Request } from "express";
 import { authenticateToken, isAdmin } from "../middleware/auth";
 import { ensureUploadsDir } from "../utils/files";
+import fs from "fs";
+import path from "path";
 
 const router = Router();
+
+// Function to ensure complaints directory exists
+const ensureComplaintsDir = () => {
+  const complaintsDir = path.join(process.cwd(), "images", "complaints");
+  if (!fs.existsSync(complaintsDir)) {
+    fs.mkdirSync(complaintsDir, { recursive: true });
+  }
+};
 
 const storage = multer.diskStorage({
   destination: (
@@ -75,8 +85,8 @@ const storage = multer.diskStorage({
     file: Express.Multer.File,
     cb: (error: Error | null, destination: string) => void
   ) => {
-    ensureUploadsDir();
-    cb(null, "uploads");
+    ensureComplaintsDir();
+    cb(null, "images/complaints");
   },
   filename: (
     req: Request,
@@ -129,6 +139,11 @@ const upload = multer({ storage, fileFilter });
  *                 format: date-time
  *               complaint_content:
  *                 type: string
+ *               sitio:
+ *                 type: number
+ *                 minimum: 1
+ *                 maximum: 100
+ *                 description: Optional. Sitio number (1-100).
  *               attachments:
  *                 type: array
  *                 items:

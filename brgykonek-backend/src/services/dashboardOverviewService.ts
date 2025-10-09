@@ -82,7 +82,8 @@ export const getOverviewStatistics = async (
   }));
 
   const complaintsBySitio = await Complaint.aggregate([
-    { $group: { _id: "$address_sitio", count: { $sum: 1 } } },
+    { $group: { _id: "$sitio", count: { $sum: 1 } } },
+    { $match: { _id: { $ne: null } } },
     { $project: { sitio: "$_id", count: 1, _id: 0 } },
     { $sort: { count: -1 } },
   ]);

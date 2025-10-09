@@ -41,7 +41,7 @@
     [ngClass]="{ 'ml-64': sidebarOpen, 'ml-16': !sidebarOpen }"
   >
     <nav
-      class="navbar bg-white shadow h-16 flex items-center px-6 justify-between fixed top-0 right-0 z-20 w-[calc(100%-16rem)]"
+      class="navbar bg-white shadow h-16 flex items-center px-6 justify-between fixed top-0 right-0 z-20"
       [ngClass]="{
         'w-[calc(100%-16rem)]': sidebarOpen,
         'w-[calc(100%-4rem)]': !sidebarOpen
@@ -51,10 +51,13 @@
       <span class="font-semibold text-gray-700">Web Dashboard v1.0.0</span>
       <div class="flex items-center space-x-4">
         <app-notification-bell></app-notification-bell>
-        <app-user-avatar-dropdown
-          [userRole]="authService.getCurrentUser()?.role || ''"
-          (logout)="logout()"
-        ></app-user-avatar-dropdown>
+        <button
+          (click)="logout()"
+          class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2"
+        >
+          <ng-icon name="heroArrowRightOnRectangle" class="w-5 h-5"></ng-icon>
+          Logout
+        </button>
       </div>
     </nav>
     <main

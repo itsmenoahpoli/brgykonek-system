@@ -23,6 +23,7 @@ export interface Complaint {
   attachments: string[];
   status: string;
   priority?: 'low' | 'medium' | 'high';
+  sitio?: number;
   resolution_note?: string;
   created_at: string;
   updated_at: string;
@@ -88,6 +89,15 @@ export class ComplaintsService {
   async getResidentById(id: string): Promise<Resident | undefined> {
     try {
       const res = await apiClient.get<Resident>(`/residents/${id}`);
+      return res.data;
+    } catch (error) {
+      return undefined;
+    }
+  }
+
+  async getAllResidents(): Promise<Resident[] | undefined> {
+    try {
+      const res = await apiClient.get<Resident[]>('/administrator/residents');
       return res.data;
     } catch (error) {
       return undefined;

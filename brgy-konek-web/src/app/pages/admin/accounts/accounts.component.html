@@ -1,516 +1,372 @@
-<app-dashboard-layout [title]="pageTitle" [subtitle]="pageSubtitle">
-  <div class="flex items-center justify-between mb-4">
-    <div class="flex gap-2">
-      <input
-        type="text"
-        class="border rounded px-3 py-2 text-sm h-10 !w-80"
-        placeholder="Search by name, email, or mobile"
-        [(ngModel)]="searchTerm"
-      />
-    </div>
-    <button
-      type="button"
-      class="bg-blue-600 text-white px-4 py-2 h-10 rounded"
-      (click)="openCreateUserModal()"
-    >
-      Create User
-    </button>
-  </div>
-  <div class="mt-6 bg-white rounded-xl shadow p-6" *ngIf="mode === 'all' && pendingUsers.length > 0">
-    <div class="font-semibold text-lg mb-3">Pending Accounts</div>
-    <table class="min-w-full border-separate border-spacing-0 bg-transparent text-sm">
-      <thead>
-        <tr>
-          <th class="px-4 py-2 text-left">Name</th>
-          <th class="px-4 py-2 text-left">Email</th>
-          <th class="px-4 py-2 text-left">Mobile</th>
-          <th class="px-4 py-2 text-left">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let user of pendingUsers">
-          <td class="px-4 py-2 underline cursor-pointer" (click)="editUser(user)">{{ user.name }}</td>
-          <td class="px-4 py-2">{{ user.email }}</td>
-          <td class="px-4 py-2">{{ user.mobile_number }}</td>
-          <td class="px-4 py-2">
-            <button type="button" class="px-3 py-1 text-green-700 hover:underline" (click)="viewProfile(user)">View</button>
-            <button type="button" class="px-3 py-1 text-emerald-700 hover:underline" (click)="approve(user)">Approve</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  
-  <!-- Disabled Accounts Section -->
-  <div class="mt-6 bg-white rounded-xl shadow p-6" *ngIf="mode === 'all' && disabledAccounts.length > 0">
-    <div class="font-semibold text-lg mb-3 text-red-600">Disabled Accounts (Login Locked)</div>
-    <table class="min-w-full border-separate border-spacing-0 bg-transparent text-sm">
-      <thead>
-        <tr>
-          <th class="px-4 py-2 text-left">Name</th>
-          <th class="px-4 py-2 text-left">Email</th>
-          <th class="px-4 py-2 text-left">Disabled Date</th>
-          <th class="px-4 py-2 text-left">Login Attempts</th>
-          <th class="px-4 py-2 text-left">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let account of disabledAccounts" class="hover:bg-gray-50">
-          <td class="px-4 py-2">{{ account.name }}</td>
-          <td class="px-4 py-2">{{ account.email }}</td>
-          <td class="px-4 py-2">{{ account.loginDisabledAt | date:'short' }}</td>
-          <td class="px-4 py-2 text-red-600 font-semibold">{{ account.loginAttempts }}/3</td>
-          <td class="px-4 py-2">
-            <button 
-              type="button" 
-              class="text-green-600 hover:text-green-800 hover:underline"
-              (click)="enableAccount(account._id)"
-            >
-              Enable Account
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  
-  <div class="overflow-x-auto mt-6">
-    <table class="min-w-full border-separate border-spacing-0 bg-transparent">
-      <thead>
-        <tr>
-          <th class="px-4 py-2 font-medium text-left">Name</th>
-          <th class="px-4 py-2 font-medium text-left">Email</th>
-          <th class="px-4 py-2 font-medium text-left">Mobile Number</th>
-          <th class="px-4 py-2 font-medium text-left">User Type</th>
-          <th class="px-4 py-2 font-medium text-left">Status</th>
-          <th class="px-4 py-2 font-medium text-left">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <ng-container *ngIf="users as users">
-          <tr *ngIf="filteredUsers.length === 0">
-            <td colspan="6" class="py-8 text-center text-gray-400">
-              <svg
-                width="48"
-                height="48"
-                fill="none"
-                viewBox="0 0 24 24"
-                class="mx-auto mb-2"
-              >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="#cbd5e1"
-                  stroke-width="2"
-                />
-                <path
-                  d="M8 12h8M12 8v8"
-                  stroke="#cbd5e1"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                />
-              </svg>
-              No data
-            </td>
-          </tr>
-          <tr *ngFor="let user of filteredUsers" [hidden]="user._id === currentUserId">
-            <td class="px-4 py-2">{{ user.name }}</td>
-            <td class="px-4 py-2">{{ user.email }}</td>
-            <td class="px-4 py-2">{{ user.mobile_number }}</td>
-            <td class="px-4 py-2">
-              <span
-                class="px-2 py-1 text-yellow-700 border border-yellow-400 rounded-full bg-yellow-50 text-xs font-semibold capitalize"
-              >
-                {{ user.user_type }}
-              </span>
-            </td>
-            <td class="px-4 py-2">
-              <span *ngIf="user.approved === false || user.approved === undefined || user.status === 'pending'" class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-300 text-xs font-semibold">Pending</span>
-              <span *ngIf="user.approved === true || user.status === 'approved'" class="px-2 py-1 rounded-full bg-green-100 text-green-800 border border-green-300 text-xs font-semibold">Approved</span>
-              <span *ngIf="user.status === 'inactive'" class="px-2 py-1 rounded-full bg-gray-100 text-gray-700 border border-gray-300 text-xs font-semibold">Inactive</span>
-            </td>
-            <td class="px-4 py-2 flex items-center gap-3">
-              <button type="button" class="text-green-600 hover:underline" (click)="viewProfile(user)">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                View
-              </button>
-              <button *ngIf="user.approved === false || user.status === 'pending'" type="button" class="text-emerald-700 hover:underline" (click)="approve(user)">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                Approve
-              </button>
-              <button type="button" class="text-red-600 hover:underline" (click)="openDeleteModal(user)">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                Delete
-              </button>
-            </td>
-          </tr>
-        </ng-container>
-      </tbody>
-    </table>
-  </div>
-</app-dashboard-layout>
-
-<ng-container *ngIf="isCreateUserModalVisible">
-  <div
-    class="fixed inset-0 bg-gray-600 bg-opacity-50 h-full w-full z-50 flex items-center justify-center"
-  >
-    <div
-      class="mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white"
-    >
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-medium text-gray-900">Create User</h3>
-        <button
-          type="button"
-          class="text-gray-400 hover:text-gray-600"
-          (click)="closeCreateUserModal()"
-        >
-          &times;
-        </button>
-      </div>
-      <form (ngSubmit)="submitCreateUser()" autocomplete="off">
-        <div class="mb-3">
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >Name</label
-          >
-          <input
-            type="text"
-            class="w-full border rounded px-3 py-2"
-            [(ngModel)]="createUserForm.name"
-            name="name"
-            required
-          />
-        </div>
-        <div class="mb-3">
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >Email</label
-          >
-          <input
-            type="email"
-            class="w-full border rounded px-3 py-2"
-            [(ngModel)]="createUserForm.email"
-            name="email"
-            required
-          />
-        </div>
-        <div class="mb-3">
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >Mobile Number</label
-          >
-          <input
-            type="text"
-            class="w-full border rounded px-3 py-2"
-            [ngClass]="{ 'border-red-500': mobileNumberError }"
-            [(ngModel)]="createUserForm.mobile_number"
-            name="mobile_number"
-            required
-            (blur)="validateMobileNumber()"
-            (input)="validateMobileNumber()"
-          />
-          <div *ngIf="mobileNumberError" class="text-red-500 text-xs mt-1">
-            {{ mobileNumberError }}
-          </div>
-        </div>
-        <div class="mb-3">
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >Password</label
-          >
-          <div class="relative">
-            <input
-              [type]="showPassword ? 'text' : 'password'"
-              class="w-full border rounded px-3 py-2 pr-10"
-              [ngClass]="{ 'border-red-500': passwordError }"
-              [(ngModel)]="createUserForm.password"
-              name="password"
-              required
-              (blur)="validatePassword()"
-              (input)="validatePassword()"
-            />
-            <button
-              type="button"
-              (click)="showPassword = !showPassword"
-              class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"
-            >
-              <svg
-                *ngIf="!showPassword"
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.274.832-.67 1.613-1.176 2.318M15.54 17.44A9.956 9.956 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.956 9.956 0 012.042-3.338"
-                />
-              </svg>
-              <svg
-                *ngIf="showPassword"
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.956 9.956 0 012.042-3.338m1.664-2.486A9.956 9.956 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.965 9.965 0 01-4.293 5.411M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M3 3l18 18"
-                />
-              </svg>
-            </button>
-            <button
-              type="button"
-              (click)="generatePassword()"
-              class="absolute inset-y-0 right-10 flex items-center px-2 text-blue-600 text-xs"
-            >
-              Generate
-            </button>
-          </div>
-          <div *ngIf="passwordError" class="text-red-500 text-xs mt-1">
-            {{ passwordError }}
-          </div>
-          <ul class="mt-2 space-y-1 text-xs">
-            <li
-              [class.text-green-600]="passwordValidationStatus.length"
-              [class.text-red-500]="!passwordValidationStatus.length"
-            >
-              Minimum 8 and maximum 20 characters
-            </li>
-            <li
-              [class.text-green-600]="passwordValidationStatus.uppercase"
-              [class.text-red-500]="!passwordValidationStatus.uppercase"
-            >
-              At least one uppercase letter
-            </li>
-            <li
-              [class.text-green-600]="passwordValidationStatus.lowercase"
-              [class.text-red-500]="!passwordValidationStatus.lowercase"
-            >
-              At least one lowercase letter
-            </li>
-            <li
-              [class.text-green-600]="passwordValidationStatus.number"
-              [class.text-red-500]="!passwordValidationStatus.number"
-            >
-              At least one number
-            </li>
-            <li
-              [class.text-green-600]="passwordValidationStatus.special"
-              [class.text-red-500]="!passwordValidationStatus.special"
-            >
-              At least one special character (!&#64;#$%^&*)
-            </li>
-          </ul>
-        </div>
-        <div class="mb-3">
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >User Type</label
-          >
-          <select
-            class="w-full border rounded px-3 py-2"
-            [(ngModel)]="createUserForm.user_type"
-            name="user_type"
-          >
-            <option value="resident">Resident</option>
-            <option value="admin">Admin</option>
-            <option value="staff">Staff</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >Address</label
-          >
-          <input
-            type="text"
-            class="w-full border rounded px-3 py-2"
-            [(ngModel)]="createUserForm.address"
-            name="address"
-            required
-          />
-        </div>
-        <div class="mb-3">
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >Birthdate</label
-          >
-          <input
-            type="date"
-            class="w-full border rounded px-3 py-2"
-            [(ngModel)]="createUserForm.birthdate"
-            name="birthdate"
-            required
-          />
-        </div>
-        <div class="mb-3">
-          <label class="block text-sm font-medium text-gray-700 mb-1"
-            >Barangay Clearance (Image or PDF)</label
-          >
-          <div
-            class="w-full border-2 border-dashed rounded px-3 py-6 text-center cursor-pointer bg-gray-50 hover:bg-gray-100"
-            (drop)="
-              $event.preventDefault();
-              onBarangayClearanceChange(
-                $event.dataTransfer &&
-                  $event.dataTransfer.files &&
-                  $event.dataTransfer.files.length > 0
-                  ? $event.dataTransfer.files[0]
-                  : null
-              )
-            "
-            (dragover)="$event.preventDefault()"
-          >
-            <input
-              type="file"
-              accept="image/*,application/pdf"
-              class="hidden"
-              #fileInput
-              (change)="onBarangayClearanceChange(fileInput.files?.[0] ?? null)"
-            />
-            <div (click)="fileInput && fileInput.click()">
-              <span *ngIf="!createUserForm.barangay_clearance"
-                >Drag & drop or click to select file</span
-              >
-              <span *ngIf="createUserForm.barangay_clearance">{{
-                createUserForm.barangay_clearance.name
-              }}</span>
-            </div>
-          </div>
-        </div>
-        <div
-          *ngIf="createUserError"
-          class="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded mb-3"
-        >
-          {{ createUserError }}
-        </div>
-        <div class="flex justify-end gap-2 mt-4">
-          <button
-            type="button"
-            class="px-4 py-2 border rounded text-gray-700 bg-white"
-            (click)="closeCreateUserModal()"
-            [disabled]="isSubmitting"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="px-4 py-2 rounded text-white bg-blue-600"
-            [disabled]="isSubmitting"
-          >
-            {{ isSubmitting ? "Creating..." : "Create" }}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</ng-container>
-
-<app-status-modal
-  [isVisible]="showStatusModal"
-  [type]="statusModalType"
-  [title]="statusModalTitle"
-  [message]="statusModalMessage"
-  (modalClosed)="closeStatusModal()"
-></app-status-modal>
-
-<div *ngIf="showViewModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-  <div class="bg-white rounded-lg shadow-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-    <div class="flex items-center justify-between p-6 border-b">
-      <h3 class="text-lg font-semibold text-gray-900">User Profile</h3>
-      <button type="button" class="text-gray-400 hover:text-gray-600" (click)="closeViewModal()">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
+<app-dashboard-layout>
+  <div class="p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">Account Management</h1>
+      <button 
+        class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded transition-colors duration-200"
+        (click)="openCreateModal()"
+      >
+        Create New Account
       </button>
     </div>
-    <div class="p-6" *ngIf="selectedUser">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-          <p class="text-gray-900">{{ selectedUser.name }}</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-          <p class="text-gray-900">{{ selectedUser.email }}</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
-          <p class="text-gray-900">{{ selectedUser.mobile_number }}</p>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+          <input 
+            type="text" 
+            class="w-full border rounded px-3 py-2" 
+            placeholder="Search by name or email..."
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()"
+          />
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">User Type</label>
-          <span class="inline-block px-2 py-1 text-yellow-700 border border-yellow-400 rounded-full bg-yellow-50 text-xs font-semibold capitalize">
-            {{ selectedUser.user_type }}
-          </span>
+          <select 
+            class="w-full border rounded px-3 py-2" 
+            [(ngModel)]="userTypeFilter"
+            (change)="onFilterChange()"
+          >
+            <option value="all">All Types</option>
+            <option value="staff">Staff</option>
+            <option value="resident">Resident</option>
+          </select>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-          <span *ngIf="selectedUser.approved === false || selectedUser.approved === undefined || selectedUser.status === 'pending'" class="inline-block px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-300 text-xs font-semibold">Pending</span>
-          <span *ngIf="selectedUser.approved === true || selectedUser.status === 'approved'" class="inline-block px-2 py-1 rounded-full bg-green-100 text-green-800 border border-green-300 text-xs font-semibold">Approved</span>
-          <span *ngIf="selectedUser.status === 'inactive'" class="inline-block px-2 py-1 rounded-full bg-gray-100 text-gray-700 border border-gray-300 text-xs font-semibold">Inactive</span>
+          <select 
+            class="w-full border rounded px-3 py-2" 
+            [(ngModel)]="statusFilter"
+            (change)="onFilterChange()"
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-          <p class="text-gray-900">{{ selectedUser.address }}</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Birthdate</label>
-          <p class="text-gray-900">{{ selectedUser.birthdate | date:'longDate' }}</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Barangay Clearance</label>
-          <div *ngIf="selectedUser.barangay_clearance" class="mt-2">
-            <img 
-              *ngIf="isImageFile(selectedUser.barangay_clearance)"
-              [src]="getImageUrl(selectedUser.barangay_clearance)" 
-              [alt]="selectedUser.barangay_clearance"
-              class="max-w-full h-auto max-h-64 rounded border"
-              (error)="onImageError($event)"
-            />
-            <a 
-              *ngIf="!isImageFile(selectedUser.barangay_clearance)"
-              [href]="getImageUrl(selectedUser.barangay_clearance)" 
-              target="_blank"
-              class="text-blue-600 hover:text-blue-800 underline"
-            >
-              {{ selectedUser.barangay_clearance }}
-            </a>
-          </div>
-          <p *ngIf="!selectedUser.barangay_clearance" class="text-gray-500 italic">No document uploaded</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Created At</label>
-          <p class="text-gray-900">{{ selectedUser.createdAt | date:'medium' }}</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Updated At</label>
-          <p class="text-gray-900">{{ selectedUser.updatedAt | date:'medium' }}</p>
+        <div class="flex items-end">
+          <button 
+            class="w-full bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded transition-colors duration-200"
+            (click)="searchTerm = ''; userTypeFilter = 'all'; statusFilter = 'all'; applyFilters()"
+          >
+            Clear Filters
+          </button>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<app-confirm-delete-modal
-  [visible]="isDeleteModalVisible"
-  [title]="'Delete User'"
-  [message]="
-    'Are you sure you want to delete this user? This action cannot be undone.'
-  "
-  (cancel)="closeDeleteModal()"
-  (confirm)="confirmDeleteUser()"
-></app-confirm-delete-modal>
+    <!-- Users Table -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngIf="loading">
+              <td colspan="6" class="px-6 py-4 text-center">
+                <div class="flex items-center justify-center">
+                  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                  <span class="ml-2">Loading users...</span>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="!loading && filteredUsers.length === 0">
+              <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                No users found matching your criteria.
+              </td>
+            </tr>
+            <tr *ngFor="let user of filteredUsers" class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <div class="h-10 w-10 rounded-full bg-indigo-500 flex items-center justify-center">
+                      <span class="text-sm font-medium text-white">{{ user.name.charAt(0).toUpperCase() }}</span>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">{{ user.name }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user.email }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full border" 
+                      [class]="getUserTypeClass(user.user_type)">
+                  {{ user.user_type | titlecase }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full border" 
+                      [class]="getStatusClass(user)">
+                  {{ (user.approved !== false && user.status !== 'inactive') ? 'Enabled' : 'Disabled' }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {{ user.createdAt | date:'short' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div class="flex flex-col space-y-2">
+                  <button 
+                    class="text-indigo-600 hover:text-indigo-900"
+                    (click)="openEditModal(user)"
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    class="text-gray-600 hover:text-gray-900"
+                    (click)="toggleUserStatus(user)"
+                  >
+                    {{ (user.approved !== false && user.status !== 'inactive') ? 'Disable' : 'Enable' }}
+                  </button>
+                  <button 
+                    class="text-red-600 hover:text-red-900"
+                    (click)="openDeleteModal(user)"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Success Modal -->
+    <app-status-modal
+      [isVisible]="showSuccessModal"
+      [title]="successTitle"
+      [message]="successMessage"
+      (modalClosed)="onSuccessModalClosed()"
+    ></app-status-modal>
+  </div>
+
+  <!-- Create User Modal -->
+  <div *ngIf="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Create New Account</h3>
+      </div>
+      <form (ngSubmit)="createUser()" class="px-6 py-4 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+          <input 
+            type="text" 
+            class="w-full border rounded px-3 py-2" 
+            [class.border-red-500]="isFormSubmitted && formErrors.name"
+            [(ngModel)]="createForm.name" 
+            name="name"
+            required
+          />
+          <div *ngIf="isFormSubmitted && formErrors.name" class="mt-1 text-sm text-red-600">
+            {{ formErrors.name }}
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input 
+            type="email" 
+            class="w-full border rounded px-3 py-2" 
+            [class.border-red-500]="isFormSubmitted && formErrors.email"
+            [(ngModel)]="createForm.email" 
+            name="email"
+            required
+          />
+          <div *ngIf="isFormSubmitted && formErrors.email" class="mt-1 text-sm text-red-600">
+            {{ formErrors.email }}
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <input 
+            type="password" 
+            class="w-full border rounded px-3 py-2" 
+            [class.border-red-500]="isFormSubmitted && formErrors.password"
+            [(ngModel)]="createForm.password" 
+            name="password"
+            required
+          />
+          <div *ngIf="isFormSubmitted && formErrors.password" class="mt-1 text-sm text-red-600">
+            {{ formErrors.password }}
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">User Type</label>
+          <select 
+            class="w-full border rounded px-3 py-2" 
+            [class.border-red-500]="isFormSubmitted && formErrors.user_type"
+            [(ngModel)]="createForm.user_type" 
+            name="user_type"
+            required
+          >
+            <option value="resident">Resident</option>
+            <option value="staff">Staff</option>
+          </select>
+          <div *ngIf="isFormSubmitted && formErrors.user_type" class="mt-1 text-sm text-red-600">
+            {{ formErrors.user_type }}
+          </div>
+        </div>
+        
+        <div class="flex items-center">
+          <input 
+            type="checkbox" 
+            id="create-active" 
+            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            [(ngModel)]="createForm.is_active" 
+            name="is_active"
+          />
+          <label for="create-active" class="ml-2 block text-sm text-gray-900">
+            Active Account
+          </label>
+        </div>
+      </form>
+      <div class="px-6 py-4 bg-gray-50 flex justify-end space-x-3">
+        <button 
+          type="button" 
+          class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+          (click)="closeCreateModal()"
+        >
+          Cancel
+        </button>
+        <button 
+          type="button" 
+          class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-indigo-700"
+          (click)="createUser()"
+        >
+          Create Account
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div *ngIf="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Edit Account</h3>
+      </div>
+      <form (ngSubmit)="updateUser()" class="px-6 py-4 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+          <input 
+            type="text" 
+            class="w-full border rounded px-3 py-2" 
+            [class.border-red-500]="isFormSubmitted && formErrors.name"
+            [(ngModel)]="editForm.name" 
+            name="name"
+            required
+          />
+          <div *ngIf="isFormSubmitted && formErrors.name" class="mt-1 text-sm text-red-600">
+            {{ formErrors.name }}
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input 
+            type="email" 
+            class="w-full border rounded px-3 py-2" 
+            [class.border-red-500]="isFormSubmitted && formErrors.email"
+            [(ngModel)]="editForm.email" 
+            name="email"
+            required
+          />
+          <div *ngIf="isFormSubmitted && formErrors.email" class="mt-1 text-sm text-red-600">
+            {{ formErrors.email }}
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">User Type</label>
+          <select 
+            class="w-full border rounded px-3 py-2" 
+            [class.border-red-500]="isFormSubmitted && formErrors.user_type"
+            [(ngModel)]="editForm.user_type" 
+            name="user_type"
+            required
+          >
+            <option value="resident">Resident</option>
+            <option value="staff">Staff</option>
+          </select>
+          <div *ngIf="isFormSubmitted && formErrors.user_type" class="mt-1 text-sm text-red-600">
+            {{ formErrors.user_type }}
+          </div>
+        </div>
+        
+        <div class="flex items-center">
+          <input 
+            type="checkbox" 
+            id="edit-active" 
+            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            [(ngModel)]="editForm.is_active" 
+            name="is_active"
+          />
+          <label for="edit-active" class="ml-2 block text-sm text-gray-900">
+            Active Account
+          </label>
+        </div>
+      </form>
+      <div class="px-6 py-4 bg-gray-50 flex justify-end space-x-3">
+        <button 
+          type="button" 
+          class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+          (click)="closeEditModal()"
+        >
+          Cancel
+        </button>
+        <button 
+          type="button" 
+          class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-indigo-700"
+          (click)="updateUser()"
+        >
+          Update Account
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div *ngIf="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Delete Account</h3>
+      </div>
+      <div class="px-6 py-4">
+        <p class="text-sm text-gray-600">
+          Are you sure you want to delete the account for <strong>{{ userToDelete?.name }}</strong>?
+          This action cannot be undone.
+        </p>
+      </div>
+      <div class="px-6 py-4 bg-gray-50 flex justify-end space-x-3">
+        <button 
+          type="button" 
+          class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+          (click)="closeDeleteModal()"
+        >
+          Cancel
+        </button>
+        <button 
+          type="button" 
+          class="px-4 py-2 bg-red-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-red-700"
+          (click)="deleteUser()"
+        >
+          Delete Account
+        </button>
+      </div>
+    </div>
+  </div>
+</app-dashboard-layout>

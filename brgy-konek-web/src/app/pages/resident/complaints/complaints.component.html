@@ -27,19 +27,19 @@
       <thead>
         <tr>
           <th class="px-4 py-2 font-medium text-left">Category</th>
+          <th class="px-4 py-2 font-medium text-left">Sitio</th>
           <th class="px-4 py-2 font-medium text-left">Date of Report</th>
           <th class="px-4 py-2 font-medium text-left">Content</th>
           <th class="px-4 py-2 font-medium text-left">Attachments</th>
+          <th class="px-4 py-2 font-medium text-left">Priority</th>
           <th class="px-4 py-2 font-medium text-left">Status</th>
-          <th class="px-4 py-2 font-medium text-left">Created At</th>
-          <th class="px-4 py-2 font-medium text-left">Updated At</th>
           <th class="px-4 py-2 font-medium text-left">Actions</th>
         </tr>
       </thead>
       <tbody>
         <ng-container *ngIf="filteredComplaints as complaints">
           <tr *ngIf="complaints.length === 0">
-            <td colspan="7" class="py-8 text-center text-gray-400">
+            <td colspan="8" class="py-8 text-center text-gray-400">
               <svg
                 width="48"
                 height="48"
@@ -66,71 +66,72 @@
           </tr>
           <tr *ngFor="let complaint of complaints">
             <td class="px-4 py-2">
-              <span class="inline-flex items-center">
-                <span
-                  class="w-3 h-3 rounded-full mr-2"
-                  [ngStyle]="{
-                    'background-color':
-                      complaint.category === 'Noise'
-                        ? '#facc15'
-                        : complaint.category === 'Garbage'
-                        ? '#22c55e'
-                        : complaint.category === 'Vandalism'
-                        ? '#3b82f6'
-                        : '#6b7280'
-                  }"
-                ></span>
+              <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold"
+                [class]="getCategoryClass(complaint.category)">
                 {{ complaint.category }}
+              </span>
+            </td>
+            <td class="px-4 py-2">
+              <span class="inline-block px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium">
+                Sitio {{ complaint.sitio || 'N/A' }}
               </span>
             </td>
             <td class="px-4 py-2">
               {{ complaint.date_of_report | date : "medium" }}
             </td>
-            <td class="px-4 py-2">{{ complaint.complaint_content }}</td>
-            <td class="px-4 py-2">
-              <ng-container
-                *ngIf="complaint.attachments?.length; else noAttachments"
-              >
-                <span
-                  class="inline-block px-3 py-1 rounded-full bg-green-100 text-green-800 text-xs font-semibold"
-                  >With attachments</span
-                >
+            <td class="px-4 py-2 w-48 max-w-48">
+              <div class="truncate" [title]="complaint.complaint_content">
+                {{ complaint.complaint_content }}
+              </div>
+            </td>
+            <td class="px-4 py-2 text-center">
+              <ng-container *ngIf="complaint.attachments?.length; else noAttachments">
+                <div class="flex items-center justify-center">
+                  <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
               </ng-container>
-              <ng-template #noAttachments>-</ng-template>
+              <ng-template #noAttachments>
+                <div class="flex items-center justify-center">
+                  <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+              </ng-template>
             </td>
             <td class="px-4 py-2">
-              <span
-                *ngIf="complaint.status === 'draft'"
-                class="inline-block px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold"
-                >Draft</span
+              <span 
+                class="inline-block px-3 py-1 rounded-full text-xs font-semibold"
+                [class]="getPriorityClass(complaint.priority)"
               >
-              <span
-                *ngIf="complaint.status === 'published'"
-                class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold"
-                >Published</span
-              >
-              <span
-                *ngIf="
-                  complaint.status !== 'draft' &&
-                  complaint.status !== 'published'
-                "
-                >{{ complaint.status }}</span
-              >
+                {{ complaint.priority || 'Medium' }}
+              </span>
             </td>
             <td class="px-4 py-2">
-              {{ complaint.created_at | date : "medium" }}
+              <span 
+                class="inline-block px-3 py-1 rounded-full text-xs font-semibold"
+                [class]="getStatusClass(complaint.status)"
+              >
+                {{ complaint.status }}
+              </span>
             </td>
             <td class="px-4 py-2">
-              {{ complaint.updated_at | date : "medium" }}
-            </td>
-            <td class="flex flex-row gap-x-2 px-4 py-2">
-              <button
-                type="button"
-                class="bg-transparent !text-sm !border-0 p-2 text-red-600"
-                (click)="onDeleteComplaint(complaint)"
-              >
-                Delete
-              </button>
+              <div class="flex flex-col space-y-2">
+                <button 
+                  type="button" 
+                  class="bg-blue-600 text-white px-3 py-1 rounded text-sm" 
+                  (click)="openViewModal(complaint)">
+                  View
+                </button>
+                <button
+                  type="button"
+                  class="bg-red-600 text-white px-3 py-1 rounded text-sm"
+                  (click)="onDeleteComplaint(complaint)"
+                >
+                  Delete
+                </button>
+              </div>
             </td>
           </tr>
         </ng-container>
@@ -174,6 +175,18 @@
               {{ category }}
             </option>
           </select>
+        </div>
+        <div class="mb-4">
+          <label class="block mb-1">Sitio</label>
+          <input
+            type="number"
+            min="1"
+            max="100"
+            class="border rounded w-full px-3 py-2"
+            [(ngModel)]="complaintSitio"
+            name="complaintSitio"
+            placeholder="Enter sitio number (1-100)"
+          />
         </div>
         <div class="mb-4">
           <label class="block mb-1">Date of Report</label>
@@ -304,7 +317,14 @@
             </select>
           </div>
         </div>
-        <div class="flex justify-end">
+        <div class="flex justify-between">
+          <button
+            type="button"
+            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors duration-200"
+            (click)="closeCreateModal()"
+          >
+            Cancel
+          </button>
           <button
             type="button"
             class="bg-blue-600 text-white px-4 py-2 rounded"
@@ -323,6 +343,103 @@
     (cancel)="onDeleteModalClosed()"
     (confirm)="confirmDeleteComplaint()"
   ></app-confirm-delete-modal>
+  <!-- View Complaint Modal -->
+  <div *ngIf="showViewModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">Complaint Details</h3>
+        <button
+          type="button"
+          class="text-gray-500 hover:text-gray-700 text-xl font-bold"
+          (click)="closeViewModal()"
+        >
+          ×
+        </button>
+      </div>
+      
+      <div *ngIf="selectedComplaint" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+          <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold"
+            [class]="getCategoryClass(selectedComplaint.category)">
+            {{ selectedComplaint.category }}
+          </span>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Sitio</label>
+          <span class="inline-block px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium">
+            Sitio {{ selectedComplaint.sitio || 'N/A' }}
+          </span>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Date of Report</label>
+          <p class="text-gray-900">{{ selectedComplaint.date_of_report | date : "medium" }}</p>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Location of Incident</label>
+          <p class="text-gray-900">{{ selectedComplaint.location_of_incident }}</p>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+          <p class="text-gray-900 whitespace-pre-line">{{ selectedComplaint.complaint_content }}</p>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+          <span 
+            class="inline-block px-3 py-1 rounded-full text-xs font-semibold"
+            [class]="getPriorityClass(selectedComplaint.priority)"
+          >
+            {{ selectedComplaint.priority || 'Medium' }}
+          </span>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <span 
+            class="inline-block px-3 py-1 rounded-full text-xs font-semibold"
+            [class]="getStatusClass(selectedComplaint.status)"
+          >
+            {{ selectedComplaint.status }}
+          </span>
+        </div>
+        
+        <div *ngIf="selectedComplaint.attachments && selectedComplaint.attachments.length > 0">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Attachments</label>
+          <div class="space-y-2">
+            <div *ngFor="let attachment of selectedComplaint.attachments" class="flex items-center space-x-2">
+              <svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
+              </svg>
+              <a [href]="attachment" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">
+                {{ attachment.split('/').pop() }}
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="selectedComplaint.resolution_note">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Resolution Notes</label>
+          <p class="text-gray-900 whitespace-pre-line">{{ selectedComplaint.resolution_note }}</p>
+        </div>
+      </div>
+      
+      <div class="mt-6 flex justify-end">
+        <button
+          type="button"
+          class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors duration-200"
+          (click)="closeViewModal()"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
   <app-status-modal
     [isVisible]="showSuccessModal"
     [type]="'success'"

@@ -237,4 +237,29 @@ router.get(
   dashboardOverviewController.getOverviewStatistics
 );
 
+/**
+ * @swagger
+ * /api/administrator/residents:
+ *   get:
+ *     summary: Get all residents
+ *     tags: [Administrator]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of residents
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ */
+router.get(
+  "/residents",
+  authenticateToken,
+  isAdmin,
+  administratorController.getResidents
+);
+
 export default router;

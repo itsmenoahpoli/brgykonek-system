@@ -74,10 +74,16 @@ export const routes: Routes = [
   {
     path: 'admin/pending-approval',
     loadComponent: () =>
+      import('./pages/admin/pending-approval/pending-approval.component').then(
+        (m) => m.PendingApprovalComponent
+      ),
+  },
+  {
+    path: 'admin/accounts',
+    loadComponent: () =>
       import('./pages/admin/accounts/accounts.component').then(
         (m) => m.AccountsComponent
       ),
-    data: { mode: 'pending' },
   },
   {
     path: 'admin/complaints',

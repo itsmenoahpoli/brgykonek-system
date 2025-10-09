@@ -14,7 +14,7 @@ export interface OverviewStatistics {
   complaintsPerMonth: MonthlyCount[];
   announcementsPerMonth: MonthlyCount[];
   usersPerMonth: MonthlyCount[];
-  complaintsBySitio: { sitio: string; count: number }[];
+  complaintsBySitio: { sitio: number | string; count: number }[];
   complaintsByCategory: { category: string; count: number }[];
 }
 

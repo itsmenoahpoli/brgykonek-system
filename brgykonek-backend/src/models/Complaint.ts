@@ -47,6 +47,12 @@ const ComplaintSchema = new mongoose.Schema(
       default: "low",
       required: true,
     },
+    sitio: {
+      type: Number,
+      required: false,
+      min: 1,
+      max: 100,
+    },
     resolution_note: {
       type: String,
       required: false,

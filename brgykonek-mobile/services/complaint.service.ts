@@ -7,6 +7,7 @@ export interface Complaint {
   category: string;
   status: string;
   resident_name: string;
+  sitio?: number;
   created_at: string;
   updated_at: string;
 }

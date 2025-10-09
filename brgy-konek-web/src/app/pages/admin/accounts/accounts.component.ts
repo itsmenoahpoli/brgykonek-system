@@ -1,377 +1,303 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { CommonModule, DatePipe } from '@angular/common';
-import { UsersService, User } from '../../../services/users.service';
-import { DashboardLayoutComponent } from '../../../components/shared/dashboard-layout/dashboard-layout.component';
-import { AuthService } from '../../../services/auth.service';
-import apiClient from '../../../utils/api.util';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { UsersService, User as ServiceUser } from '../../../services/users.service';
+import { DashboardLayoutComponent } from '../../../components/shared/dashboard-layout/dashboard-layout.component';
 import { StatusModalComponent } from '../../../components/shared/status-modal/status-modal.component';
-import { ConfirmDeleteModalComponent } from '../../../components/shared/confirm-delete-modal.component';
+
+export type User = ServiceUser;
 
 @Component({
   selector: 'app-accounts',
   standalone: true,
-  imports: [
-    CommonModule,
-    DashboardLayoutComponent,
-    DatePipe,
-    FormsModule,
-    StatusModalComponent,
-    ConfirmDeleteModalComponent,
-  ],
+  imports: [CommonModule, FormsModule, DashboardLayoutComponent, StatusModalComponent],
   templateUrl: './accounts.component.html',
-  styleUrls: ['./accounts.component.scss'],
+  styleUrls: ['./accounts.component.scss']
 })
 export class AccountsComponent implements OnInit {
   users: User[] = [];
-  pendingUsers: User[] = [];
-  disabledAccounts: any[] = [];
-  currentUserId: string | undefined;
+  filteredUsers: User[] = [];
+  loading = false;
+  
+  showCreateModal = false;
+  showEditModal = false;
+  showDeleteModal = false;
+  showSuccessModal = false;
+  
+  selectedUser: User | null = null;
+  userToDelete: User | null = null;
+  
+  successTitle = '';
+  successMessage = '';
+  
   searchTerm = '';
-  isCreateUserModalVisible = false;
-  mode: 'pending' | 'all' = 'all';
-  pageTitle = 'Accounts';
-  pageSubtitle = 'View and manage user accounts';
-  createUserForm = {
+  userTypeFilter = 'all';
+  statusFilter = 'all';
+  
+  createForm = {
     name: '',
     email: '',
+    password: '',
+    user_type: 'resident' as string,
     mobile_number: '',
-    user_type: 'resident',
     address: '',
     birthdate: '',
-    barangay_clearance: null as File | null,
-    password: '',
+    is_active: true
   };
-  isSubmitting = false;
-  createUserError = '';
-  mobileNumberError = '';
-  passwordError = '';
-  showPassword = true;
-  showStatusModal = false;
-  statusModalType: 'success' | 'error' | 'info' = 'success';
-  statusModalTitle = '';
-  statusModalMessage = '';
-  isDeleteModalVisible = false;
-  userToDelete: User | null = null;
-  showViewModal = false;
-  selectedUser: User | null = null;
+  
+  editForm = {
+    name: '',
+    email: '',
+    user_type: 'resident' as string,
+    mobile_number: '',
+    address: '',
+    birthdate: '',
+    is_active: true
+  };
+  
+  formErrors = {
+    name: '',
+    email: '',
+    password: '',
+    user_type: ''
+  };
+  
+  isFormSubmitted = false;
 
-  constructor(
-    private usersService: UsersService,
-    private authService: AuthService,
-    private route: ActivatedRoute
-  ) {}
-  async ngOnInit(): Promise<void> {
-    this.users = ((await this.usersService.getUsers()) || []).filter(u => u.user_type === 'resident');
-    this.pendingUsers = this.users.filter(u => u.approved === false || u.status === 'pending');
-    await this.loadDisabledAccounts();
-    const currentUser = this.authService.getCurrentUser();
-    this.currentUserId = currentUser?.id;
-    const mode = this.route.snapshot.data?.['mode'] as 'pending' | 'all' | undefined;
-    if (mode === 'pending') {
-      this.mode = 'pending';
-      this.pageTitle = 'Pending Accounts';
-      this.pageSubtitle = 'Review and approve new resident accounts';
-      this.users = this.pendingUsers;
-    } else {
-      this.mode = 'all';
-      this.pageTitle = 'Accounts';
-      this.pageSubtitle = 'View and manage user accounts';
+  constructor(private usersService: UsersService) {}
+
+  ngOnInit() {
+    this.loadUsers();
+  }
+
+  async loadUsers() {
+    this.loading = true;
+    try {
+      const allUsers = await this.usersService.getUsers() || [];
+      // Filter out admin users - only show residents and staff
+      this.users = allUsers.filter(user => user.user_type !== 'admin');
+      this.applyFilters();
+    } catch (error) {
+      console.error('Error loading users:', error);
+    } finally {
+      this.loading = false;
     }
   }
-  get filteredUsers(): User[] {
-    const term = this.searchTerm.toLowerCase();
-    return this.users
-      .filter(user => user.user_type === 'resident')
-      .filter(
-      (user) =>
-        !term ||
-        user.name.toLowerCase().includes(term) ||
-        user.email.toLowerCase().includes(term) ||
-        user.mobile_number.includes(term)
-    );
+
+  applyFilters() {
+    this.filteredUsers = this.users.filter(user => {
+      const matchesSearch = user.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+                           user.email.toLowerCase().includes(this.searchTerm.toLowerCase());
+      const matchesType = this.userTypeFilter === 'all' || user.user_type === this.userTypeFilter;
+      const matchesStatus = this.statusFilter === 'all' || 
+                           (this.statusFilter === 'active' && (user.approved !== false && user.status !== 'inactive')) ||
+                           (this.statusFilter === 'inactive' && (user.approved === false || user.status === 'inactive'));
+      
+      return matchesSearch && matchesType && matchesStatus;
+    });
   }
-  editUser(user: User) {
-    this.viewProfile(user);
+
+  onSearchChange() {
+    this.applyFilters();
   }
-  deleteUser(user: User) {
-    if (user.status === 'pending') {
-      this.openDeleteModal(user);
-    }
+
+  onFilterChange() {
+    this.applyFilters();
   }
-  openCreateUserModal() {
-    this.isCreateUserModalVisible = true;
-    this.createUserForm = {
+
+  openCreateModal() {
+    this.showCreateModal = true;
+    this.isFormSubmitted = false;
+    this.createForm = {
       name: '',
       email: '',
-      mobile_number: '',
+      password: '',
       user_type: 'resident',
+      mobile_number: '',
       address: '',
       birthdate: '',
-      barangay_clearance: null,
+      is_active: true
+    };
+    this.formErrors = {
+      name: '',
+      email: '',
       password: '',
-    };
-    this.createUserError = '';
-    this.showPassword = true;
-  }
-
-  closeCreateUserModal() {
-    this.isCreateUserModalVisible = false;
-    this.createUserError = '';
-  }
-
-  onBarangayClearanceChange(file: File | null) {
-    this.createUserForm.barangay_clearance = file;
-  }
-
-  validateMobileNumber() {
-    const value = this.createUserForm.mobile_number;
-    const mobileRegex = /^(\+63)[0-9]{10}$/;
-    if (!value) {
-      this.mobileNumberError = 'Mobile number is required';
-      return false;
-    }
-    if (!mobileRegex.test(value)) {
-      this.mobileNumberError =
-        'Please enter a valid Philippine mobile number (e.g., +639123456789)';
-      return false;
-    }
-    this.mobileNumberError = '';
-    return true;
-  }
-
-  get passwordValidationStatus() {
-    const password = this.createUserForm.password || '';
-    return {
-      length: password.length >= 8 && password.length <= 20,
-      uppercase: /[A-Z]/.test(password),
-      lowercase: /[a-z]/.test(password),
-      number: /\d/.test(password),
-      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+      user_type: ''
     };
   }
 
-  validatePassword() {
-    const password = this.createUserForm.password || '';
-    const minLength = 8;
-    const maxLength = 20;
-    if (!password) {
-      this.passwordError = 'Password is required';
-      return false;
-    }
-    if (password.length < minLength || password.length > maxLength) {
-      this.passwordError = 'Password must be 8-20 characters';
-      return false;
-    }
-    if (!/[A-Z]/.test(password)) {
-      this.passwordError = 'Password must have at least one uppercase letter';
-      return false;
-    }
-    if (!/[a-z]/.test(password)) {
-      this.passwordError = 'Password must have at least one lowercase letter';
-      return false;
-    }
-    if (!/\d/.test(password)) {
-      this.passwordError = 'Password must have at least one number';
-      return false;
-    }
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      this.passwordError = 'Password must have at least one special character';
-      return false;
-    }
-    this.passwordError = '';
-    return true;
+  closeCreateModal() {
+    this.showCreateModal = false;
   }
 
-  generatePassword() {
-    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const lower = 'abcdefghijklmnopqrstuvwxyz';
-    const numbers = '0123456789';
-    const special = '!@#$%^&*(),.?":{}|<>';
-    let password = '';
-    password += upper[Math.floor(Math.random() * upper.length)];
-    password += lower[Math.floor(Math.random() * lower.length)];
-    password += numbers[Math.floor(Math.random() * numbers.length)];
-    password += special[Math.floor(Math.random() * special.length)];
-    const all = upper + lower + numbers + special;
-    for (let i = 4; i < 12; i++) {
-      password += all[Math.floor(Math.random() * all.length)];
-    }
-    password = password
-      .split('')
-      .sort(() => 0.5 - Math.random())
-      .join('');
-    this.createUserForm.password = password;
-    this.validatePassword();
+  openEditModal(user: User) {
+    this.selectedUser = user;
+    this.showEditModal = true;
+    this.isFormSubmitted = false;
+    this.editForm = {
+      name: user.name,
+      email: user.email,
+      user_type: user.user_type,
+      mobile_number: user.mobile_number || '',
+      address: user.address || '',
+      birthdate: user.birthdate || '',
+      is_active: (user.approved !== false && user.status !== 'inactive')
+    };
+    this.formErrors = {
+      name: '',
+      email: '',
+      password: '',
+      user_type: ''
+    };
   }
 
-  closeStatusModal() {
-    this.showStatusModal = false;
-  }
-
-  async submitCreateUser() {
-    if (!this.validateMobileNumber() || !this.validatePassword()) {
-      this.isSubmitting = false;
-      return;
-    }
-    this.isSubmitting = true;
-    this.createUserError = '';
-    try {
-      let payload: any = { ...this.createUserForm };
-      if (this.createUserForm.barangay_clearance) {
-        const formData = new FormData();
-        for (const key in payload) {
-          if (key === 'barangay_clearance' && payload[key]) {
-            formData.append('barangay_clearance', payload[key]);
-          } else {
-            formData.append(key, payload[key]);
-          }
-        }
-        payload = formData;
-      } else {
-        payload.barangay_clearance = null;
-      }
-      const user = await this.usersService.createUser(payload);
-      if (user) {
-        this.users.push(user);
-        this.closeCreateUserModal();
-        this.statusModalType = 'success';
-        this.statusModalTitle = 'User Created';
-        this.statusModalMessage = 'The user account was created successfully.';
-        this.showStatusModal = true;
-        setTimeout(() => this.closeStatusModal(), 2000);
-      } else {
-        this.createUserError = 'Failed to create user.';
-      }
-    } catch (e) {
-      this.createUserError = 'Failed to create user.';
-    }
-    this.isSubmitting = false;
+  closeEditModal() {
+    this.showEditModal = false;
+    this.selectedUser = null;
   }
 
   openDeleteModal(user: User) {
     this.userToDelete = user;
-    this.isDeleteModalVisible = true;
+    this.showDeleteModal = true;
   }
 
   closeDeleteModal() {
-    this.isDeleteModalVisible = false;
+    this.showDeleteModal = false;
     this.userToDelete = null;
   }
 
-  viewProfile(user: User): void {
-    this.selectedUser = user;
-    this.showViewModal = true;
+  validateForm(formData: any, isEdit = false): boolean {
+    this.formErrors = {
+      name: '',
+      email: '',
+      password: '',
+      user_type: ''
+    };
+
+    let isValid = true;
+
+    if (!formData.name || formData.name.trim() === '') {
+      this.formErrors.name = 'Please enter a name';
+      isValid = false;
+    }
+
+    if (!formData.email || formData.email.trim() === '') {
+      this.formErrors.email = 'Please enter an email';
+      isValid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      this.formErrors.email = 'Please enter a valid email';
+      isValid = false;
+    }
+
+    if (!isEdit && (!formData.password || formData.password.trim() === '')) {
+      this.formErrors.password = 'Please enter a password';
+      isValid = false;
+    }
+
+    if (!formData.user_type) {
+      this.formErrors.user_type = 'Please select a user type';
+      isValid = false;
+    }
+
+    return isValid;
   }
 
-  closeViewModal(): void {
-    this.showViewModal = false;
-    this.selectedUser = null;
-  }
+  async createUser() {
+    this.isFormSubmitted = true;
+    
+    if (!this.validateForm(this.createForm)) {
+      return;
+    }
 
-  async confirmDeleteUser() {
-    if (!this.userToDelete) return;
-    const id = this.userToDelete._id;
-    this.isSubmitting = true;
     try {
-      const res = await this.usersService.deleteUser(id!);
-      if (res === true) {
-        this.users = this.users.filter((u) => u._id !== id);
-        this.closeDeleteModal();
-        this.statusModalType = 'success';
-        this.statusModalTitle = 'User Deleted';
-        this.statusModalMessage = 'The user account was successfully deleted.';
-        this.showStatusModal = true;
-        setTimeout(() => this.closeStatusModal(), 2000);
-      } else {
-        this.createUserError = 'Failed to delete user.';
-      }
-    } catch (e) {
-      this.createUserError = 'Failed to delete user.';
-    }
-    this.isSubmitting = false;
-  }
-
-  async toggleActive(user: User) {
-    if (!user._id) return;
-    const next = user.status === 'inactive' ? 'approved' : 'inactive';
-    const updated = await this.usersService.updateUser(user._id, { status: next });
-    if (updated) {
-      this.users = this.users.map((u) => (u._id === user._id ? { ...u, status: next } : u));
-      this.pendingUsers = this.users.filter((u) => (u.approved === false || u.status === 'pending') && u.user_type === 'resident');
-      this.statusModalType = 'success';
-      this.statusModalTitle = 'Status Updated';
-      this.statusModalMessage = `User has been set to ${next}.`;
-      this.showStatusModal = true;
-      setTimeout(() => this.closeStatusModal(), 1500);
-    } else {
-      this.statusModalType = 'error';
-      this.statusModalTitle = 'Update Failed';
-      this.statusModalMessage = 'Could not update user status.';
-      this.showStatusModal = true;
-    }
-  }
-
-  async approve(user: User) {
-    if (!user._id) return;
-    const updated = await this.usersService.approveUser(user._id);
-    if (updated) {
-      this.users = this.users.map((u) => (u._id === user._id ? { ...u, approved: true, status: 'approved' } : u));
-      this.pendingUsers = this.users.filter((u) => (u.approved === false || u.status === 'pending') && u.user_type === 'resident');
-      this.statusModalType = 'success';
-      this.statusModalTitle = 'User Approved';
-      this.statusModalMessage = 'The user has been approved.';
-      this.showStatusModal = true;
-      setTimeout(() => this.closeStatusModal(), 1500);
-    } else {
-      this.statusModalType = 'error';
-      this.statusModalTitle = 'Approval Failed';
-      this.statusModalMessage = 'Could not approve user.';
-      this.showStatusModal = true;
-    }
-  }
-
-  isImageFile(filename: string): boolean {
-    if (!filename) return false;
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
-    const extension = filename.toLowerCase().substring(filename.lastIndexOf('.'));
-    return imageExtensions.includes(extension);
-  }
-
-  getImageUrl(filename: string): string {
-    if (!filename) return '';
-    return `/api/uploads/${filename}`;
-  }
-
-  onImageError(event: any) {
-    event.target.style.display = 'none';
-  }
-
-  async loadDisabledAccounts(): Promise<void> {
-    try {
-      const response = await apiClient.get('/user-accounts/disabled');
-      if (response.data.success) {
-        this.disabledAccounts = response.data.data || [];
-      }
+      await this.usersService.createUser(this.createForm);
+      this.closeCreateModal();
+      this.successTitle = 'User Created';
+      this.successMessage = 'User account has been created successfully.';
+      this.showSuccessModal = true;
+      await this.loadUsers();
     } catch (error) {
-      console.error('Error loading disabled accounts:', error);
-      this.disabledAccounts = [];
+      console.error('Error creating user:', error);
     }
   }
 
-  async enableAccount(userId: string): Promise<void> {
-    try {
-      const response = await apiClient.post('/user-accounts/enable', { userId });
-      if (response.data.success) {
-        // Remove from disabled accounts list
-        this.disabledAccounts = this.disabledAccounts.filter(account => account._id !== userId);
-        // Show success message
-        alert('Account enabled successfully');
-      }
-    } catch (error) {
-      console.error('Error enabling account:', error);
-      alert('Failed to enable account');
+  async updateUser() {
+    if (!this.selectedUser || !this.selectedUser._id) return;
+    
+    this.isFormSubmitted = true;
+    
+    if (!this.validateForm(this.editForm, true)) {
+      return;
     }
+
+    try {
+      await this.usersService.updateUser(this.selectedUser._id, this.editForm);
+      this.closeEditModal();
+      this.successTitle = 'User Updated';
+      this.successMessage = 'User account has been updated successfully.';
+      this.showSuccessModal = true;
+      await this.loadUsers();
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+  }
+
+  async deleteUser() {
+    if (!this.userToDelete || !this.userToDelete._id) return;
+
+    try {
+      await this.usersService.deleteUser(this.userToDelete._id);
+      this.closeDeleteModal();
+      this.successTitle = 'User Deleted';
+      this.successMessage = 'User account has been deleted successfully.';
+      this.showSuccessModal = true;
+      await this.loadUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  }
+
+  async toggleUserStatus(user: User) {
+    if (!user._id) return;
+    
+    try {
+      const isCurrentlyActive = user.approved !== false && user.status !== 'inactive';
+      const newStatus = isCurrentlyActive ? 'inactive' : 'approved';
+      const newApproved = !isCurrentlyActive;
+      
+      await this.usersService.updateUser(user._id, { 
+        approved: newApproved, 
+        status: newStatus 
+      });
+      
+      this.successTitle = isCurrentlyActive ? 'User Disabled' : 'User Enabled';
+      this.successMessage = `User account has been ${isCurrentlyActive ? 'disabled' : 'enabled'} successfully.`;
+      this.showSuccessModal = true;
+      await this.loadUsers();
+    } catch (error) {
+      console.error('Error updating user status:', error);
+    }
+  }
+
+  onSuccessModalClosed() {
+    this.showSuccessModal = false;
+  }
+
+  getUserTypeClass(userType: string): string {
+    switch (userType) {
+      case 'staff':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'resident':
+        return 'bg-green-100 text-green-800 border-green-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  }
+
+  getStatusClass(user: User): string {
+    const isActive = user.approved !== false && user.status !== 'inactive';
+    return isActive 
+      ? 'bg-green-100 text-green-800 border-green-200' 
+      : 'bg-red-100 text-red-800 border-red-200';
   }
 }

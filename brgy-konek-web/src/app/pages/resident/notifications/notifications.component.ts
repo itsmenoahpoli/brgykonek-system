@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NotificationService, NotificationItem } from '../../../services/notification.service';
 import { DashboardLayoutComponent } from '../../../components/shared/dashboard-layout/dashboard-layout.component';
+import { AuthService } from '../../../services/auth.service';
 import { Observable, Subscription } from 'rxjs';
 
 @Component({
@@ -21,7 +22,8 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   constructor(
     private notificationService: NotificationService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     this.notifications$ = this.notificationService.notifications$;
     this.unreadCount$ = this.notificationService.unreadCount$;
@@ -50,16 +52,35 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   handleNotificationClick(notification: NotificationItem): void {
     this.markAsRead(notification);
     
+    // Get current user to determine if admin
+    const currentUser = this.authService.getCurrentUser();
+    const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 'staff';
+    
     // Navigate based on notification type
     switch (notification.type) {
       case 'announcement':
         this.router.navigate(['/announcements']);
         break;
       case 'complaint_update':
-        this.router.navigate(['/resident/complaints']);
+        if (isAdmin) {
+          // For admin users, navigate to admin complaints page
+          // Pass complaint ID as query parameter to open specific complaint
+          const complaintId = notification.payload?.['complaint_id'] || notification.payload?.['complaintId'];
+          this.router.navigate(['/admin/complaints'], {
+            queryParams: complaintId ? { complaintId } : {}
+          });
+        } else {
+          // For resident users, navigate to resident complaints
+          this.router.navigate(['/resident/complaints']);
+        }
         break;
       case 'document_request_update':
-        this.router.navigate(['/resident/list-of-reports']);
+        if (isAdmin) {
+          // Admin users might not need this, but keep the resident behavior
+          this.router.navigate(['/resident/list-of-reports']);
+        } else {
+          this.router.navigate(['/resident/list-of-reports']);
+        }
         break;
     }
   }

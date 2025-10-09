@@ -71,3 +71,12 @@ export const createUser = async (req: Request, res: Response) => {
     }
   }
 };
+
+export const getResidents = async (req: Request, res: Response) => {
+  try {
+    const residents = await administratorService.getResidents();
+    res.status(200).json(residents);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};

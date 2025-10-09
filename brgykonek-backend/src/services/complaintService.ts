@@ -23,14 +23,28 @@ const notifyAdmins = async (type: string, title: string, message: string, payloa
 export const createComplaint = async (data: Record<string, any>) => {
   let complaintData = { ...data };
   
-  if (data.resident_email && !data.resident_id) {
-    const User = require("../models/User").default;
+  // If resident_id is provided, validate it exists
+  if (data.resident_id) {
+    const user = await User.findById(data.resident_id);
+    if (!user) {
+      throw new Error("Resident not found with the provided ID");
+    }
+    // Ensure the user is actually a resident
+    if (user.user_type !== 'resident') {
+      throw new Error("The selected user is not a resident");
+    }
+  }
+  // Fallback: if resident_email is provided and no resident_id, look up by email
+  else if (data.resident_email && !data.resident_id) {
     const user = await User.findOne({ email: data.resident_email });
     if (user) {
-      complaintData.resident_id = user._id.toString();
+      complaintData.resident_id = String(user._id);
     } else {
       throw new Error("Resident not found with the provided email");
     }
+  }
+  else {
+    throw new Error("Either resident_id or resident_email must be provided");
   }
   
   const c = await Complaint.create(complaintData);
@@ -56,7 +70,21 @@ export const createComplaint = async (data: Record<string, any>) => {
 };
 
 export const createAdminComplaint = async (data: Record<string, any>) => {
-  const c = await Complaint.create({ ...data, created_by_admin: true });
+  let complaintData = { ...data };
+  
+  // Validate resident_id if provided
+  if (data.resident_id) {
+    const user = await User.findById(data.resident_id);
+    if (!user) {
+      throw new Error("Resident not found with the provided ID");
+    }
+    // Ensure the user is actually a resident
+    if (user.user_type !== 'resident') {
+      throw new Error("The selected user is not a resident");
+    }
+  }
+  
+  const c = await Complaint.create({ ...complaintData, created_by_admin: true });
   return c;
 };
 

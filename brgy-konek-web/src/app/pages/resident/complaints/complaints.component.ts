@@ -42,9 +42,22 @@ export class ComplaintsComponent {
   complaintContent = '';
   complaintStatus = 'pending';
   complaintPriority: 'low' | 'medium' | 'high' = 'low';
+  complaintSitio: number | null = null;
   showDeleteModal = false;
   complaintToDelete: Complaint | null = null;
+  showViewModal = false;
+  selectedComplaint: Complaint | null = null;
   showSuccessModal = false;
+  successTitle = '';
+  successMessage = '';
+
+  formErrors = {
+    title: '',
+    category: '',
+    complaint_content: ''
+  };
+
+  isFormSubmitted = false;
 
   constructor(
     private complaintsService: ComplaintsService,
@@ -145,9 +158,43 @@ export class ComplaintsComponent {
     this.showSuccessModal = false;
   }
 
+  validateForm(): boolean {
+    this.formErrors = {
+      title: '',
+      category: '',
+      complaint_content: ''
+    };
+
+    let isValid = true;
+
+    if (!this.complaintTitle || this.complaintTitle.trim() === '') {
+      this.formErrors.title = 'Please enter a complaint title';
+      isValid = false;
+    }
+
+    if (!this.complaintCategory) {
+      this.formErrors.category = 'Please select a category';
+      isValid = false;
+    }
+
+    if (!this.complaintContent || this.complaintContent.trim() === '') {
+      this.formErrors.complaint_content = 'Please enter complaint content';
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
   async submitComplaint() {
     const user = this.authService.getCurrentUser();
     if (!user) return;
+
+    this.isFormSubmitted = true;
+
+    if (!this.validateForm()) {
+      return;
+    }
+
     const formData = new FormData();
     formData.append('resident_id', user.id);
     formData.append('title', this.complaintTitle);
@@ -157,12 +204,72 @@ export class ComplaintsComponent {
     formData.append('complaint_content', this.complaintContent);
     formData.append('status', this.complaintStatus);
     formData.append('priority', this.complaintPriority);
+    if (this.complaintSitio) {
+      formData.append('sitio', this.complaintSitio.toString());
+    }
     for (const f of this.uploadedFiles) {
       formData.append('attachments', f);
     }
     await this.complaintsService.createComplaint(formData);
     this.closeCreateModal();
     this.loadComplaints();
+  }
+
+  getPriorityClass(priority?: string): string {
+    switch (priority) {
+      case 'low':
+        return 'bg-green-100 text-green-800 border-green-300';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      case 'high':
+        return 'bg-red-100 text-red-800 border-red-300';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-300';
+    }
+  }
+
+  getStatusClass(status?: string): string {
+    switch (status) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-500';
+      case 'in_progress':
+        return 'bg-blue-100 text-blue-800 border-blue-500';
+      case 'resolved':
+        return 'bg-green-100 text-green-800 border-green-500';
+      case 'rejected':
+        return 'bg-red-100 text-red-800 border-red-500';
+      case 'draft':
+        return 'bg-gray-100 text-gray-800 border-gray-500';
+      case 'published':
+        return 'bg-blue-100 text-blue-800 border-blue-500';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-500';
+    }
+  }
+
+  getCategoryClass(category?: string): string {
+    switch (category) {
+      case 'Noise':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      case 'Garbage':
+        return 'bg-green-100 text-green-800 border-green-300';
+      case 'Vandalism':
+        return 'bg-blue-100 text-blue-800 border-blue-300';
+      case 'Other':
+        return 'bg-gray-100 text-gray-800 border-gray-300';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-300';
+    }
+  }
+
+  openViewModal(complaint: Complaint) {
+    this.selectedComplaint = complaint;
+    this.showViewModal = true;
+  }
+
+  closeViewModal() {
+    this.showViewModal = false;
+    this.selectedComplaint = null;
   }
 
   // Removed base64 mock uploader in favor of multipart form upload
