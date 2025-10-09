@@ -42,12 +42,34 @@ export class AnnouncementsService {
     }
   }
 
+  async addAnnouncementWithFile(formData: FormData): Promise<any> {
+    try {
+      const res = await apiClient.post(this.baseUrl, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      return res.data;
+    } catch (error) {
+      return undefined;
+    }
+  }
+
   async updateAnnouncement(
     _id: string,
     announcement: Announcement
   ): Promise<any> {
     try {
       const res = await apiClient.put(`${this.baseUrl}/${_id}`, announcement);
+      return res.data;
+    } catch (error) {
+      return undefined;
+    }
+  }
+
+  async updateAnnouncementWithFile(_id: string, formData: FormData): Promise<any> {
+    try {
+      const res = await apiClient.put(`${this.baseUrl}/${_id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       return res.data;
     } catch (error) {
       return undefined;

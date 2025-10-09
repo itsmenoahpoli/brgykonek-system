@@ -54,7 +54,11 @@ export const deleteUserById = async (req: Request, res: Response) => {
 
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const user = await administratorService.createUser(req.body);
+    const userData = {
+      ...req.body,
+      barangay_clearance: req.file ? req.file.filename : undefined,
+    };
+    const user = await administratorService.createUser(userData);
     res.status(201).json(user);
   } catch (error) {
     if (

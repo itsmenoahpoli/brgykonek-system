@@ -44,6 +44,8 @@ export class AnnouncementsComponent {
   confirmDeleteVisible = false;
   deleteId: string | null = null;
   expandedAnnouncements = new Set<string>();
+  showViewModal = false;
+  selectedAnnouncement: Announcement | null = null;
   constructor(
     private announcementsService: AnnouncementsService,
     private fb: FormBuilder
@@ -99,10 +101,21 @@ export class AnnouncementsComponent {
   }
   async submit() {
     if (this.form.invalid) return;
+    
+    const formData = new FormData();
+    const formValue = this.form.value;
+    
+    // Add all form fields to FormData
+    Object.keys(formValue).forEach(key => {
+      if (key === 'banner_image' && formValue[key] instanceof File) {
+        formData.append('banner_image', formValue[key]);
+      } else if (formValue[key] !== null && formValue[key] !== undefined && formValue[key] !== '') {
+        formData.append(key, formValue[key]);
+      }
+    });
+    
     if (this.editId) {
-      await this.announcementsService.updateAnnouncement(this.editId, {
-        ...this.form.value,
-      });
+      await this.announcementsService.updateAnnouncementWithFile(this.editId, formData);
       this.editId = null;
       this.form.reset();
       await this.loadAnnouncements();
@@ -111,9 +124,7 @@ export class AnnouncementsComponent {
       this.statusModalMessage = 'The announcement was updated successfully.';
       this.statusModalVisible = true;
     } else {
-      await this.announcementsService.addAnnouncement({
-        ...this.form.value,
-      });
+      await this.announcementsService.addAnnouncementWithFile(formData);
       this.form.reset();
       await this.loadAnnouncements();
       this.showModal = false;
@@ -174,20 +185,23 @@ export class AnnouncementsComponent {
       const reader = new FileReader();
       reader.onload = () => {
         this.bannerImagePreview = reader.result as string;
-        this.form.patchValue({ banner_image: this.bannerImagePreview });
       };
       reader.readAsDataURL(file);
+      // Store the actual file for upload
+      this.form.patchValue({ banner_image: file });
     }
   }
   onStatusModalClosed() {
     this.statusModalVisible = false;
   }
 
-  toggleReadMore(announcementId: string) {
-    if (this.expandedAnnouncements.has(announcementId)) {
-      this.expandedAnnouncements.delete(announcementId);
-    } else {
-      this.expandedAnnouncements.add(announcementId);
-    }
+  viewAnnouncement(announcement: Announcement) {
+    this.selectedAnnouncement = announcement;
+    this.showViewModal = true;
+  }
+
+  closeViewModal() {
+    this.showViewModal = false;
+    this.selectedAnnouncement = null;
   }
 }

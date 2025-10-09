@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { NotificationService, NotificationItem } from '../../../services/notification.service';
+import { AuthService } from '../../../services/auth.service';
 import { Observable, Subscription } from 'rxjs';
 
 @Component({
@@ -19,7 +20,8 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
 
   constructor(
     private notificationService: NotificationService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     this.notifications$ = this.notificationService.notifications$;
     this.unreadCount$ = this.notificationService.unreadCount$;
@@ -54,16 +56,32 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     this.markAsRead(notification);
     this.showDropdown = false;
     
-    // Navigate based on notification type
+    // Get current user role
+    const currentUser = this.authService.getCurrentUser();
+    const userRole = currentUser?.role;
+    
+    // Navigate based on notification type and user role
     switch (notification.type) {
       case 'announcement':
-        this.router.navigate(['/resident/announcements']);
+        if (userRole === 'admin' || userRole === 'staff') {
+          this.router.navigate(['/admin/announcements']);
+        } else {
+          this.router.navigate(['/resident/announcements']);
+        }
         break;
       case 'complaint_update':
-        this.router.navigate(['/resident/complaints']);
+        if (userRole === 'admin' || userRole === 'staff') {
+          this.router.navigate(['/admin/complaints']);
+        } else {
+          this.router.navigate(['/resident/complaints']);
+        }
         break;
       case 'document_request_update':
-        this.router.navigate(['/resident/list-of-reports']);
+        if (userRole === 'admin' || userRole === 'staff') {
+          this.router.navigate(['/admin/accounts']);
+        } else {
+          this.router.navigate(['/resident/list-of-reports']);
+        }
         break;
     }
   }

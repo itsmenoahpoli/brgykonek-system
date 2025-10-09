@@ -112,7 +112,7 @@ export class ComplaintsComponent implements OnInit {
 
   async createComplaint() {
     const formData = new FormData();
-    formData.append('resident_id', this.createForm.resident_id);
+    formData.append('resident_email', this.createForm.resident_id);
     formData.append('category', this.createForm.category);
     formData.append('date_of_report', new Date(this.createForm.date_of_report).toISOString());
     formData.append('location_of_incident', this.createForm.location_of_incident);

@@ -21,7 +21,19 @@ const notifyAdmins = async (type: string, title: string, message: string, payloa
 };
 
 export const createComplaint = async (data: Record<string, any>) => {
-  const c = await Complaint.create(data);
+  let complaintData = { ...data };
+  
+  if (data.resident_email && !data.resident_id) {
+    const User = require("../models/User").default;
+    const user = await User.findOne({ email: data.resident_email });
+    if (user) {
+      complaintData.resident_id = user._id.toString();
+    } else {
+      throw new Error("Resident not found with the provided email");
+    }
+  }
+  
+  const c = await Complaint.create(complaintData);
   try {
     await Notification.create({
       recipient_id: String(c.resident_id),

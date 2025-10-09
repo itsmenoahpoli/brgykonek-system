@@ -7,7 +7,7 @@ import {
   RouterModule,
 } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { NotificationsService, NotificationItem } from '../../../services/notifications.service';
+import { NotificationService, NotificationItem } from '../../../services/notification.service';
 import { NgIcon } from '@ng-icons/core';
 import { UserAvatarDropdownComponent } from '../user-avatar-dropdown/user-avatar-dropdown.component';
 import { NotificationBellComponent } from '../notification-bell/notification-bell.component';
@@ -32,7 +32,7 @@ export class DashboardLayoutComponent {
     public authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private notificationsService: NotificationsService
+    private notificationsService: NotificationService
   ) {
     const currentUser = this.authService.getCurrentUser();
     if (currentUser?.role === 'resident') {
@@ -104,9 +104,11 @@ export class DashboardLayoutComponent {
 
     const currentUserForNotifications = this.authService.getCurrentUser();
     if (currentUserForNotifications?.id) {
-      this.notificationsService.getUserNotifications(currentUserForNotifications.id).then((items) => {
-        this.notifications = items || [];
-        this.unreadCount = (this.notifications || []).filter((n) => !n.read).length;
+      this.notificationsService.refresh().then(() => {
+        this.notificationsService.notifications$.subscribe((items) => {
+          this.notifications = items || [];
+          this.unreadCount = (this.notifications || []).filter((n) => !n.read).length;
+        });
       });
     }
   }

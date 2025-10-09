@@ -82,8 +82,8 @@
             <button (click)="edit(a)" class="text-blue-600">Edit</button>
             <button (click)="delete(a._id)" class="text-red-600">Delete</button>
           </div>
-          <button (click)="toggleReadMore(a._id)" class="text-blue-700 hover:text-blue-900">
-            {{ expandedAnnouncements.has(a._id) ? 'Read Less' : 'Read More' }} {{ expandedAnnouncements.has(a._id) ? '↑' : '→' }}
+          <button (click)="viewAnnouncement(a)" class="text-blue-700 hover:text-blue-900">
+            Read More →
           </button>
         </div>
       </div>
@@ -94,7 +94,7 @@
     class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
   >
     <div
-      class="bg-white rounded-lg shadow-lg w-full max-w-4xl mx-4 p-6 max-h-[90vh] overflow-y-auto"
+      class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-4 p-6 max-h-[90vh] overflow-y-auto"
       relative
     >
       <button
@@ -193,28 +193,28 @@
           <label class="block font-medium">Select Sitios</label>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
             <label class="flex items-center">
-              <input type="checkbox" value="Sitio 1" class="mr-2" />
-              Sitio 1
+              <input type="checkbox" value="Maharlika" class="mr-2" />
+              Maharlika
             </label>
             <label class="flex items-center">
-              <input type="checkbox" value="Sitio 2" class="mr-2" />
-              Sitio 2
+              <input type="checkbox" value="Happy Village" class="mr-2" />
+              Happy Village
             </label>
             <label class="flex items-center">
-              <input type="checkbox" value="Sitio 3" class="mr-2" />
-              Sitio 3
+              <input type="checkbox" value="Sitio San Jose" class="mr-2" />
+              Sitio San Jose
             </label>
             <label class="flex items-center">
-              <input type="checkbox" value="Sitio 4" class="mr-2" />
-              Sitio 4
+              <input type="checkbox" value="Sitio Maligaya" class="mr-2" />
+              Sitio Maligaya
             </label>
             <label class="flex items-center">
-              <input type="checkbox" value="Sitio 5" class="mr-2" />
-              Sitio 5
+              <input type="checkbox" value="Sitio Bagong Silang" class="mr-2" />
+              Sitio Bagong Silang
             </label>
             <label class="flex items-center">
-              <input type="checkbox" value="Sitio 6" class="mr-2" />
-              Sitio 6
+              <input type="checkbox" value="Sitio Pag-asa" class="mr-2" />
+              Sitio Pag-asa
             </label>
           </div>
         </div>
@@ -275,4 +275,56 @@
     (confirm)="onConfirmDelete()"
     (cancel)="onCancelDelete()"
   ></app-confirm-delete-modal>
+  
+  <!-- View Announcement Modal -->
+  <div
+    *ngIf="showViewModal"
+    class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+  >
+    <div
+      class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-4 p-6 max-h-[90vh] overflow-y-auto"
+    >
+      <button
+        (click)="closeViewModal()"
+        class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl z-10"
+      >
+        &times;
+      </button>
+      <div *ngIf="selectedAnnouncement" class="space-y-4">
+        <div class="text-2xl font-bold">{{ selectedAnnouncement.title }}</div>
+        <div class="text-lg font-semibold text-gray-700">{{ selectedAnnouncement.header }}</div>
+        <img
+          *ngIf="selectedAnnouncement.banner_image"
+          [src]="selectedAnnouncement.banner_image"
+          alt="Banner"
+          class="w-full h-64 object-cover rounded"
+        />
+        <div class="text-gray-700 whitespace-pre-wrap">{{ selectedAnnouncement.body }}</div>
+        <div class="flex justify-between items-center text-sm text-gray-500">
+          <span>Category: {{ selectedAnnouncement.category }}</span>
+          <span>Status: {{ selectedAnnouncement.status | titlecase }}</span>
+        </div>
+        <div class="flex justify-between items-center text-sm text-gray-500">
+          <span>Audience: {{ selectedAnnouncement.audience }}</span>
+          <span *ngIf="selectedAnnouncement.publish_at">
+            Published: {{ selectedAnnouncement.publish_at | date:'medium' }}
+          </span>
+        </div>
+        <div class="flex gap-2">
+          <button
+            (click)="edit(selectedAnnouncement)"
+            class="bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            Edit
+          </button>
+          <button
+            (click)="closeViewModal()"
+            class="bg-gray-400 text-white px-4 py-2 rounded"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </app-dashboard-layout>
