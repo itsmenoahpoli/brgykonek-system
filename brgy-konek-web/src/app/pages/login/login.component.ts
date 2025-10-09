@@ -61,7 +61,8 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value;
 
-      if (this.authService.isAccountLocked(email)) {
+      // Skip max attempts check for admin accounts
+      if (!this.authService.isAdminAccount(email) && this.authService.isAccountLocked(email)) {
         this.errorMessage = 'Your account has been disabled temporarily. Max login attempt reached, please contact admin to enable your account';
         return;
       }
@@ -80,16 +81,22 @@ export class LoginComponent {
             const route = this.getHomeRoute(userType);
             this.router.navigate([route]);
           } else {
-            this.authService.incrementLoginAttempts(email);
-            const attempts = this.authService.getLoginAttempts(email);
+            // Only increment attempts for non-admin accounts
+            if (!this.authService.isAdminAccount(email)) {
+              this.authService.incrementLoginAttempts(email);
+              const attempts = this.authService.getLoginAttempts(email);
+            }
 
             this.errorMessage = response.message;
           }
         },
         error: (error) => {
           this.isLoading = false;
-          this.authService.incrementLoginAttempts(email);
-          const attempts = this.authService.getLoginAttempts(email);
+          // Only increment attempts for non-admin accounts
+          if (!this.authService.isAdminAccount(email)) {
+            this.authService.incrementLoginAttempts(email);
+            const attempts = this.authService.getLoginAttempts(email);
+          }
 
           this.errorMessage = 'An error occurred during login';
         },

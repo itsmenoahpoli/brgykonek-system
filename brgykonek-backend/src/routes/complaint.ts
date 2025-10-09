@@ -65,6 +65,7 @@ import * as complaintController from "../controllers/complaintController";
 import multer, { FileFilterCallback } from "multer";
 import { Request } from "express";
 import { authenticateToken, isAdmin } from "../middleware/auth";
+import { ensureUploadsDir } from "../utils/files";
 
 const router = Router();
 
@@ -74,7 +75,8 @@ const storage = multer.diskStorage({
     file: Express.Multer.File,
     cb: (error: Error | null, destination: string) => void
   ) => {
-    cb(null, "src/uploads");
+    ensureUploadsDir();
+    cb(null, "uploads");
   },
   filename: (
     req: Request,

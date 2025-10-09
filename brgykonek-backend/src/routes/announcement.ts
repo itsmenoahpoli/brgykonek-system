@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as announcementController from "../controllers/announcementController";
 import multer, { FileFilterCallback } from "multer";
 import { Request } from "express";
+import { ensureAnnouncementImagesDir } from "../utils/files";
 
 const router = Router();
 
@@ -11,7 +12,8 @@ const storage = multer.diskStorage({
     file: Express.Multer.File,
     cb: (error: Error | null, destination: string) => void
   ) => {
-    cb(null, "uploads");
+    ensureAnnouncementImagesDir();
+    cb(null, "public/images/announcements");
   },
   filename: (
     req: Request,

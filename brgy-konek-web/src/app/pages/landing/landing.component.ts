@@ -10,6 +10,7 @@ import {
   heroMegaphone,
   heroExclamationCircle,
 } from '@ng-icons/heroicons/outline';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-landing',
@@ -23,6 +24,10 @@ export class LandingComponent implements OnInit {
   heroExclamationCircle = heroExclamationCircle;
   announcements: Announcement[] = [];
   loading = false;
+
+  getImageUrl(imagePath: string): string {
+    return imagePath ? `${environment.baseUrl}${imagePath}` : '';
+  }
   constructor(
     private router: Router,
     private announcementsService: AnnouncementsService

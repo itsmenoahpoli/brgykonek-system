@@ -22,7 +22,7 @@
       >
         <img
           *ngIf="a.banner_image"
-          [src]="a.banner_image"
+          [src]="`${'http://localhost:2000'}${a.banner_image}`"
           alt="Banner"
           class="h-48 w-full object-cover"
         />

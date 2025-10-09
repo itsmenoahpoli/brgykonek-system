@@ -9,11 +9,13 @@ import {
   AnnouncementsService,
   Announcement,
 } from '../../../services/announcements.service';
+import { AuthService } from '../../../services/auth.service';
 import { DashboardLayoutComponent } from '../../../components/shared/dashboard-layout/dashboard-layout.component';
 import { TitleCasePipe } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { StatusModalComponent } from '../../../components/shared/status-modal/status-modal.component';
 import { ConfirmDeleteModalComponent } from '../../../components/shared/confirm-delete-modal.component';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-announcements',
@@ -48,7 +50,8 @@ export class AnnouncementsComponent {
   selectedAnnouncement: Announcement | null = null;
   constructor(
     private announcementsService: AnnouncementsService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private authService: AuthService
   ) {
     this.form = this.fb.group({
       banner_image: [''],
@@ -63,6 +66,11 @@ export class AnnouncementsComponent {
     });
     this.loadAnnouncements();
   }
+
+  getImageUrl(imagePath: string): string {
+    return imagePath ? `${environment.baseUrl}${imagePath}` : '';
+  }
+
   get filteredAnnouncements() {
     return this.announcements.filter((a) => {
       const matchesTitle = a.title
@@ -91,6 +99,11 @@ export class AnnouncementsComponent {
     } else {
       this.form.reset();
       this.editId = null;
+      const currentUser = this.authService.getCurrentUser();
+      if (currentUser) {
+        const fullName = `${currentUser.firstName} ${currentUser.middleName ? currentUser.middleName + ' ' : ''}${currentUser.lastName}`.trim();
+        this.form.patchValue({ created_by: fullName });
+      }
     }
     this.showModal = true;
   }

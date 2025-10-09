@@ -58,7 +58,7 @@
       class="bg-white rounded-lg shadow overflow-hidden flex flex-col"
     >
       <img
-        [src]="a.banner_image"
+        [src]="getImageUrl(a.banner_image)"
         alt="Banner"
         class="h-40 w-full object-cover"
         *ngIf="a.banner_image"
@@ -236,7 +236,7 @@
           </div>
           <div>
             <label class="block font-medium">Created By</label>
-            <input type="text" formControlName="created_by" class="w-full border rounded px-3 py-2" />
+            <input type="text" formControlName="created_by" class="w-full border rounded px-3 py-2 bg-gray-100" readonly />
           </div>
         </div>
         <div class="text-xs text-gray-500">
@@ -295,7 +295,7 @@
         <div class="text-lg font-semibold text-gray-700">{{ selectedAnnouncement.header }}</div>
         <img
           *ngIf="selectedAnnouncement.banner_image"
-          [src]="selectedAnnouncement.banner_image"
+          [src]="getImageUrl(selectedAnnouncement.banner_image)"
           alt="Banner"
           class="w-full h-64 object-cover rounded"
         />

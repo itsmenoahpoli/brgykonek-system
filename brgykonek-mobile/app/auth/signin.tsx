@@ -49,13 +49,16 @@ const SigninPage: React.FC = () => {
       router.push(`/auth/verify-otp?email=${encodeURIComponent(data.email)}&from=login`);
       setLoading(false);
     } catch (e) {
-      setFailedAttempts((prev) => prev + 1);
-      if (failedAttempts + 1 >= 3) {
-        setShowModal(true);
-        setModalStep('email');
-        setModalEmail('');
-        setModalOTP('');
-        setModalError('');
+      // Skip max attempts for admin accounts
+      if (!data.email.includes('admin')) {
+        setFailedAttempts((prev) => prev + 1);
+        if (failedAttempts + 1 >= 3) {
+          setShowModal(true);
+          setModalStep('email');
+          setModalEmail('');
+          setModalOTP('');
+          setModalError('');
+        }
       }
       setLoading(false);
     }

@@ -11,6 +11,7 @@ import { authenticateToken, isAdmin } from "../middleware/auth";
 import * as dashboardOverviewController from "../controllers/dashboardOverviewController";
 import multer, { FileFilterCallback } from "multer";
 import { Request } from "express";
+import { ensureUploadsDir } from "../utils/files";
 
 const router = Router();
 
@@ -20,6 +21,7 @@ const storage = multer.diskStorage({
     file: Express.Multer.File,
     cb: (error: Error | null, destination: string) => void
   ) => {
+    ensureUploadsDir();
     cb(null, "uploads");
   },
   filename: (

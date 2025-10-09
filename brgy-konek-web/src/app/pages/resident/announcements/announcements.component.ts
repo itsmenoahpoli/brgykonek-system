@@ -8,6 +8,7 @@ import {
   Announcement,
 } from '../../../services/announcements.service';
 import { AnnouncementDetailsModalComponent } from '../../../components/shared/announcement-details-modal/announcement-details-modal.component';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-resident-announcements',
@@ -30,6 +31,10 @@ export class AnnouncementsComponent {
 
   constructor(private announcementsService: AnnouncementsService) {
     this.loadAnnouncements();
+  }
+
+  getImageUrl(imagePath: string): string {
+    return imagePath ? `${environment.baseUrl}${imagePath}` : '';
   }
 
   get filteredAnnouncements() {

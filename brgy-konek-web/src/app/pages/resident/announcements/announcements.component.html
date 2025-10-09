@@ -55,7 +55,7 @@
     >
       <div class="relative">
         <img
-          [src]="announcement.banner_image"
+          [src]="getImageUrl(announcement.banner_image)"
           alt="Announcement Banner"
           class="h-48 w-full object-cover"
           *ngIf="announcement.banner_image"

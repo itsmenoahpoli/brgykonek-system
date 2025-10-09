@@ -50,11 +50,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password, deviceInfo, rememberDevice } = req.body;
 
-    // Check if account is disabled
+    // Check if account is disabled (skip for admin accounts)
     const User = require("../models/User").default;
     const user = await User.findOne({ email });
     
-    if (user && user.loginDisabled) {
+    const isAdminAccount = user && (user.user_type === 'admin' || email.includes('admin'));
+    
+    if (user && user.loginDisabled && !isAdminAccount) {
       res.status(403).json({ 
         message: "Your account has been disabled temporarily. Max login attempt reached, please contact admin to enable your account" 
       });
@@ -88,8 +90,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
   } catch (error) {
     const errorMessage = (error as Error).message;
     if (errorMessage === "Invalid credentials") {
-      // Increment login attempts on failed login
-      await userAccountService.incrementLoginAttempts(req.body.email);
+      // Increment login attempts on failed login (skip for admin accounts)
+      const User = require("../models/User").default;
+      const user = await User.findOne({ email: req.body.email });
+      const isAdminAccount = user && (user.user_type === 'admin' || req.body.email.includes('admin'));
+      
+      if (!isAdminAccount) {
+        await userAccountService.incrementLoginAttempts(req.body.email);
+      }
       res.status(400).json({ message: errorMessage });
     } else if (errorMessage === "JWT secret not configured") {
       res.status(500).json({ message: errorMessage });

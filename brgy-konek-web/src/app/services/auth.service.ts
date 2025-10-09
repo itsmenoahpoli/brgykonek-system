@@ -279,6 +279,10 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  isAdminAccount(email: string): boolean {
+    return email.includes('admin');
+  }
+
   fetchProfile(): Observable<User> {
     return from(
       apiClient.get('/auth/profile').then((response) => {
@@ -309,6 +313,11 @@ export class AuthService {
   }
 
   incrementLoginAttempts(email: string): void {
+    // Skip max attempts for admin accounts
+    if (this.isAdminAccount(email)) {
+      return;
+    }
+
     const attempts = this.loginAttempts.get(email) || { count: 0 };
     attempts.count += 1;
 
@@ -338,6 +347,11 @@ export class AuthService {
   }
 
   isAccountLocked(email: string): boolean {
+    // Skip lockout check for admin accounts
+    if (this.isAdminAccount(email)) {
+      return false;
+    }
+
     // Check if email is in locked emails list (persistent lockout)
     const lockedEmails = JSON.parse(localStorage.getItem('lockedEmails') || '[]');
     if (lockedEmails.includes(email)) {

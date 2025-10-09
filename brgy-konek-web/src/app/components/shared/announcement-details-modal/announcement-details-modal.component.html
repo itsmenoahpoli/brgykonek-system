@@ -19,7 +19,7 @@
     <div class="space-y-6">
       <div class="relative">
         <img
-          [src]="announcement.banner_image"
+          [src]="getImageUrl(announcement.banner_image)"
           alt="Announcement Banner"
           class="w-full h-64 object-cover rounded-lg"
           *ngIf="announcement.banner_image"
