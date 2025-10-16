@@ -2,7 +2,7 @@
 # This Caddyfile serves the Angular application with proper routing and security headers
 
 # Use Railway's PORT environment variable
-{$PORT:80} {
+:{$PORT:80} {
 	# Set the root directory where the built Angular app is located
 	root * /srv
 	

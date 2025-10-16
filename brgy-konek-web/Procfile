@@ -1,1 +1,0 @@
-web: caddy run --config /srv/Caddyfile --adapter caddyfile --port $PORT
