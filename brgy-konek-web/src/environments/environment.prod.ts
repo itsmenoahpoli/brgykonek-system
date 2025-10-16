@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:2000/api',
-  baseUrl: 'http://localhost:2000'
+  apiUrl: 'https://brgykonekapi.up.railway.app//api',
+  baseUrl: 'https://brgykonekapi.up.railway.app/'
 };
