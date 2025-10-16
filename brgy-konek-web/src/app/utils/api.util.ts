@@ -29,10 +29,8 @@ export function getImageUrl(imagePath: string): string {
 
 const apiClient = axios.create({
   baseURL: environment.apiUrl,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  timeout: 30000, // Increased timeout to 30 seconds
+  // Don't set default Content-Type - let axios/browser set it appropriately
 });
 
 apiClient.interceptors.request.use((config) => {

@@ -252,15 +252,20 @@
         </div>
         <div class="mb-4">
           <label class="block mb-1">Sitio</label>
-          <input
-            type="number"
-            min="1"
-            max="100"
+          <select
             class="border rounded w-full px-3 py-2"
             [(ngModel)]="complaintSitio"
             name="complaintSitio"
-            placeholder="Enter sitio number (1-100)"
-          />
+          >
+            <option [ngValue]="null">Select Sitio</option>
+            <option [ngValue]="1">Maharlika</option>
+            <option [ngValue]="2">Pilar Village</option>
+            <option [ngValue]="3">Happy Village</option>
+            <option [ngValue]="4">Centro</option>
+            <option [ngValue]="5">Sagana</option>
+            <option [ngValue]="6">Crotinda</option>
+            <option [ngValue]="7">Aplaya</option>
+          </select>
         </div>
         <div class="mb-4">
           <label class="block mb-1">Date of Report</label>

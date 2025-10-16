@@ -27,8 +27,9 @@ export const registerValidation = [
     .normalizeEmail()
     .withMessage("Please provide a valid email address"),
   body("password")
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters long"),
+    .isLength({ min: 8, max: 20 })
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,20}$/)
+    .withMessage("Password must be 8-20 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character"),
   body("mobile_number")
     .optional()
     .matches(/^(\+63|0)9\d{9}$/)
@@ -47,10 +48,9 @@ export const registerValidation = [
     .isString()
     .withMessage("Please provide a valid birthdate"),
   body("address_sitio")
-    .optional()
     .trim()
     .isLength({ min: 1, max: 100 })
-    .withMessage("Sitio must be between 1 and 100 characters"),
+    .withMessage("Sitio is required and must be between 1 and 100 characters"),
   body("address_barangay")
     .optional()
     .trim()
@@ -120,6 +120,7 @@ export const resetPasswordValidation = [
     .normalizeEmail()
     .withMessage("Please provide a valid email address"),
   body("new_password")
-    .isLength({ min: 6 })
-    .withMessage("New password must be at least 6 characters long"),
+    .isLength({ min: 8, max: 20 })
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,20}$/)
+    .withMessage("New password must be 8-20 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character"),
 ];

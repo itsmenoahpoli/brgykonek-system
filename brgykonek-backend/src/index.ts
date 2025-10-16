@@ -17,6 +17,7 @@ import { swaggerOptions } from "./config/swagger";
 import { requestLogger } from "./middleware/requestLogger";
 import { logger } from "./utils/logger";
 import { SwaggerTheme, SwaggerThemeNameEnum } from "swagger-themes";
+import { emailService } from "./services/emailService";
 
 dotenv.config();
 
@@ -116,6 +117,15 @@ app.use("*", (req, res) => {
 const startServer = async () => {
   try {
     await connectDB();
+    
+    // Initialize email service
+    try {
+      emailService.initialize();
+      logger.info("Email service initialized successfully");
+    } catch (error) {
+      logger.warn("Email service initialization failed", { error: error instanceof Error ? error.message : "Unknown error" });
+    }
+    
     app.listen(PORT, () => {
       logger.info(`Server started successfully on port ${PORT}`);
       logger.info(

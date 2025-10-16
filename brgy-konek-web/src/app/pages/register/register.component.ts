@@ -34,6 +34,17 @@ export class RegisterComponent {
   showSuccessDialog = false;
   showPassword = false;
 
+  getMobileDisplay(): string {
+    const full = this.registerForm.get('mobile_number')?.value || '';
+    return full.startsWith('+639') ? full.slice(4) : '';
+  }
+
+  onMobileInput(event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    const digits = (input?.value || '').replace(/[^0-9]/g, '').slice(0, 9);
+    this.registerForm.get('mobile_number')?.setValue(`+639${digits}`);
+  }
+
   get passwordValidationStatus() {
     const password = this.registerForm.get('password')?.value || '';
     return {
@@ -56,26 +67,26 @@ export class RegisterComponent {
   ) {
     this.registerForm = this.fb.group(
       {
-        first_name: ['', [Validators.required, Validators.minLength(2)]],
-        middle_name: [''],
-        last_name: ['', [Validators.required, Validators.minLength(2)]],
-        birthdate: ['', [Validators.required]],
+        first_name: ['John', [Validators.required, Validators.minLength(2)]],
+        middle_name: ['Michael'],
+        last_name: ['Doe', [Validators.required, Validators.minLength(2)]],
+        birthdate: ['1990-05-15', [Validators.required]],
         email: [
-          '',
-          [Validators.required, Validators.email, this.gmailOnlyValidator],
+          'test.user@gmail.com',
+          [Validators.required, Validators.email],
         ],
-        password: ['', [Validators.required, this.passwordStrengthValidator]],
-        confirmPassword: ['', [Validators.required]],
+        password: ['Test123!', [Validators.required, this.passwordStrengthValidator]],
+        confirmPassword: ['Test123!', [Validators.required]],
         mobile_number: [
-          '',
+          '+639123456789',
           [Validators.required, this.philippineMobileValidator],
         ],
         province: ['Oriental Mindoro'],
         municipality: ['Bongabong'],
         barangay: ['Masaguisi'],
-        sitio: ['', [Validators.required]],
+        sitio: ['Centro', [Validators.required]],
         barangay_clearance: ['', [this.fileValidator]],
-        rememberDevice: [false],
+        rememberDevice: [true],
       },
       { validators: this.passwordMatchValidator }
     );
@@ -172,6 +183,9 @@ export class RegisterComponent {
     }
 
     const file = control.value;
+    if (!(file instanceof File)) {
+      return null;
+    }
     const maxSize = 5 * 1024 * 1024;
     const allowedTypes = [
       'image/jpeg',

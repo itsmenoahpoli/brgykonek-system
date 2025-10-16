@@ -169,6 +169,10 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
   }
 
   goBackToLogin(): void {
+    // Clear authentication data from storage
+    console.log('🧹 Clearing auth data and redirecting to login...');
+    this.authService.logout();
+    console.log('✅ Auth data cleared, redirecting to login page');
     this.router.navigate(['/login']);
   }
 
@@ -210,6 +214,12 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
       this.router.navigate(['/login']);
       return;
     }
+    // After successful registration, redirect to login page instead of dashboard
+    if (this.type === 'registration') {
+      this.router.navigate(['/login']);
+      return;
+    }
+    // Only redirect to dashboard for existing users (not new registrations)
     if (effectiveRole === 'admin' || effectiveRole === 'staff') {
       this.router.navigate(['/admin/home']);
     } else if (effectiveRole === 'resident') {

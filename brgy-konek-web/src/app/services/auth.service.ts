@@ -156,15 +156,30 @@ export class AuthService {
   ): Observable<{ success: boolean; message: string; user?: User }> {
     return from(
       (async () => {
+        console.log('🚀 Starting registration request...');
         const isFormData = userData instanceof FormData;
+        console.log('📦 Is FormData:', isFormData);
+        console.log('🔗 API URL:', apiClient.defaults.baseURL + '/auth/register');
+        
         let response;
         if (isFormData) {
+          console.log('📤 Sending FormData request...');
           response = await apiClient.post<ApiUser>('/auth/register', userData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
+            headers: {
+              // Don't set Content-Type for FormData - let browser set it with boundary
+            },
+            timeout: 30000, // Explicit timeout for this request
           });
         } else {
-          response = await apiClient.post<ApiUser>('/auth/register', userData);
+          console.log('📤 Sending JSON request...');
+          response = await apiClient.post<ApiUser>('/auth/register', userData, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            timeout: 30000, // Explicit timeout for this request
+          });
         }
+        console.log('✅ Request completed successfully');
         const data = response.data;
         if (data && data.user && (data.user.id || response.status === 201)) {
           const user: User = {
@@ -193,6 +208,12 @@ export class AuthService {
           };
         }
       })().catch((error) => {
+        console.error('❌ Registration error:', error);
+        console.error('📊 Error status:', error.response?.status);
+        console.error('📄 Error response:', error.response?.data);
+        console.error('🔍 Error message:', error.message);
+        console.error('🌐 Error code:', error.code);
+        
         return {
           success: false,
           message: error.response?.data?.message || 'Network error occurred',
@@ -260,6 +281,7 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('accessToken');
     const email = this.currentUserSubject.value?.email;
     if (email) {
       const key = this.getTrustedDeviceKey(email);

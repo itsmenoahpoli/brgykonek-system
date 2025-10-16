@@ -40,6 +40,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       res.status(400).json({ message: errorMessage });
     } else if (errorMessage === "JWT secret not configured") {
       res.status(500).json({ message: errorMessage });
+    } else if (errorMessage.includes("Failed to send OTP to email")) {
+      res.status(500).json({ message: "Registration failed: Unable to send verification email. Please try again." });
     } else {
       res.status(400).json({ message: errorMessage });
     }

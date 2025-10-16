@@ -105,14 +105,14 @@
   </form>
 </app-auth-layout>
 
-<app-status-modal
-  [isVisible]="showSuccessModal"
-  type="success"
-  title="OTP Verified Successfully!"
-  message="Your account has been verified. Redirecting to your profile..."
-  [autoCloseDelay]="3000"
-  (modalClosed)="onSuccessModalClosed()"
-></app-status-modal>
+  <app-status-modal
+    [isVisible]="showSuccessModal"
+    type="success"
+    title="OTP Verified Successfully!"
+    message="Your account has been verified. Redirecting to login page..."
+    [autoCloseDelay]="3000"
+    (modalClosed)="onSuccessModalClosed()"
+  ></app-status-modal>
 
 <app-status-modal
   [isVisible]="showErrorModal"

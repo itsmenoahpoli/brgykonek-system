@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  // Local development - assuming your backend runs on localhost:3000 or similar
+  // Local development - backend runs on localhost:2000
   apiUrl: 'http://localhost:2000/api',
   baseUrl: 'http://localhost:2000/',
   

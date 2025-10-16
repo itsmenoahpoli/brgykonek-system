@@ -306,17 +306,24 @@
         <label for="sitio" class="block text-sm font-medium text-gray-700 mb-1"
           >Sitio/Purok</label
         >
-        <input
+        <select
           id="sitio"
-          type="text"
           formControlName="sitio"
           class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          placeholder="Enter your sitio/purok"
           [class.border-red-500]="
             registerForm.get('sitio')?.invalid &&
             registerForm.get('sitio')?.touched
           "
-        />
+        >
+          <option value="">Select Sitio</option>
+          <option value="Maharlika">Maharlika</option>
+          <option value="Pilar Village">Pilar Village</option>
+          <option value="Happy Village">Happy Village</option>
+          <option value="Centro">Centro</option>
+          <option value="Sagana">Sagana</option>
+          <option value="Crotinda">Crotinda</option>
+          <option value="Aplaya">Aplaya</option>
+        </select>
         <div
           *ngIf="
             registerForm.get('sitio')?.invalid &&
@@ -334,17 +341,21 @@
           class="block text-sm font-medium text-gray-700 mb-1"
           >Mobile Number</label
         >
-        <input
-          id="mobile_number"
-          type="tel"
-          formControlName="mobile_number"
-          class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-          [class.border-red-500]="
-            registerForm.get('mobile_number')?.invalid &&
-            registerForm.get('mobile_number')?.touched
-          "
-          placeholder="+63 912 345 6789"
-        />
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 select-none">+639</span>
+          <input
+            id="mobile_number"
+            type="tel"
+            [value]="getMobileDisplay()"
+            (input)="onMobileInput($event)"
+            class="block w-full border border-gray-300 rounded-md pl-12 pr-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+            placeholder="XXXXXXXXX"
+            [class.border-red-500]="
+              registerForm.get('mobile_number')?.invalid &&
+              registerForm.get('mobile_number')?.touched
+            "
+          />
+        </div>
         <div
           *ngIf="
             registerForm.get('mobile_number')?.invalid &&

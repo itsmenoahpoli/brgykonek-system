@@ -72,6 +72,11 @@ export const authService = {
       throw new Error("User with this email already exists");
     }
 
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error("JWT secret not configured");
+    }
+
     const hashedPassword = await argon2.hash(data.password);
     const user = new User({
       name: data.name,
@@ -91,11 +96,15 @@ export const authService = {
 
     await user.save();
 
-    await this.requestOTP(user.email, "registration");
-
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) {
-      throw new Error("JWT secret not configured");
+    // Send OTP to email - this must succeed before returning success
+    try {
+      await this.requestOTP(user.email, "registration");
+      console.log(`✅ OTP sent successfully to ${user.email} for registration`);
+    } catch (e) {
+      console.error(`❌ Failed to send OTP to ${user.email}:`, e);
+      // Delete the user if email sending fails
+      await User.findByIdAndDelete(user._id);
+      throw new Error(`Failed to send OTP to email: ${e instanceof Error ? e.message : 'Unknown error'}`);
     }
 
     const userId = user._id?.toString();
