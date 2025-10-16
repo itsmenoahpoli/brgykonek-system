@@ -338,7 +338,7 @@ export class ComplaintsComponent implements OnInit {
     if (!attachment) return;
     
     // Construct the full URL for the attachment
-    const baseUrl = 'http://localhost:2000'; // You might want to make this configurable
+    const baseUrl = 'https://brgykonekapi.up.railway.app'; // You might want to make this configurable
     const fullUrl = `${baseUrl}/${attachment}`;
     
     // Open in a new tab
@@ -349,7 +349,7 @@ export class ComplaintsComponent implements OnInit {
     if (!attachment) return;
     
     // Construct the full URL for the attachment
-    const baseUrl = 'http://localhost:2000'; // You might want to make this configurable
+    const baseUrl = 'https://brgykonekapi.up.railway.app'; // You might want to make this configurable
     const fullUrl = `${baseUrl}/${attachment}`;
     
     // Create a temporary anchor element to trigger download
