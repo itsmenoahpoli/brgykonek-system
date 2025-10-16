@@ -2,8 +2,8 @@
   title="Create your account"
   subtitle="Join BrgyKonek to connect with your community"
 >
-  <form class="space-y-6" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <form class="space-y-4 sm:space-y-6" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
         <label
           for="first_name"
@@ -97,7 +97,7 @@
         </div>
       </div>
 
-      <div class="md:col-span-2">
+      <div class="sm:col-span-2">
         <label for="email" class="block text-sm font-medium text-gray-700 mb-1"
           >Email Address</label
         >
@@ -105,7 +105,7 @@
           id="email"
           type="email"
           formControlName="email"
-          class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
           [class.border-red-500]="
             registerForm.get('email')?.invalid &&
             registerForm.get('email')?.touched
@@ -328,7 +328,7 @@
         </div>
       </div>
 
-      <div class="md:col-span-2">
+      <div class="sm:col-span-2">
         <label
           for="mobile_number"
           class="block text-sm font-medium text-gray-700 mb-1"
@@ -338,7 +338,7 @@
           id="mobile_number"
           type="tel"
           formControlName="mobile_number"
-          class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
           [class.border-red-500]="
             registerForm.get('mobile_number')?.invalid &&
             registerForm.get('mobile_number')?.touched
@@ -363,14 +363,14 @@
         </div>
       </div>
 
-      <div class="md:col-span-2">
+      <div class="sm:col-span-2">
         <label
           for="barangay_clearance"
           class="block text-sm font-medium text-gray-700 mb-1"
           >Barangay Clearance</label
         >
         <div
-          class="relative border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-indigo-400 transition-colors duration-200"
+          class="relative border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-6 text-center hover:border-indigo-400 transition-colors duration-200"
           [class.border-red-500]="
             registerForm.get('barangay_clearance')?.invalid &&
             registerForm.get('barangay_clearance')?.touched
@@ -468,12 +468,12 @@
 
     <div class="flex items-center gap-2">
       <input id="remember_device" type="checkbox" formControlName="rememberDevice" class="h-4 w-4 text-indigo-600 border-gray-300 rounded" />
-      <label for="remember_device" class="text-sm text-gray-700">Remember this device for 30 days</label>
+      <label for="remember_device" class="text-xs sm:text-sm text-gray-700">Remember this device for 30 days</label>
     </div>
 
     <div
       *ngIf="errorMessage"
-      class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative"
+      class="bg-red-50 border border-red-200 text-red-700 px-3 sm:px-4 py-2 sm:py-3 rounded relative text-sm"
     >
       {{ errorMessage }}
     </div>
@@ -482,7 +482,7 @@
       <button
         type="submit"
         [disabled]="registerForm.invalid || isLoading"
-        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span
           *ngIf="isLoading"
@@ -514,7 +514,7 @@
     </div>
 
     <div class="text-center">
-      <p class="text-sm text-gray-600">
+      <p class="text-xs sm:text-sm text-gray-600">
         Already have an account?
         <button
           type="button"

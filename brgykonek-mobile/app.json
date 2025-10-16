@@ -1,10 +1,11 @@
 {
   "expo": {
-    "name": "Brgy Konek",
-    "slug": "brgy-konek-mobile",
+    "name": "brgykonek-mobile",
+    "slug": "brgykonek-mobile",
     "version": "1.0.0",
-    "scheme": "brgy-konek-mobile",
-    "backgroundColor": "#000",
+
+    "scheme": "brgykonek-mobile",
+    "platforms": ["ios", "android"],
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -13,33 +14,29 @@
     "plugins": ["expo-router"],
     "experiments": {
       "typedRoutes": true,
+
       "tsconfigPaths": true
     },
+
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+
     "userInterfaceStyle": "light",
+
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
-    "build": {
-      "preview": {
-        "android": {
-          "buildType": "apk"
-        }
-      },
-      "preview2": {
-        "android": {
-          "gradleCommand": ":app:assembleRelease"
-        }
-      },
-      "preview3": {
-        "developmentClient": true
-      },
-      "preview4": {
-        "distribution": "internal"
-      },
-      "production": {}
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
     }
   }
 }
