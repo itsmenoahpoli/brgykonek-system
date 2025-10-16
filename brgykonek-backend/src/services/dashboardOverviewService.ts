@@ -136,13 +136,10 @@ export const getOverviewStatistics = async () => {
       countsMap.set(row.sitio as number, row.count || 0);
     }
   }
-  const complaintsBySitio = [] as { sitio: number | string; count: number }[];
-  for (let s = 1; s <= 100; s++) {
-    complaintsBySitio.push({ sitio: s, count: countsMap.get(s) || 0 });
-  }
-  if (unspecifiedCount > 0) {
-    complaintsBySitio.push({ sitio: "Unspecified", count: unspecifiedCount });
-  }
+  // Map counts to existing sitios by name
+  const existingSitios = await (await import('../models/Sitio')).default.find({}).sort({ code: 1 }).select('code name');
+  const complaintsBySitio = existingSitios.map((s: any) => ({ sitio: s.name, count: countsMap.get(s.code) || 0 }));
+  if (unspecifiedCount > 0) complaintsBySitio.push({ sitio: "Unspecified", count: unspecifiedCount });
   
   console.log('Complaints by sitio aggregation result:', complaintsBySitio);
 

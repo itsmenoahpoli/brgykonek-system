@@ -54,12 +54,12 @@ const run = async () => {
 
     const residents = await User.find({ user_type: 'resident' }).select('_id name');
     const staff = await User.find({ user_type: { $in: ['admin', 'staff'] } }).select('_id name user_type');
-    const sitios = await Sitio.find({}).sort({ code: 1 }).select('_id code');
+    const sitios = await Sitio.find({}).sort({ code: 1 }).select('_id code name');
 
     if (!residents.length) throw new Error('No residents available to attach complaints to.');
     if (!sitios.length) throw new Error('No sitios found; seed sitios first.');
 
-    console.log('Seeding complaints: 10 per sitio...');
+    console.log('Seeding complaints: 10 per sitio (named sitios)...');
     const complaintsPerSitio: any[] = [];
     for (const sitio of sitios) {
       for (let i = 0; i < 10; i++) {
@@ -67,10 +67,10 @@ const run = async () => {
         const category = pick(categories);
         complaintsPerSitio.push({
           resident_id: resident._id,
-          title: `${category} at Sitio ${sitio.code} #${i + 1}`,
+          title: `${category} at ${sitio.name} #${i + 1}`,
           category,
           date_of_report: randomPastDate(),
-          complaint_content: `${category} issue reported in Sitio ${sitio.code}.`,
+          complaint_content: `${category} issue reported in ${sitio.name}.`,
           attachments: [],
           status: randomStatus(),
           priority: randomPriority(),

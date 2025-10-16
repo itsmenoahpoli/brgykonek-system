@@ -16,8 +16,16 @@ const run = async () => {
     await Complaint.deleteMany({});
     console.log('Complaints cleared.');
 
-    console.log('Seeding sitios 1-100...');
-    const sitios = Array.from({ length: 100 }, (_, i) => ({ code: i + 1, name: `Sitio ${i + 1}` }));
+    console.log('Seeding sitios (7 named sitios)...');
+    const sitios = [
+      { code: 1, name: 'Maharlika' },
+      { code: 2, name: 'Pilar Village' },
+      { code: 3, name: 'Happy Village' },
+      { code: 4, name: 'Centro' },
+      { code: 5, name: 'Sagana' },
+      { code: 6, name: 'Crotinda' },
+      { code: 7, name: 'Aplaya' },
+    ];
     await Sitio.deleteMany({});
     await Sitio.insertMany(sitios);
     console.log('Sitios seeded.');
