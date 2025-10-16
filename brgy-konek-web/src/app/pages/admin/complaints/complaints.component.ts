@@ -10,6 +10,7 @@ import {
 import { Observable } from 'rxjs';
 import { DashboardLayoutComponent } from '../../../components/shared/dashboard-layout/dashboard-layout.component';
 import { StatusModalComponent } from '../../../components/shared/status-modal/status-modal.component';
+import { getBaseUrl } from '../../../utils/api.util';
 
 @Component({
   selector: 'app-complaints',
@@ -338,7 +339,7 @@ export class ComplaintsComponent implements OnInit {
     if (!attachment) return;
     
     // Construct the full URL for the attachment
-    const baseUrl = 'https://brgykonekapi.up.railway.app'; // You might want to make this configurable
+    const baseUrl = getBaseUrl();
     const fullUrl = `${baseUrl}/${attachment}`;
     
     // Open in a new tab
@@ -349,7 +350,7 @@ export class ComplaintsComponent implements OnInit {
     if (!attachment) return;
     
     // Construct the full URL for the attachment
-    const baseUrl = 'https://brgykonekapi.up.railway.app'; // You might want to make this configurable
+    const baseUrl = getBaseUrl();
     const fullUrl = `${baseUrl}/${attachment}`;
     
     // Create a temporary anchor element to trigger download

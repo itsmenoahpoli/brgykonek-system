@@ -6,6 +6,7 @@ import {
   Announcement,
 } from '../../services/announcements.service';
 import { DatePipe, CommonModule } from '@angular/common';
+import { getImageUrl } from '../../utils/api.util';
 
 @Component({
   selector: 'app-announcements',
@@ -47,5 +48,9 @@ export class AnnouncementsComponent implements OnInit {
   onModalClosed() {
     this.showModal = false;
     this.selectedAnnouncement = null;
+  }
+
+  getImageUrl(imagePath: string): string {
+    return getImageUrl(imagePath);
   }
 }

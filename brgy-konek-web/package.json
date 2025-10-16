@@ -3,11 +3,18 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "dev": "ng serve",
-    "build": "ng build",
+    "dev": "ng serve --configuration development",
+    "serve": "ng serve --configuration development",
+    "serve:prod": "ng serve --configuration production",
+    "build": "ng build --configuration production",
+    "build:dev": "ng build --configuration development",
+    "build:prod": "ng build --configuration production",
+    "build:railway": "npm run build:prod && echo 'Build completed for Railway deployment'",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "eslint . --ext .ts,.html"
+    "lint": "eslint . --ext .ts,.html",
+    "validate:caddyfile": "caddy validate --config Caddyfile",
+    "test:caddy": "caddy run --config Caddyfile --watch"
   },
   "private": true,
   "dependencies": {

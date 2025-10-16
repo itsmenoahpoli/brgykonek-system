@@ -1,5 +1,6 @@
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
+import { environment } from '../../environments/environment';
 
 const SECRET_KEY = 'brgykonek_secret_key';
 
@@ -12,8 +13,22 @@ export function decrypt(ciphertext: string): string {
   return bytes.toString(CryptoJS.enc.Utf8);
 }
 
+export function getBaseUrl(): string {
+  return environment.baseUrl;
+}
+
+export function getApiUrl(): string {
+  return environment.apiUrl;
+}
+
+export function getImageUrl(imagePath: string): string {
+  if (!imagePath) return '';
+  if (imagePath.startsWith('http')) return imagePath;
+  return `${environment.baseUrl}${imagePath}`;
+}
+
 const apiClient = axios.create({
-  baseURL: 'https://brgykonekapi.up.railway.app/api',
+  baseURL: environment.apiUrl,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

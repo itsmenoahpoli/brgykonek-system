@@ -8,46 +8,65 @@
 
   <!-- Sidebar -->
   <div
-    class="sidebar bg-cover bg-center text-white transition-all duration-300 fixed top-0 left-0 h-screen z-30"
+    class="sidebar bg-cover bg-center text-white transition-all duration-300 fixed top-0 left-0 h-screen z-30 flex flex-col"
     [ngClass]="{
       'w-64': sidebarOpen,
       'w-16': !sidebarOpen,
-      'hidden lg:flex': !sidebarOpen && !sidebarOpen,
+      'hidden lg:flex': !sidebarOpen,
       'flex': sidebarOpen
     }"
     style="background-image: url('assets/images/splash-bg.png')"
   >
     <div class="sidebar-overlay absolute inset-0 z-0"></div>
-    <button
-      (click)="toggleSidebar()"
-      class="absolute top-4 right-4 z-20 focus:outline-none"
-    >
-      <ng-icon *ngIf="sidebarOpen" name="heroXMark" class="w-6 h-6"></ng-icon>
-      <ng-icon *ngIf="!sidebarOpen" name="heroBars3" class="w-6 h-6"></ng-icon>
-    </button>
-    <div
-      class="flex flex-col items-center justify-center h-36 relative z-10 mb-8"
-    >
-      <img
-        src="assets/images/brand-logo.png"
-        alt="Brand Logo"
-        class="h-36 w-auto mt-4"
-        *ngIf="sidebarOpen"
-      />
+    
+    <!-- Sidebar Header -->
+    <div class="relative z-10 p-4 border-b border-white border-opacity-20">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3" *ngIf="sidebarOpen">
+          <img
+            src="assets/images/brand-logo.png"
+            alt="Brand Logo"
+            class="h-8 w-8"
+          />
+          <span class="font-bold text-lg">Dashboard</span>
+        </div>
+        <button
+          (click)="toggleSidebar()"
+          class="p-2 rounded-md hover:bg-white hover:bg-opacity-10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
+        >
+          <ng-icon *ngIf="sidebarOpen" name="heroXMark" class="w-5 h-5"></ng-icon>
+          <ng-icon *ngIf="!sidebarOpen" name="heroBars3" class="w-5 h-5"></ng-icon>
+        </button>
+      </div>
     </div>
-    <div class="flex items-center justify-between h-16 px-4 relative z-10">
-      <span class="font-bold text-lg" *ngIf="sidebarOpen">Dashboard</span>
-    </div>
-    <ul class="mt-8 space-y-4 px-4 relative z-10" *ngIf="sidebarOpen">
-      <li
-        *ngFor="let link of sidebarLinks"
-        (click)="goToSidebarLink(link)"
-        class="hover:text-indigo-200 cursor-pointer flex items-center gap-3"
-      >
-        <ng-icon [name]="link.icon" class="w-7 h-7"></ng-icon>
-        {{ link.label }}
-      </li>
-    </ul>
+
+    <!-- Sidebar Navigation -->
+    <nav class="flex-1 relative z-10 p-4">
+      <ul class="space-y-2" *ngIf="sidebarOpen">
+        <li
+          *ngFor="let link of sidebarLinks"
+          (click)="goToSidebarLink(link)"
+          class="hover:bg-white hover:bg-opacity-10 cursor-pointer rounded-lg p-3 transition-colors duration-200"
+        >
+          <div class="flex items-center gap-3">
+            <ng-icon [name]="link.icon" class="w-5 h-5"></ng-icon>
+            <span class="text-sm font-medium">{{ link.label }}</span>
+          </div>
+        </li>
+      </ul>
+      
+      <!-- Collapsed sidebar icons -->
+      <div *ngIf="!sidebarOpen" class="flex flex-col items-center space-y-4">
+        <div
+          *ngFor="let link of sidebarLinks"
+          (click)="goToSidebarLink(link)"
+          class="p-2 rounded-lg hover:bg-white hover:bg-opacity-10 cursor-pointer transition-colors duration-200"
+          [title]="link.label"
+        >
+          <ng-icon [name]="link.icon" class="w-5 h-5"></ng-icon>
+        </div>
+      </div>
+    </nav>
   </div>
 
   <!-- Main Content Area -->
