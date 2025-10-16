@@ -47,11 +47,17 @@ const ComplaintSchema = new mongoose.Schema(
       default: "low",
       required: true,
     },
-    sitio: {
+    sitio_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Sitio",
+      required: false,
+    },
+    sitio_code: {
       type: Number,
       required: false,
       min: 1,
       max: 100,
+      index: true,
     },
     resolution_note: {
       type: String,

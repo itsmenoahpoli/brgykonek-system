@@ -78,7 +78,7 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
         break;
       case 'document_request_update':
         if (userRole === 'admin' || userRole === 'staff') {
-          this.router.navigate(['/admin/accounts']);
+          this.router.navigate(['/admin/document-requests']);
         } else {
           this.router.navigate(['/resident/list-of-reports']);
         }

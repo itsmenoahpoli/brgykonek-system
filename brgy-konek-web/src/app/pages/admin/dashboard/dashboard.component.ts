@@ -185,8 +185,7 @@ export class DashboardComponent implements OnInit {
   getComplaintsBySitio() {
     if (!this.statistics?.complaintsBySitio) return [];
     return this.statistics.complaintsBySitio
-      .filter(sitio => sitio.sitio !== null && sitio.sitio !== undefined)
-      .slice(0, 5);
+      .filter(sitio => sitio.sitio !== null && sitio.sitio !== undefined);
   }
 
   get topComplaintCategories() {

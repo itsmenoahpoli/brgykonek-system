@@ -17,9 +17,7 @@ const MONTHS = [
   "December",
 ];
 
-export const getOverviewStatistics = async (
-  year = new Date().getFullYear()
-) => {
+export const getOverviewStatistics = async () => {
   const [totalComplaints, totalActiveAnnouncements, totalResidents] =
     await Promise.all([
       Complaint.countDocuments(),
@@ -27,66 +25,126 @@ export const getOverviewStatistics = async (
       User.countDocuments({ user_type: "resident" }),
     ]);
 
-  const start = new Date(year, 0, 1);
-  const end = new Date(year + 1, 0, 1);
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth() - 11, 1);
+  const end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
   const complaintsPerMonthRaw = await Complaint.aggregate([
     { $match: { created_at: { $gte: start, $lt: end } } },
     {
       $group: {
-        _id: { month: { $month: "$created_at" } },
+        _id: { year: { $year: "$created_at" }, month: { $month: "$created_at" } },
         count: { $sum: 1 },
       },
     },
-    { $project: { month: "$_id.month", count: 1, _id: 0 } },
-    { $sort: { month: 1 } },
+    { $project: { year: "$_id.year", month: "$_id.month", count: 1, _id: 0 } },
+    { $sort: { year: 1, month: 1 } },
   ]);
 
   const announcementsPerMonthRaw = await Announcement.aggregate([
     { $match: { status: "published", created_at: { $gte: start, $lt: end } } },
     {
       $group: {
-        _id: { month: { $month: "$created_at" } },
+        _id: { year: { $year: "$created_at" }, month: { $month: "$created_at" } },
         count: { $sum: 1 },
       },
     },
-    { $project: { month: "$_id.month", count: 1, _id: 0 } },
-    { $sort: { month: 1 } },
+    { $project: { year: "$_id.year", month: "$_id.month", count: 1, _id: 0 } },
+    { $sort: { year: 1, month: 1 } },
   ]);
 
   const usersPerMonthRaw = await User.aggregate([
     { $match: { user_type: "resident", createdAt: { $gte: start, $lt: end } } },
     {
       $group: {
-        _id: { month: { $month: "$createdAt" } },
+        _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
         count: { $sum: 1 },
       },
     },
-    { $project: { month: "$_id.month", count: 1, _id: 0 } },
-    { $sort: { month: 1 } },
+    { $project: { year: "$_id.year", month: "$_id.month", count: 1, _id: 0 } },
+    { $sort: { year: 1, month: 1 } },
   ]);
 
-  const complaintsPerMonth = complaintsPerMonthRaw.map((item) => ({
-    month: MONTHS[item.month - 1],
-    count: item.count,
+  const buildLast12Months = () => {
+    const result: { key: string; label: string }[] = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${d.getFullYear()}-${d.getMonth() + 1}`;
+      result.push({ key, label: MONTHS[d.getMonth()] });
+    }
+    return result;
+  };
+  const monthsWindow = buildLast12Months();
+  const complaintsMap = new Map(
+    complaintsPerMonthRaw.map((i: any) => [`${i.year}-${i.month}`, i.count])
+  );
+  const complaintsPerMonth = monthsWindow.map((m) => ({
+    month: m.label,
+    count: complaintsMap.get(m.key) || 0,
   }));
 
-  const announcementsPerMonth = announcementsPerMonthRaw.map((item) => ({
-    month: MONTHS[item.month - 1],
-    count: item.count,
+  const announcementsMap = new Map(
+    announcementsPerMonthRaw.map((i: any) => [`${i.year}-${i.month}`, i.count])
+  );
+  const announcementsPerMonth = monthsWindow.map((m) => ({
+    month: m.label,
+    count: announcementsMap.get(m.key) || 0,
   }));
 
-  const usersPerMonth = usersPerMonthRaw.map((item) => ({
-    month: MONTHS[item.month - 1],
-    count: item.count,
+  const usersMap = new Map(
+    usersPerMonthRaw.map((i: any) => [`${i.year}-${i.month}`, i.count])
+  );
+  const usersPerMonth = monthsWindow.map((m) => ({
+    month: m.label,
+    count: usersMap.get(m.key) || 0,
   }));
 
-  const complaintsBySitio = await Complaint.aggregate([
-    { $group: { _id: "$sitio", count: { $sum: 1 } } },
-    { $match: { _id: { $ne: null } } },
+  const complaintsBySitioAgg = await Complaint.aggregate([
+    { $lookup: { from: "users", localField: "resident_id", foreignField: "_id", as: "resident" } },
+    { $unwind: { path: "$resident", preserveNullAndEmptyArrays: true } },
+    { $addFields: { sitioFromComplaint: "$sitio_code" } },
+    { $addFields: { sitioFromResidentRaw: "$resident.address_sitio" } },
+    {
+      $addFields: {
+        sitioDigits: {
+          $regexFind: { input: { $toString: "$sitioFromResidentRaw" }, regex: /\d+/ },
+        },
+      },
+    },
+    {
+      $addFields: {
+        sitioFromResident: {
+          $convert: { input: "$sitioDigits.match", to: "int", onError: null, onNull: null },
+        },
+      },
+    },
+    {
+      $addFields: {
+        sitioNumber: { $ifNull: ["$sitioFromComplaint", "$sitioFromResident"] },
+      },
+    },
+    { $group: { _id: "$sitioNumber", count: { $sum: 1 } } },
     { $project: { sitio: "$_id", count: 1, _id: 0 } },
-    { $sort: { count: -1 } },
   ]);
+
+  const countsMap = new Map<number, number>();
+  let unspecifiedCount = 0;
+  for (const row of complaintsBySitioAgg) {
+    if (row.sitio === null || row.sitio === undefined || Number.isNaN(row.sitio)) {
+      unspecifiedCount += row.count || 0;
+    } else {
+      countsMap.set(row.sitio as number, row.count || 0);
+    }
+  }
+  const complaintsBySitio = [] as { sitio: number | string; count: number }[];
+  for (let s = 1; s <= 100; s++) {
+    complaintsBySitio.push({ sitio: s, count: countsMap.get(s) || 0 });
+  }
+  if (unspecifiedCount > 0) {
+    complaintsBySitio.push({ sitio: "Unspecified", count: unspecifiedCount });
+  }
+  
+  console.log('Complaints by sitio aggregation result:', complaintsBySitio);
 
   const complaintsByCategory = await Complaint.aggregate([
     { $group: { _id: "$category", count: { $sum: 1 } } },

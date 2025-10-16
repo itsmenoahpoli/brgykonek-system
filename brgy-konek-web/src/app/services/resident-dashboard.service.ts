@@ -36,8 +36,8 @@ export class ResidentDashboardService {
         apiClient.get(`/documents/requests/resident/${residentId}`)
       ]);
 
-      const complaints = complaintsRes?.data || [];
-      const documents = documentsRes?.data || [];
+      const complaints = (complaintsRes?.data?.data ?? complaintsRes?.data) || [];
+      const documents = (documentsRes?.data?.data ?? documentsRes?.data) || [];
 
       const pendingComplaints = complaints.filter((c: any) => 
         c.status === 'pending' || c.status === 'in_progress'

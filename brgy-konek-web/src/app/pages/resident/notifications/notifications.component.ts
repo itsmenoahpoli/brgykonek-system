@@ -76,8 +76,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
         break;
       case 'document_request_update':
         if (isAdmin) {
-          // Admin users might not need this, but keep the resident behavior
-          this.router.navigate(['/resident/list-of-reports']);
+          this.router.navigate(['/admin/document-requests']);
         } else {
           this.router.navigate(['/resident/list-of-reports']);
         }
