@@ -100,8 +100,9 @@
         <div
           class="flex justify-between items-center pt-3 border-t border-gray-100"
         >
-          <div class="text-xs text-gray-500">
-            {{ announcement.created_at | date : "MMM dd, yyyy" }}
+          <div class="text-xs text-gray-500 flex items-center gap-2">
+            <span>{{ announcement.created_at | date : "MMM dd, yyyy" }}</span>
+            <span *ngIf="announcement.posted_by">• Posted by {{ announcement.posted_by }}</span>
           </div>
           <button
             (click)="openAnnouncementDetails(announcement)"

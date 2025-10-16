@@ -12,6 +12,7 @@ import {
   getUserById,
   updateUserById,
   deleteUserById,
+  getApprovalStatus,
 } from "../controllers/authController";
 import { authenticateToken, isAdmin } from "../middleware/auth";
 import {
@@ -329,6 +330,29 @@ router.post("/login", loginValidation, validateRequest, login);
  *                   type: string
  */
 router.get("/my-profile", authenticateToken, getProfile);
+
+/**
+ * @swagger
+ * /api/auth/approval-status:
+ *   get:
+ *     summary: Get approval status of the authenticated user
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Returns approval status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 approved:
+ *                   type: boolean
+ *       401:
+ *         description: Unauthorized
+ */
+router.get("/approval-status", authenticateToken, getApprovalStatus);
 
 /**
  * @swagger

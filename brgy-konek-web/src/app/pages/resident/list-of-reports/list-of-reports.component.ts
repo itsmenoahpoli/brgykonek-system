@@ -29,7 +29,9 @@ export class ListOfReportsComponent {
   }
 
   get filteredReports() {
-    return this.reports.filter(r => (this.statusFilter ? r.status === this.statusFilter : true));
+    return this.reports
+      .filter(r => r.type === 'document_request')
+      .filter(r => (this.statusFilter ? r.status === this.statusFilter : true));
   }
 
   async loadReports() {

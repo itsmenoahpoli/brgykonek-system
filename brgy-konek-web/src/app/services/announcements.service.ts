@@ -8,10 +8,10 @@ export interface Announcement {
   header: string;
   body: string;
   status: string;
+  posted_by?: string;
   category?: 'Health' | 'Safety' | 'Events' | string;
   audience?: 'All Residents' | 'Specific Zone' | 'Staff Only' | string;
   publish_at?: string;
-  created_by?: string;
   created_at: string;
   updated_at?: string;
 }

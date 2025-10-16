@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import * as announcementService from "../services/announcementService";
+import Notification from "../models/Notification";
+import User from "../models/User";
 
 export const create = async (req: Request, res: Response) => {
   try {
@@ -26,6 +28,21 @@ export const create = async (req: Request, res: Response) => {
     }
     
     const announcement = await announcementService.createAnnouncement(req.body);
+    try {
+      if (announcement.status === "published") {
+        const residents = await User.find({ user_type: "resident" }).select("_id");
+        const notifications = residents.map((r) => ({
+          recipient_id: String(r._id),
+          type: "announcement",
+          title: announcement.title,
+          message: announcement.header || announcement.title,
+          payload: { announcementId: String(announcement._id) },
+        }));
+        if (notifications.length > 0) {
+          await Notification.insertMany(notifications);
+        }
+      }
+    } catch {}
     res.status(201).json(announcement);
   } catch (error) {
     res.status(400).json({ error: (error as Error).message });
@@ -115,6 +132,21 @@ export const update = async (req: Request, res: Response) => {
     );
     if (!announcement)
       return res.status(404).json({ error: "Announcement not found" });
+    try {
+      if (announcement.status === "published") {
+        const residents = await User.find({ user_type: "resident" }).select("_id");
+        const notifications = residents.map((r) => ({
+          recipient_id: String(r._id),
+          type: "announcement",
+          title: announcement.title,
+          message: announcement.header || announcement.title,
+          payload: { announcementId: String(announcement._id) },
+        }));
+        if (notifications.length > 0) {
+          await Notification.insertMany(notifications);
+        }
+      }
+    } catch {}
     res.status(200).json(announcement);
   } catch (error) {
     res.status(400).json({ error: (error as Error).message });

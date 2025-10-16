@@ -133,6 +133,23 @@ export const getProfile = async (
   }
 };
 
+export const getApprovalStatus = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ message: "User not authenticated" });
+      return;
+    }
+
+    const approved = Boolean(req.user.approved);
+    res.status(200).json({ approved });
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
 export const requestOTP = async (
   req: Request,
   res: Response

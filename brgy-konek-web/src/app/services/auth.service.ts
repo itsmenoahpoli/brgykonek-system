@@ -285,8 +285,8 @@ export class AuthService {
 
   fetchProfile(): Observable<User> {
     return from(
-      apiClient.get('/auth/profile').then((response) => {
-        const user = response.data;
+      apiClient.get('/auth/my-profile').then((response) => {
+        const user = response.data?.user || response.data;
         const updatedUser: User = {
           id: user.id,
           email: user.email,
@@ -304,6 +304,21 @@ export class AuthService {
         localStorage.setItem('currentUser', JSON.stringify(updatedUser));
         this.currentUserSubject.next(updatedUser);
         return updatedUser;
+      })
+    );
+  }
+
+  checkApprovalStatus(): Observable<boolean> {
+    return from(
+      apiClient.get('/auth/approval-status').then((response) => {
+        const approved = Boolean(response.data?.approved);
+        const current = this.currentUserSubject.value;
+        if (current && current.approved !== approved) {
+          const updated = { ...current, approved } as User;
+          localStorage.setItem('currentUser', JSON.stringify(updated));
+          this.currentUserSubject.next(updated);
+        }
+        return approved;
       })
     );
   }

@@ -93,6 +93,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'admin/document-requests',
+    loadComponent: () =>
+      import('./pages/admin/document-requests/document-requests.component').then(
+        (m) => m.DocumentRequestsComponent
+      ),
+  },
+  {
     path: 'admin/notifications',
     loadComponent: () =>
       import('./pages/resident/notifications/notifications.component').then(

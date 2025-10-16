@@ -38,6 +38,12 @@ export class HomeComponent implements OnInit {
         this.loadDashboardData();
       },
     });
+
+    this.authService.checkApprovalStatus().subscribe((approved) => {
+      if (this.currentUser) {
+        this.isPendingApproval = this.currentUser.role === 'resident' && !approved;
+      }
+    });
   }
 
   private checkPendingStatus(): void {

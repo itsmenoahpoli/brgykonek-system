@@ -80,6 +80,7 @@ export class DashboardLayoutComponent {
           icon: 'heroUsers',
           route: 'admin/accounts',
         },
+        { label: 'Document Requests', icon: 'heroDocumentText', route: 'admin/document-requests' },
         { label: 'Complaints', icon: 'heroExclamationTriangle', route: 'admin/complaints' },
         {
           label: 'Announcements',

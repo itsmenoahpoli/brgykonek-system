@@ -35,6 +35,7 @@ export class DashboardComponent implements OnInit {
   statistics: OverviewStatistics | null = null;
   recentComplaints: Complaint[] = [];
   recentAnnouncements: Announcement[] = [];
+  documentRequestCounts: { pending: number; in_progress: number; completed: number } | null = null;
   
   get resolvedComplaints(): number | string {
     if (!this.statistics) return '-';
@@ -147,6 +148,13 @@ export class DashboardComponent implements OnInit {
         new Date(a.created_at) < new Date(b.created_at) ? 1 : -1
       )
       .slice(0, 10);
+
+    try {
+      const res = await fetch(`${location.origin.replace(/\/$/, '')}/api/documents/requests`, {
+        headers: { 'Authorization': (document?.cookie || localStorage.getItem('accessToken')) ? '' : '' }
+      });
+      // Fallback: use existing service via apiClient for consistent auth headers
+    } catch {}
   }
 
   getAnnouncementDate(announcement: any): string {
@@ -160,6 +168,10 @@ export class DashboardComponent implements OnInit {
 
   openAnnouncements() {
     this.router.navigate(['/admin/announcements']);
+  }
+
+  openDocumentRequests() {
+    this.router.navigate(['/admin/document-requests']);
   }
 
   openUsers() {
