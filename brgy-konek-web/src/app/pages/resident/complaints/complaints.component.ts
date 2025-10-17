@@ -210,9 +210,14 @@ export class ComplaintsComponent {
     for (const f of this.uploadedFiles) {
       formData.append('attachments', f);
     }
-    await this.complaintsService.createComplaint(formData);
-    this.closeCreateModal();
-    this.loadComplaints();
+    const created = await this.complaintsService.createComplaint(formData);
+    if (created) {
+      this.successTitle = 'Complaint Submitted';
+      this.successMessage = 'Your complaint has been submitted successfully.';
+      this.showSuccessModal = true;
+      this.closeCreateModal();
+      this.loadComplaints();
+    }
   }
 
   getPriorityClass(priority?: string): string {

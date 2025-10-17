@@ -67,26 +67,20 @@ export class RegisterV2Component {
   ) {
     this.registerForm = this.fb.group(
       {
-        first_name: ['John', [Validators.required, Validators.minLength(2)]],
-        middle_name: ['Michael'],
-        last_name: ['Doe', [Validators.required, Validators.minLength(2)]],
-        birthdate: ['1990-05-15', [Validators.required]],
-        email: [
-          'test.user.v2@gmail.com',
-          [Validators.required, Validators.email],
-        ],
-        password: ['Test123!', [Validators.required, this.passwordStrengthValidator]],
-        confirmPassword: ['Test123!', [Validators.required]],
-        mobile_number: [
-          '+639123456789',
-          [Validators.required, this.philippineMobileValidator],
-        ],
-        province: ['Oriental Mindoro'],
-        municipality: ['Bongabong'],
-        barangay: ['Masaguisi'],
-        sitio: ['Centro', [Validators.required]],
+        first_name: ['', [Validators.required, Validators.minLength(2)]],
+        middle_name: [''],
+        last_name: ['', [Validators.required, Validators.minLength(2)]],
+        birthdate: ['', [Validators.required]],
+        email: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, this.passwordStrengthValidator]],
+        confirmPassword: ['', [Validators.required]],
+        mobile_number: ['', [Validators.required, this.philippineMobileValidator]],
+        province: [''],
+        municipality: [''],
+        barangay: [''],
+        sitio: ['', [Validators.required]],
         barangay_clearance: ['', [this.fileValidator]],
-        rememberDevice: [true],
+        rememberDevice: [false],
       },
       { validators: this.passwordMatchValidator }
     );

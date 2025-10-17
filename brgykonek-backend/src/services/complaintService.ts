@@ -1,4 +1,5 @@
 import Complaint from "../models/Complaint";
+import Sitio from "../models/Sitio";
 import Notification from "../models/Notification";
 import User from "../models/User";
 import { Document, FilterQuery } from "mongoose";
@@ -22,6 +23,17 @@ const notifyAdmins = async (type: string, title: string, message: string, payloa
 
 export const createComplaint = async (data: Record<string, any>) => {
   let complaintData = { ...data };
+  if (complaintData.sitio) {
+    const code = Number(complaintData.sitio);
+    const sitio = await Sitio.findOne({ code });
+    if (sitio) {
+      complaintData.sitio_code = code;
+      complaintData.sitio_id = sitio._id;
+    } else {
+      complaintData.sitio_code = code;
+    }
+    delete (complaintData as any).sitio;
+  }
   
   // If resident_id is provided, validate it exists
   if (data.resident_id) {
@@ -71,6 +83,17 @@ export const createComplaint = async (data: Record<string, any>) => {
 
 export const createAdminComplaint = async (data: Record<string, any>) => {
   let complaintData = { ...data };
+  if (complaintData.sitio) {
+    const code = Number(complaintData.sitio);
+    const sitio = await Sitio.findOne({ code });
+    if (sitio) {
+      complaintData.sitio_code = code;
+      complaintData.sitio_id = sitio._id;
+    } else {
+      complaintData.sitio_code = code;
+    }
+    delete (complaintData as any).sitio;
+  }
   
   // Validate resident_id if provided
   if (data.resident_id) {
