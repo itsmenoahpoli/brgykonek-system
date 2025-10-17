@@ -340,7 +340,7 @@ export class ComplaintsComponent implements OnInit {
     
     // Construct the full URL for the attachment
     const baseUrl = getBaseUrl();
-    const fullUrl = `${baseUrl}/${attachment}`;
+    const fullUrl = `${baseUrl}${attachment}`;
     
     // Open in a new tab
     window.open(fullUrl, '_blank');
