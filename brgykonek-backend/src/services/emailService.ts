@@ -42,16 +42,28 @@ export const emailService = {
       throw new Error("Email service not configured");
     }
 
-    const html = pug.renderFile(
-      __dirname + "/../mail-templates/otp-email.pug",
-      {
-        subject: "Your OTP Code - BrgyKonek",
-        heading: "BrgyKonek OTP Verification",
-        message: "Your OTP code is:",
-        otpCode,
-        footer: "If you didn't request this code, please ignore this email.",
-      }
-    );
+    const template = `
+doctype html
+html
+  head
+    meta(charset="UTF-8")
+    title #{subject}
+  body(style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;")
+    img(src="cid:brand-logo" alt="BrgyKonek Logo" style="display: block; margin: 0 auto 20px auto; max-width: 120px;")
+    h2(style="color: #333; text-align: center;") #{heading}
+    .container(style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;")
+      p(style="margin: 0; font-size: 16px; color: #555;") #{message}
+      h1(style="text-align: center; color: #007bff; font-size: 32px; margin: 10px 0; letter-spacing: 5px;") #{otpCode}
+      p(style="margin: 0; font-size: 14px; color: #666;") This code will expire in 10 minutes.
+    p(style="font-size: 14px; color: #666; text-align: center;") #{footer}
+`;
+    const html = pug.render(template, {
+      subject: "Your OTP Code - BrgyKonek",
+      heading: "BrgyKonek OTP Verification",
+      message: "Your OTP code is:",
+      otpCode,
+      footer: "If you didn't request this code, please ignore this email.",
+    });
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -84,17 +96,29 @@ export const emailService = {
       throw new Error("Email service not configured");
     }
 
-    const html = pug.renderFile(
-      __dirname + "/../mail-templates/otp-email.pug",
-      {
-        subject: "Password Reset OTP - BrgyKonek",
-        heading: "BrgyKonek Password Reset",
-        message: "Your password reset OTP code is:",
-        otpCode,
-        footer:
-          "If you didn't request a password reset, please ignore this email and ensure your account is secure.",
-      }
-    );
+    const template = `
+doctype html
+html
+  head
+    meta(charset="UTF-8")
+    title #{subject}
+  body(style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;")
+    img(src="cid:brand-logo" alt="BrgyKonek Logo" style="display: block; margin: 0 auto 20px auto; max-width: 120px;")
+    h2(style="color: #333; text-align: center;") #{heading}
+    .container(style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;")
+      p(style="margin: 0; font-size: 16px; color: #555;") #{message}
+      h1(style="text-align: center; color: #007bff; font-size: 32px; margin: 10px 0; letter-spacing: 5px;") #{otpCode}
+      p(style="margin: 0; font-size: 14px; color: #666;") This code will expire in 10 minutes.
+    p(style="font-size: 14px; color: #666; text-align: center;") #{footer}
+`;
+    const html = pug.render(template, {
+      subject: "Password Reset OTP - BrgyKonek",
+      heading: "BrgyKonek Password Reset",
+      message: "Your password reset OTP code is:",
+      otpCode,
+      footer:
+        "If you didn't request a password reset, please ignore this email and ensure your account is secure.",
+    });
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
