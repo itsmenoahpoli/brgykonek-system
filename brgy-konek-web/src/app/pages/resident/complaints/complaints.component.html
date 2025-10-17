@@ -438,7 +438,10 @@
         
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
-          <p class="text-gray-900 whitespace-pre-line">{{ selectedComplaint.complaint_content }}</p>
+          <div class="bg-slate-50 border border-slate-100 rounded p-3">
+            <p class="text-gray-900 whitespace-pre-line">{{ selectedComplaint.complaint_content }}</p>
+          </div>
+
         </div>
         
         <div>
@@ -476,7 +479,6 @@
               </div>
               <div class="flex items-center gap-2">
                 <a [href]="fileUrl(attachment)" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs">View</a>
-                <a [href]="fileUrl(attachment)" [attr.download]="(attachment.split('/') | slice:-1)[0]" class="text-gray-600 hover:text-gray-800 text-xs">Download</a>
               </div>
             </div>
           </div>

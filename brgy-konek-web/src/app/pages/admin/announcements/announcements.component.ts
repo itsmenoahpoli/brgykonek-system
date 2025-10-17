@@ -65,10 +65,23 @@ export class AnnouncementsComponent {
       created_by: [''],
     });
     this.loadAnnouncements();
+
+    this.form.get('status')?.valueChanges.subscribe((status) => {
+      if (status === 'published') {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        const hh = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        const localDatetime = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+        this.form.patchValue({ publish_at: localDatetime });
+      }
+    });
   }
 
   getImageUrl(imagePath: string): string {
-    return imagePath ? `${environment.baseUrl}${imagePath}` : '';
+    return imagePath ? `${environment.baseUrl}${imagePath.charAt(0) === '/' ? imagePath.slice(1) : imagePath}` : '';
   }
 
   get filteredAnnouncements() {
@@ -104,6 +117,14 @@ export class AnnouncementsComponent {
         const fullName = `${currentUser.firstName} ${currentUser.middleName ? currentUser.middleName + ' ' : ''}${currentUser.lastName}`.trim();
         this.form.patchValue({ created_by: fullName });
       }
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const hh = String(now.getHours()).padStart(2, '0');
+      const min = String(now.getMinutes()).padStart(2, '0');
+      const localDatetime = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+      this.form.patchValue({ publish_at: localDatetime });
     }
     this.showModal = true;
   }
@@ -117,6 +138,17 @@ export class AnnouncementsComponent {
     
     const formData = new FormData();
     const formValue = this.form.value;
+
+    if (formValue.status === 'published' && (!formValue.publish_at || formValue.publish_at === '')) {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const hh = String(now.getHours()).padStart(2, '0');
+      const min = String(now.getMinutes()).padStart(2, '0');
+      const localDatetime = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+      this.form.patchValue({ publish_at: localDatetime });
+    }
     
     // Add all form fields to FormData
     Object.keys(formValue).forEach(key => {
