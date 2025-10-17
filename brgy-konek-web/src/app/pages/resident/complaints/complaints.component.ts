@@ -11,6 +11,7 @@ import {
 import { AuthService } from '../../../services/auth.service';
 import { ConfirmDeleteModalComponent } from '../../../components/shared/confirm-delete-modal.component';
 import { StatusModalComponent } from '../../../components/shared/status-modal/status-modal.component';
+import { getImageUrl } from '../../../utils/api.util';
 
 @Component({
   selector: 'app-resident-complaints',
@@ -218,6 +219,10 @@ export class ComplaintsComponent {
       this.closeCreateModal();
       this.loadComplaints();
     }
+  }
+
+  fileUrl(path: string): string {
+    return getImageUrl(path);
   }
 
   getPriorityClass(priority?: string): string {
