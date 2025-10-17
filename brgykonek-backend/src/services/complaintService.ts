@@ -78,7 +78,14 @@ export const createComplaint = async (data: Record<string, any>) => {
     { complaintId: c._id, status: c.status }
   );
   
-  return c;
+  const created: any = await Complaint.findById(c._id)
+    .populate("resident_id")
+    .populate("sitio_id")
+    .lean();
+  return {
+    ...created,
+    sitio: created?.sitio_id ? { _id: created.sitio_id._id, code: created.sitio_code, name: created.sitio_id.name } : (created?.sitio_code ? { code: created.sitio_code } : undefined)
+  };
 };
 
 export const createAdminComplaint = async (data: Record<string, any>) => {
@@ -108,17 +115,38 @@ export const createAdminComplaint = async (data: Record<string, any>) => {
   }
   
   const c = await Complaint.create({ ...complaintData, created_by_admin: true });
-  return c;
+  const created: any = await Complaint.findById(c._id)
+    .populate("resident_id")
+    .populate("sitio_id")
+    .lean();
+  return {
+    ...created,
+    sitio: created?.sitio_id ? { _id: created.sitio_id._id, code: created.sitio_code, name: created.sitio_id.name } : (created?.sitio_code ? { code: created.sitio_code } : undefined)
+  };
 };
 
 export const getComplaints = async (filter: FilterQuery<Document> = {}) => {
-  return await Complaint.find({ ...filter })
+  const items = await Complaint.find({ ...filter })
     .sort({ created_at: -1 })
-    .populate("resident_id");
+    .populate("resident_id")
+    .populate("sitio_id")
+    .lean();
+  return items.map((c: any) => ({
+    ...c,
+    sitio: c.sitio_id ? { _id: c.sitio_id._id, code: c.sitio_code, name: c.sitio_id.name } : (c.sitio_code ? { code: c.sitio_code } : undefined)
+  }));
 };
 
 export const getComplaintById = async (id: string) => {
-  return await Complaint.findById(id).populate("resident_id");
+  const c: any = await Complaint.findById(id)
+    .populate("resident_id")
+    .populate("sitio_id")
+    .lean();
+  if (!c) return c;
+  return {
+    ...c,
+    sitio: c.sitio_id ? { _id: c.sitio_id._id, code: c.sitio_code, name: c.sitio_id.name } : (c.sitio_code ? { code: c.sitio_code } : undefined)
+  };
 };
 
 export const updateComplaint = async (
@@ -137,7 +165,14 @@ export const updateComplaint = async (
       });
     } catch {}
   }
-  return updated;
+  const populated: any = await Complaint.findById(id)
+    .populate("resident_id")
+    .populate("sitio_id")
+    .lean();
+  return populated ? {
+    ...populated,
+    sitio: populated?.sitio_id ? { _id: populated.sitio_id._id, code: populated.sitio_code, name: populated.sitio_id.name } : (populated?.sitio_code ? { code: populated.sitio_code } : undefined)
+  } : updated;
 };
 
 export const deleteComplaint = async (id: string) => {
@@ -145,5 +180,12 @@ export const deleteComplaint = async (id: string) => {
 };
 
 export const getComplaintsByResidentId = async (resident_id: string) => {
-  return await Complaint.find({ resident_id }).sort({ created_at: -1 });
+  const items = await Complaint.find({ resident_id })
+    .sort({ created_at: -1 })
+    .populate("sitio_id")
+    .lean();
+  return items.map((c: any) => ({
+    ...c,
+    sitio: c.sitio_id ? { _id: c.sitio_id._id, code: c.sitio_code, name: c.sitio_id.name } : (c.sitio_code ? { code: c.sitio_code } : undefined)
+  }));
 };

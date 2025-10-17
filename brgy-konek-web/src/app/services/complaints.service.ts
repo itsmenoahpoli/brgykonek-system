@@ -23,7 +23,7 @@ export interface Complaint {
   attachments: string[];
   status: string;
   priority?: 'low' | 'medium' | 'high';
-  sitio?: number;
+  sitio?: { _id?: string; code?: number; name?: string };
   resolution_note?: string;
   created_at: string;
   updated_at: string;
