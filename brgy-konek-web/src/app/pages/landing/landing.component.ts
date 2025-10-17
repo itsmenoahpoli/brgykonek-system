@@ -26,7 +26,7 @@ export class LandingComponent implements OnInit {
   loading = false;
 
   getImageUrl(imagePath: string): string {
-    return imagePath ? `${environment.baseUrl}${imagePath}` : '';
+    return imagePath ? `${environment.baseUrl}${imagePath.charAt(0) === '/' ? imagePath.slice(1) : imagePath}` : '';
   }
   constructor(
     private router: Router,
