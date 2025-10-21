@@ -56,7 +56,7 @@ export const createUser = async (req: Request, res: Response) => {
   try {
     const userData = {
       ...req.body,
-      barangay_clearance: req.file ? req.file.filename : undefined,
+      barangay_clearance: req.file ? req.file.path : undefined,
     };
     const user = await administratorService.createUser(userData);
     res.status(201).json(user);

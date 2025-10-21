@@ -176,6 +176,7 @@ export const authService = {
             address_barangay: user.address_barangay,
             address_municipality: user.address_municipality,
             address_province: user.address_province,
+            barangay_clearance: user.barangay_clearance,
             approved: user.approved,
           },
         };
@@ -201,6 +202,7 @@ export const authService = {
         address_barangay: user.address_barangay,
         address_municipality: user.address_municipality,
         address_province: user.address_province,
+        barangay_clearance: user.barangay_clearance,
         approved: user.approved,
       },
     };

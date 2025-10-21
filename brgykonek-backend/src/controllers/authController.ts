@@ -26,7 +26,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       user_type,
       address,
       birthdate,
-      barangay_clearance: req.file ? req.file.filename : undefined,
+      barangay_clearance: req.file ? req.file.path : undefined,
     });
 
     res.status(201).json({
@@ -247,6 +247,7 @@ export const updateProfile = async (
       address_barangay,
       address_municipality,
       address_province,
+      barangay_clearance: req.file ? req.file.path : undefined,
     });
 
     res.status(200).json({
