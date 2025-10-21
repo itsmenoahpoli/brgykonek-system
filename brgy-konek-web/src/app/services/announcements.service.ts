@@ -14,6 +14,7 @@ export interface Announcement {
   publish_at?: string;
   created_at: string;
   updated_at?: string;
+  selected_sitios?: string[];
 }
 
 @Injectable({ providedIn: 'root' })

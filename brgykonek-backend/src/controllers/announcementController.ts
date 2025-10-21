@@ -17,6 +17,16 @@ export const create = async (req: Request, res: Response) => {
       req.body.title_slug = req.body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     }
     
+    // Parse selected_sitios if it's a JSON string
+    if (req.body.selected_sitios && typeof req.body.selected_sitios === 'string') {
+      try {
+        req.body.selected_sitios = JSON.parse(req.body.selected_sitios);
+      } catch (error) {
+        console.error('Error parsing selected_sitios:', error);
+        req.body.selected_sitios = [];
+      }
+    }
+    
     // Map frontend audience values to backend enum values
     const audienceMapping: { [key: string]: string } = {
       'All Residents': 'all_residents',
@@ -30,7 +40,18 @@ export const create = async (req: Request, res: Response) => {
     const announcement = await announcementService.createAnnouncement(req.body);
     try {
       if (announcement.status === "published") {
-        const residents = await User.find({ user_type: "resident" }).select("_id");
+        let residents;
+        if (announcement.audience === "specific_zone" && announcement.selected_sitios && announcement.selected_sitios.length > 0) {
+          // Find residents in specific sitios
+          residents = await User.find({ 
+            user_type: "resident",
+            address_sitio: { $in: announcement.selected_sitios }
+          }).select("_id");
+        } else {
+          // Find all residents for other audience types
+          residents = await User.find({ user_type: "resident" }).select("_id");
+        }
+        
         const notifications = residents.map((r) => ({
           recipient_id: String(r._id),
           type: "announcement",
@@ -116,6 +137,16 @@ export const update = async (req: Request, res: Response) => {
       req.body.title_slug = req.body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     }
     
+    // Parse selected_sitios if it's a JSON string
+    if (req.body.selected_sitios && typeof req.body.selected_sitios === 'string') {
+      try {
+        req.body.selected_sitios = JSON.parse(req.body.selected_sitios);
+      } catch (error) {
+        console.error('Error parsing selected_sitios:', error);
+        req.body.selected_sitios = [];
+      }
+    }
+    
     // Map frontend audience values to backend enum values
     const audienceMapping: { [key: string]: string } = {
       'All Residents': 'all_residents',
@@ -134,7 +165,18 @@ export const update = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Announcement not found" });
     try {
       if (announcement.status === "published") {
-        const residents = await User.find({ user_type: "resident" }).select("_id");
+        let residents;
+        if (announcement.audience === "specific_zone" && announcement.selected_sitios && announcement.selected_sitios.length > 0) {
+          // Find residents in specific sitios
+          residents = await User.find({ 
+            user_type: "resident",
+            address_sitio: { $in: announcement.selected_sitios }
+          }).select("_id");
+        } else {
+          // Find all residents for other audience types
+          residents = await User.find({ user_type: "resident" }).select("_id");
+        }
+        
         const notifications = residents.map((r) => ({
           recipient_id: String(r._id),
           type: "announcement",

@@ -51,6 +51,7 @@ export class AnnouncementsComponent {
   selectedAnnouncement: Announcement | null = null;
   sitios: Sitio[] = [];
   loadingSitios = false;
+  selectedSitios: string[] = [];
   constructor(
     private announcementsService: AnnouncementsService,
     private fb: FormBuilder,
@@ -88,6 +89,8 @@ export class AnnouncementsComponent {
       if (audience === 'Specific Zone') {
         console.log('Loading sitios because Specific Zone was selected');
         this.loadSitios();
+      } else {
+        this.selectedSitios = [];
       }
     });
   }
@@ -141,9 +144,11 @@ export class AnnouncementsComponent {
     if (editAnnouncement) {
       this.form.patchValue(editAnnouncement);
       this.editId = editAnnouncement._id;
+      this.selectedSitios = editAnnouncement.selected_sitios || [];
     } else {
       this.form.reset();
       this.editId = null;
+      this.selectedSitios = [];
       const currentUser = this.authService.getCurrentUser();
       if (currentUser) {
         const fullName = `${currentUser.firstName} ${currentUser.middleName ? currentUser.middleName + ' ' : ''}${currentUser.lastName}`.trim();
@@ -164,6 +169,7 @@ export class AnnouncementsComponent {
     this.showModal = false;
     this.form.reset();
     this.editId = null;
+    this.selectedSitios = [];
   }
   async submit() {
     if (this.form.invalid) return;
@@ -190,6 +196,11 @@ export class AnnouncementsComponent {
         formData.append(key, formValue[key]);
       }
     });
+    
+    // Add selected sitios if audience is Specific Zone
+    if (formValue.audience === 'Specific Zone' && this.selectedSitios.length > 0) {
+      formData.append('selected_sitios', JSON.stringify(this.selectedSitios));
+    }
     
     if (this.editId) {
       await this.announcementsService.updateAnnouncementWithFile(this.editId, formData);
@@ -280,5 +291,24 @@ export class AnnouncementsComponent {
   closeViewModal() {
     this.showViewModal = false;
     this.selectedAnnouncement = null;
+  }
+
+  onSitioSelectionChange(sitioId: string, isChecked: boolean) {
+    if (isChecked) {
+      if (!this.selectedSitios.includes(sitioId)) {
+        this.selectedSitios.push(sitioId);
+      }
+    } else {
+      this.selectedSitios = this.selectedSitios.filter(id => id !== sitioId);
+    }
+  }
+
+  isSitioSelected(sitioId: string): boolean {
+    return this.selectedSitios.includes(sitioId);
+  }
+
+  onSitioCheckboxChange(event: Event, sitioId: string) {
+    const target = event.target as HTMLInputElement;
+    this.onSitioSelectionChange(sitioId, target.checked);
   }
 }

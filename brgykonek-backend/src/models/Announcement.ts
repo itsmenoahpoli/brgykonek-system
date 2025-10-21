@@ -12,6 +12,7 @@ export interface IAnnouncement extends Document {
   category?: string;
   audience?: string;
   publish_at?: Date;
+  selected_sitios?: string[];
 }
 
 const announcementSchema = new Schema<IAnnouncement>(
@@ -75,6 +76,11 @@ const announcementSchema = new Schema<IAnnouncement>(
       type: String,
       required: true,
       trim: true,
+    },
+    selected_sitios: {
+      type: [String],
+      required: false,
+      default: [],
     },
   },
   {

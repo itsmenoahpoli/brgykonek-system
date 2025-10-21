@@ -194,7 +194,13 @@
           <div *ngIf="loadingSitios" class="text-sm text-gray-500 mt-2">Loading sitios...</div>
           <div *ngIf="!loadingSitios && sitios.length > 0" class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
             <label *ngFor="let sitio of sitios" class="flex items-center">
-              <input type="checkbox" [value]="sitio._id" class="mr-2" />
+              <input 
+                type="checkbox" 
+                [value]="sitio._id" 
+                [checked]="isSitioSelected(sitio._id)"
+                (change)="onSitioCheckboxChange($event, sitio._id)"
+                class="mr-2" 
+              />
               {{ sitio.name }}
             </label>
           </div>
