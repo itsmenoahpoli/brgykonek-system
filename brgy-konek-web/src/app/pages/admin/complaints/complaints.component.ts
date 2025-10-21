@@ -362,4 +362,11 @@ export class ComplaintsComponent implements OnInit {
     link.click();
     document.body.removeChild(link);
   }
+
+  getResidentName(complaint: Complaint): string {
+    if (!complaint.resident_id) {
+      return 'Unknown Resident';
+    }
+    return complaint.resident_id.name;
+  }
 }

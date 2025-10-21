@@ -193,6 +193,13 @@ export class DashboardComponent implements OnInit {
     return this.statistics.complaintsByCategory.slice(0, 5);
   }
 
+  getResidentName(complaint: Complaint): string {
+    if (!complaint.resident_id) {
+      return 'Unknown Resident';
+    }
+    return complaint.resident_id.name;
+  }
+
   private initializeEmptyCharts() {
     // Generate sample data for development/testing
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];

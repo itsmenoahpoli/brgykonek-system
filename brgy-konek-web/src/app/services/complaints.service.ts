@@ -14,7 +14,7 @@ export interface Resident {
 
 export interface Complaint {
   _id: string;
-  resident_id: Resident;
+  resident_id: Resident | null;
   title?: string;
   category: string;
   date_of_report: string;
