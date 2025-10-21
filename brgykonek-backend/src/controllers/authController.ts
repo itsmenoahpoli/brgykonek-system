@@ -16,7 +16,18 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       user_type,
       address,
       birthdate,
+      address_sitio,
+      address_barangay,
+      address_municipality,
+      address_province,
     } = req.body;
+
+    console.log('📁 File upload info:', {
+      hasFile: !!req.file,
+      filePath: req.file?.path,
+      fileName: req.file?.filename,
+      originalName: req.file?.originalname
+    });
 
     const result = await authService.register({
       name,
@@ -26,6 +37,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       user_type,
       address,
       birthdate,
+      address_sitio,
+      address_barangay,
+      address_municipality,
+      address_province,
       barangay_clearance: req.file ? req.file.path : undefined,
     });
 

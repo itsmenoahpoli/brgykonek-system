@@ -78,6 +78,9 @@ export const authService = {
     }
 
     const hashedPassword = await argon2.hash(data.password);
+    
+    console.log('💾 Saving user with barangay_clearance:', data.barangay_clearance);
+    
     const user = new User({
       name: data.name,
       email: data.email,
@@ -96,16 +99,15 @@ export const authService = {
 
     await user.save();
 
-    // Send OTP to email - this must succeed before returning success
-    try {
-      await this.requestOTP(user.email, "registration");
-      console.log(`✅ OTP sent successfully to ${user.email} for registration`);
-    } catch (e) {
-      console.error(`❌ Failed to send OTP to ${user.email}:`, e);
-      // Delete the user if email sending fails
-      await User.findByIdAndDelete(user._id);
-      throw new Error(`Failed to send OTP to email: ${e instanceof Error ? e.message : 'Unknown error'}`);
-    }
+    // Send OTP to email asynchronously - don't block registration
+    this.requestOTP(user.email, "registration")
+      .then(() => {
+        console.log(`✅ OTP sent successfully to ${user.email} for registration`);
+      })
+      .catch((e) => {
+        console.error(`❌ Failed to send OTP to ${user.email}:`, e);
+        // Log the error but don't delete the user - they can request OTP again
+      });
 
     const userId = user._id?.toString();
     if (!userId) {

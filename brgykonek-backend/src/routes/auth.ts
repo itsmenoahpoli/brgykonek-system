@@ -35,7 +35,7 @@ const storage = multer.diskStorage({
     cb: (error: Error | null, destination: string) => void
   ) => {
     ensureUploadsDir();
-    cb(null, "uploads");
+    cb(null, "public/files");
   },
   filename: (
     req: Request,
@@ -52,9 +52,23 @@ const fileFilter = (
   file: Express.Multer.File,
   cb: FileFilterCallback
 ) => {
+  console.log('🔍 File filter - MIME type:', file.mimetype, 'Original name:', file.originalname);
+  
+  // Allow PDF and image files, but also allow files with PDF/image extensions
+  const allowedMimeTypes = [
+    'application/pdf',
+    'image/jpeg',
+    'image/jpg', 
+    'image/png',
+    'image/gif'
+  ];
+  
+  const allowedExtensions = ['.pdf', '.jpg', '.jpeg', '.png', '.gif'];
+  const fileExtension = file.originalname.toLowerCase().substring(file.originalname.lastIndexOf('.'));
+  
   if (
-    file.mimetype === "application/pdf" ||
-    file.mimetype.startsWith("image/")
+    allowedMimeTypes.includes(file.mimetype) ||
+    allowedExtensions.includes(fileExtension)
   ) {
     cb(null, true);
   } else {

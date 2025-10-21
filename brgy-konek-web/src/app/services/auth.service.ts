@@ -168,7 +168,7 @@ export class AuthService {
             headers: {
               // Don't set Content-Type for FormData - let browser set it with boundary
             },
-            timeout: 30000, // Explicit timeout for this request
+            timeout: 60000, // Explicit timeout for this request
           });
         } else {
           console.log('📤 Sending JSON request...');
@@ -176,7 +176,7 @@ export class AuthService {
             headers: {
               'Content-Type': 'application/json',
             },
-            timeout: 30000, // Explicit timeout for this request
+            timeout: 60000, // Explicit timeout for this request
           });
         }
         console.log('✅ Request completed successfully');

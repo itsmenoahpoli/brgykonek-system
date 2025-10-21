@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-const uploadsDir = path.resolve(process.cwd(), "uploads");
+const uploadsDir = path.resolve(process.cwd(), "public/files");
 const announcementImagesDir = path.resolve(process.cwd(), "public/images/announcements");
 
 export function ensureUploadsDir(): void {

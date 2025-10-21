@@ -29,7 +29,7 @@ export function getImageUrl(imagePath: string): string {
 
 const apiClient = axios.create({
   baseURL: environment.apiUrl,
-  timeout: 30000, // Increased timeout to 30 seconds
+  timeout: 60000, // Increased timeout to 60 seconds for live backend
   // Don't set default Content-Type - let axios/browser set it appropriately
 });
 

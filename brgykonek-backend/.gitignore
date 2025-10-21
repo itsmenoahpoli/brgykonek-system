@@ -3,4 +3,8 @@ dist
 node_modules
 logs/
 
+
+uploads
+
 public/images/announcements/
+public/files/

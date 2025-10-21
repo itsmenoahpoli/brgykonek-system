@@ -49,7 +49,7 @@ html
     meta(charset="UTF-8")
     title #{subject}
   body(style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;")
-    img(src="cid:brand-logo" alt="BrgyKonek Logo" style="display: block; margin: 0 auto 20px auto; max-width: 120px;")
+    // Removed logo for better performance
     h2(style="color: #333; text-align: center;") #{heading}
     .container(style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;")
       p(style="margin: 0; font-size: 16px; color: #555;") #{message}
@@ -70,13 +70,7 @@ html
       to: email,
       subject: "Your OTP Code - BrgyKonek",
       html,
-      attachments: [
-        {
-          filename: "brand-logo.png",
-          path: __dirname + "/../../public/images/brand-logo.png",
-          cid: "brand-logo",
-        },
-      ],
+      // Removed attachments to improve performance
     };
 
     await this.transporter.sendMail(mailOptions);
@@ -103,7 +97,7 @@ html
     meta(charset="UTF-8")
     title #{subject}
   body(style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;")
-    img(src="cid:brand-logo" alt="BrgyKonek Logo" style="display: block; margin: 0 auto 20px auto; max-width: 120px;")
+    // Removed logo for better performance
     h2(style="color: #333; text-align: center;") #{heading}
     .container(style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;")
       p(style="margin: 0; font-size: 16px; color: #555;") #{message}
@@ -125,13 +119,7 @@ html
       to: email,
       subject: "Password Reset OTP - BrgyKonek",
       html,
-      attachments: [
-        {
-          filename: "brand-logo.png",
-          path: __dirname + "/../../public/images/brand-logo.png",
-          cid: "brand-logo",
-        },
-      ],
+      // Removed attachments to improve performance
     };
 
     await this.transporter.sendMail(mailOptions);
