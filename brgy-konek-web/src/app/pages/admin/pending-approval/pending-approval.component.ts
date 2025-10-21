@@ -91,6 +91,46 @@ export class PendingApprovalComponent implements OnInit {
     this.selectedUser = null;
   }
 
+  isPdfFile(filePath: string): boolean {
+    return filePath.toLowerCase().endsWith('.pdf');
+  }
+
+  getFileName(filePath: string): string {
+    if (!filePath) return 'No file';
+    const parts = filePath.split('/');
+    return parts[parts.length - 1] || 'Unknown file';
+  }
+
+  viewDocument(filePath: string) {
+    if (!filePath) return;
+    
+    const fullUrl = this.getFullFileUrl(filePath);
+    window.open(fullUrl, '_blank');
+  }
+
+  downloadDocument(filePath: string) {
+    if (!filePath) return;
+    
+    const fullUrl = this.getFullFileUrl(filePath);
+    const link = document.createElement('a');
+    link.href = fullUrl;
+    link.download = this.getFileName(filePath);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  private getFullFileUrl(filePath: string): string {
+    if (!filePath) return '';
+    
+    if (filePath.startsWith('http')) {
+      return filePath;
+    }
+    
+    const baseUrl = 'http://localhost:3000';
+    return `${baseUrl}/${filePath}`;
+  }
+
   getUserTypeClass(userType: string): string {
     switch (userType) {
       case 'staff':
