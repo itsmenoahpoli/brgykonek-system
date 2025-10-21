@@ -34,6 +34,7 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
   errorModalTitle = '';
   errorModalMessage = '';
   email = '';
+  password = '';
   userType = '';
   remember = '0';
   type: 'registration' | 'password_reset' | '' = '';
@@ -59,6 +60,7 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
       this.email = params['email'] || '';
+      this.password = params['password'] || '';
       this.userType = params['user_type'] || '';
       this.remember = params['remember'] || '0';
       this.type = (params['type'] as 'registration' | 'password_reset') || '';
@@ -89,15 +91,21 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
 
         this.authService.verifyOTP(emailFromUrl, otp).subscribe({
           next: (response) => {
-            this.isLoading = false;
             console.log('OTP verification response:', response);
             if (response.success) {
               if (params['remember'] === '1') {
                 this.authService.trustDevice(emailFromUrl);
               }
-              this.showSuccessModal = true;
-              this.navigateAfterSuccess(userTypeFromUrl);
+              
+              if (this.type === 'registration' && this.password) {
+                this.loginAfterOTPVerification(emailFromUrl, this.password, params['remember'] === '1');
+              } else {
+                this.isLoading = false;
+                this.showSuccessModal = true;
+                this.navigateAfterSuccess(userTypeFromUrl);
+              }
             } else {
+              this.isLoading = false;
               this.errorMessage =
                 response.message || 'Invalid OTP. Please try again.';
             }
@@ -204,6 +212,41 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
+  private loginAfterOTPVerification(email: string, password: string, rememberDevice: boolean): void {
+    this.authService.login(email, password, rememberDevice).subscribe({
+      next: (loginResponse) => {
+        this.isLoading = false;
+        console.log('Login after OTP verification response:', loginResponse);
+        if (loginResponse.success && loginResponse.user) {
+          this.showSuccessModal = true;
+          this.navigateToDashboard(loginResponse.user.role || 'resident');
+        } else {
+          this.errorMessage = loginResponse.message || 'Login failed after OTP verification';
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.log('Login after OTP verification error:', error);
+        this.errorMessage = 'Failed to login after OTP verification. Please try logging in manually.';
+      }
+    });
+  }
+
+  private navigateToDashboard(userRole: string): void {
+    if (this.hasNavigated) {
+      return;
+    }
+    this.hasNavigated = true;
+    
+    if (userRole === 'admin' || userRole === 'staff') {
+      this.router.navigate(['/admin/home']);
+    } else if (userRole === 'resident') {
+      this.router.navigate(['/resident/home']);
+    } else {
+      this.router.navigate(['/resident/home']);
+    }
+  }
+
   private navigateAfterSuccess(userType: string): void {
     if (this.hasNavigated) {
       return;
@@ -211,11 +254,6 @@ export class VerifyOtpComponent implements OnInit, OnDestroy {
     this.hasNavigated = true;
     const effectiveRole = userType || this.authService.getCurrentUser()?.role || 'resident';
     if (this.type === 'password_reset') {
-      this.router.navigate(['/login']);
-      return;
-    }
-    // After successful registration, redirect to login page instead of dashboard
-    if (this.type === 'registration') {
       this.router.navigate(['/login']);
       return;
     }

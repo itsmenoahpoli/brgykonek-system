@@ -207,7 +207,7 @@ export class RegisterV2Component {
             setTimeout(() => {
               this.showSuccessDialog = false;
               const email = formValue.email;
-              this.router.navigate(['/verify-otp'], { queryParams: { email, user_type: 'resident', type: 'registration', remember: formValue.rememberDevice ? '1' : '0' } });
+              this.router.navigate(['/verify-otp'], { queryParams: { email, password: formValue.password, user_type: 'resident', type: 'registration', remember: formValue.rememberDevice ? '1' : '0' } });
             }, 1500);
           } else {
             this.errorMessage = response.message;
