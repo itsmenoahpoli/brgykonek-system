@@ -13,15 +13,6 @@
         [(ngModel)]="search"
         (ngModelChange)="onSearchChange($event)"
       />
-      <select
-        class="border rounded px-3 py-2"
-        [(ngModel)]="statusFilter"
-        (ngModelChange)="onStatusFilterChange($event)"
-      >
-        <option value="">All Status</option>
-        <option value="published">Published</option>
-        <option value="draft">Draft</option>
-      </select>
     </div>
   </div>
 

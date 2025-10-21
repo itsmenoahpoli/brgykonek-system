@@ -79,7 +79,7 @@
             <ng-container *ngIf="announcement.updated_at; else notUpdated">
               {{ announcement.updated_at | date : "MMMM dd, yyyy" }}
             </ng-container>
-            <ng-template #notUpdated>Not updated</ng-template>
+            <ng-template #notUpdated>{{ announcement.created_at | date : "MMMM dd, yyyy" }}</ng-template>
           </div>
         </div>
       </div>

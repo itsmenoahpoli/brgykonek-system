@@ -25,7 +25,6 @@ import { environment } from '../../../../environments/environment';
 export class AnnouncementsComponent {
   announcements: Announcement[] = [];
   search = '';
-  statusFilter = '';
   selectedAnnouncement: Announcement | null = null;
   showModal = false;
 
@@ -42,9 +41,7 @@ export class AnnouncementsComponent {
       const matchesTitle = a.title
         .toLowerCase()
         .includes(this.search.toLowerCase());
-      const matchesStatus = this.statusFilter
-        ? a.status === this.statusFilter
-        : true;
+      const matchesStatus = a.status === 'published';
       return matchesTitle && matchesStatus;
     });
   }
@@ -56,10 +53,6 @@ export class AnnouncementsComponent {
 
   onSearchChange(value: string) {
     this.search = value;
-  }
-
-  onStatusFilterChange(value: string) {
-    this.statusFilter = value;
   }
 
   openAnnouncementDetails(announcement: Announcement) {
