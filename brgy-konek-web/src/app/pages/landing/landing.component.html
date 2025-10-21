@@ -1,33 +1,34 @@
 <app-landing-layout>
   <div
-    class="h-screen w-full splash-bg flex flex-col justify-center items-start pl-16 px-4 pt-32 sm:pl-16 sm:pt-0 sm:items-start items-center text-center sm:text-left relative"
+    class="min-h-screen w-full splash-bg flex flex-col justify-center items-center px-4 py-16 sm:items-start sm:pl-16 sm:text-left relative"
   >
     <div class="absolute inset-0 bg-black bg-opacity-20 z-0"></div>
-    <div class="relative z-10">
+    <div class="relative z-10 text-center sm:text-left w-full max-w-2xl">
     <h1
-      class="text-4xl sm:text-7xl font-bold leading-tight mb-4 decoration-4"
+      class="text-3xl sm:text-5xl lg:text-7xl font-bold leading-tight mb-4"
     >
-      Serving Our Community<br />Together
+      Serving Our Community<br class="hidden sm:block" />
+      <span class="sm:hidden"> </span>Together
     </h1>
     <p
-      class="text-base sm:text-xl font-medium mb-8 decoration-2 max-w-xs sm:max-w-xl"
+      class="text-sm sm:text-base lg:text-xl font-medium mb-8 max-w-xs sm:max-w-xl mx-auto sm:mx-0"
     >
       Welcome to Barangay Masaguisi's official portal. Stay informed, connected,
       and engaged with your community through our digital services.
     </p>
-    <div class="flex flex-col gap-4 w-full max-w-xs">
+    <div class="flex flex-col gap-4 w-full max-w-xs mx-auto sm:mx-0">
       <button
-        class="flex items-center gap-3 bg-blue-600 text-white font-bold px-4 sm:px-8 rounded-lg text-base sm:text-lg w-full h-14 sm:h-16"
+        class="flex items-center justify-center gap-3 bg-blue-600 text-white font-bold px-4 sm:px-8 rounded-lg text-sm sm:text-base lg:text-lg w-full h-12 sm:h-14 lg:h-16"
         (click)="navigateToAnnouncements()"
       >
-        <span class="flex-shrink-0 flex items-center justify-center h-6 w-6">
+        <span class="flex-shrink-0 flex items-center justify-center h-5 w-5 sm:h-6 sm:w-6">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="h-6 w-6"
+            class="h-5 w-5 sm:h-6 sm:w-6"
           >
             <path
               stroke-linecap="round"
@@ -36,20 +37,20 @@
             />
           </svg>
         </span>
-        <span class="truncate">View Announcements</span>
+        <span class="truncate text-xs sm:text-sm lg:text-base">View Announcements</span>
       </button>
       <button
-        class="flex items-center gap-3 bg-white text-blue-700 font-bold px-4 sm:px-8 rounded-lg text-base sm:text-lg border border-blue-200 w-full h-14 sm:h-16"
+        class="flex items-center justify-center gap-3 bg-white text-blue-700 font-bold px-4 sm:px-8 rounded-lg text-sm sm:text-base lg:text-lg border border-blue-200 w-full h-12 sm:h-14 lg:h-16"
         (click)="navigateToFileComplaint()"
       >
-        <span class="flex-shrink-0 flex items-center justify-center h-6 w-6">
+        <span class="flex-shrink-0 flex items-center justify-center h-5 w-5 sm:h-6 sm:w-6">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="h-6 w-6"
+            class="h-5 w-5 sm:h-6 sm:w-6"
           >
             <path
               stroke-linecap="round"
@@ -58,22 +59,22 @@
             />
           </svg>
         </span>
-        <span class="truncate">File Complaint</span>
+        <span class="truncate text-xs sm:text-sm lg:text-base">File Complaint</span>
       </button>
     </div>
     </div>
   </div>
 
   <div
-    class="h-screen w-full bg-gray-50 flex flex-col items-center pt-16"
+    class="min-h-screen w-full bg-gray-50 flex flex-col items-center py-8 sm:py-16"
     id="announcements"
   >
     <div class="w-full max-w-7xl px-4">
-      <div class="flex justify-between items-center mb-8">
-        <h2 class="text-3xl font-bold text-gray-900">Recent Announcements</h2>
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
+        <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">Recent Announcements</h2>
         <a
           (click)="navigateToAnnouncements()"
-          class="text-blue-700 font-medium flex items-center gap-1 hover:underline"
+          class="text-blue-700 font-medium flex items-center gap-1 hover:underline text-sm sm:text-base"
           >View All <span class="ml-1">&rarr;</span></a
         >
       </div>
@@ -88,7 +89,7 @@
       </div>
       <div
         *ngIf="!loading && announcements.length > 0"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
       >
         <button
           *ngFor="let a of announcements"
@@ -99,9 +100,9 @@
             *ngIf="a.banner_image"
             [src]="getImageUrl(a.banner_image)"
             alt="Banner"
-            class="h-48 w-full object-cover"
+            class="h-32 sm:h-40 lg:h-48 w-full object-cover"
           />
-          <div class="p-6 flex-1 flex flex-col">
+          <div class="p-4 sm:p-6 flex-1 flex flex-col">
             <div class="flex items-center text-gray-500 text-sm mb-2">
               <svg
                 class="w-4 h-4 mr-1"
@@ -118,11 +119,11 @@
               </svg>
               {{ a.created_at | date : "MMMM d, yyyy" }}
             </div>
-            <div class="font-bold text-lg mb-1 text-gray-900">
+            <div class="font-bold text-base sm:text-lg mb-1 text-gray-900">
               {{ a.title }}
             </div>
-            <div class="text-gray-700 text-sm mb-2">{{ a.body }}</div>
-            <div class="mt-4 text-blue-700 font-medium flex items-center gap-1 cursor-pointer" (click)="navigateToAnnouncements()">
+            <div class="text-gray-700 text-xs sm:text-sm mb-2 line-clamp-2">{{ a.body }}</div>
+            <div class="mt-4 text-blue-700 font-medium flex items-center gap-1 cursor-pointer text-xs sm:text-sm" (click)="navigateToAnnouncements()">
               Read More <span class="ml-1">&rarr;</span>
             </div>
           </div>
@@ -132,21 +133,21 @@
   </div>
 
   <div
-    class="h-full w-full bg-gray-50 flex flex-col items-center py-16"
+    class="w-full bg-gray-50 flex flex-col items-center py-8 sm:py-16"
     id="services"
   >
-    <h2 class="text-3xl font-bold text-gray-900 mb-10">Our Services</h2>
+    <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-10 px-4">Our Services</h2>
     <div
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-7xl px-4"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 w-full max-w-7xl px-4"
     >
       <div
-        class="bg-white rounded-2xl shadow flex flex-col items-center p-8 text-center"
+        class="bg-white rounded-2xl shadow flex flex-col items-center p-4 sm:p-6 lg:p-8 text-center"
       >
         <span
-          class="mb-4 flex items-center justify-center h-14 w-14 rounded-full bg-blue-100"
+          class="mb-3 sm:mb-4 flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 rounded-full bg-blue-100"
         >
           <svg
-            class="h-8 w-8 text-blue-500"
+            class="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-blue-500"
             fill="none"
             stroke="currentColor"
             stroke-width="1.5"
@@ -159,21 +160,21 @@
             />
           </svg>
         </span>
-        <div class="font-bold text-lg text-gray-900 mb-1">
+        <div class="font-bold text-sm sm:text-base lg:text-lg text-gray-900 mb-1">
           Certificate Issuance
         </div>
-        <div class="text-gray-600 text-sm">
+        <div class="text-gray-600 text-xs sm:text-sm">
           Barangay clearance, residency, and other official certificates
         </div>
       </div>
       <div
-        class="bg-white rounded-2xl shadow flex flex-col items-center p-8 text-center"
+        class="bg-white rounded-2xl shadow flex flex-col items-center p-4 sm:p-6 lg:p-8 text-center"
       >
         <span
-          class="mb-4 flex items-center justify-center h-14 w-14 rounded-full bg-blue-100"
+          class="mb-3 sm:mb-4 flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 rounded-full bg-blue-100"
         >
           <svg
-            class="h-8 w-8 text-blue-500"
+            class="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-blue-500"
             fill="none"
             stroke="currentColor"
             stroke-width="1.5"
@@ -187,21 +188,21 @@
             <circle cx="12" cy="12" r="9" />
           </svg>
         </span>
-        <div class="font-bold text-lg text-gray-900 mb-1">
+        <div class="font-bold text-sm sm:text-base lg:text-lg text-gray-900 mb-1">
           Dispute Resolution
         </div>
-        <div class="text-gray-600 text-sm">
+        <div class="text-gray-600 text-xs sm:text-sm">
           Mediation services for community conflicts and disputes
         </div>
       </div>
       <div
-        class="bg-white rounded-2xl shadow flex flex-col items-center p-8 text-center"
+        class="bg-white rounded-2xl shadow flex flex-col items-center p-4 sm:p-6 lg:p-8 text-center"
       >
         <span
-          class="mb-4 flex items-center justify-center h-14 w-14 rounded-full bg-blue-100"
+          class="mb-3 sm:mb-4 flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 rounded-full bg-blue-100"
         >
           <svg
-            class="h-8 w-8 text-blue-500"
+            class="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-blue-500"
             fill="none"
             stroke="currentColor"
             stroke-width="1.5"
@@ -219,19 +220,19 @@
             />
           </svg>
         </span>
-        <div class="font-bold text-lg text-gray-900 mb-1">Security Patrol</div>
-        <div class="text-gray-600 text-sm">
+        <div class="font-bold text-sm sm:text-base lg:text-lg text-gray-900 mb-1">Security Patrol</div>
+        <div class="text-gray-600 text-xs sm:text-sm">
           24/7 barangay tanod patrol for community safety
         </div>
       </div>
       <div
-        class="bg-white rounded-2xl shadow flex flex-col items-center p-8 text-center"
+        class="bg-white rounded-2xl shadow flex flex-col items-center p-4 sm:p-6 lg:p-8 text-center"
       >
         <span
-          class="mb-4 flex items-center justify-center h-14 w-14 rounded-full bg-blue-100"
+          class="mb-3 sm:mb-4 flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 rounded-full bg-blue-100"
         >
           <svg
-            class="h-8 w-8 text-blue-500"
+            class="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-blue-500"
             fill="none"
             stroke="currentColor"
             stroke-width="1.5"
@@ -249,19 +250,19 @@
             />
           </svg>
         </span>
-        <div class="font-bold text-lg text-gray-900 mb-1">Health Services</div>
-        <div class="text-gray-600 text-sm">
+        <div class="font-bold text-sm sm:text-base lg:text-lg text-gray-900 mb-1">Health Services</div>
+        <div class="text-gray-600 text-xs sm:text-sm">
           Basic health services and medical assistance programs
         </div>
       </div>
       <div
-        class="bg-white rounded-2xl shadow flex flex-col items-center p-8 text-center"
+        class="bg-white rounded-2xl shadow flex flex-col items-center p-4 sm:p-6 lg:p-8 text-center"
       >
         <span
-          class="mb-4 flex items-center justify-center h-14 w-14 rounded-full bg-blue-100"
+          class="mb-3 sm:mb-4 flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 rounded-full bg-blue-100"
         >
           <svg
-            class="h-8 w-8 text-blue-500"
+            class="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-blue-500"
             fill="none"
             stroke="currentColor"
             stroke-width="1.5"
@@ -275,19 +276,19 @@
             />
           </svg>
         </span>
-        <div class="font-bold text-lg text-gray-900 mb-1">Business Permits</div>
-        <div class="text-gray-600 text-sm">
+        <div class="font-bold text-sm sm:text-base lg:text-lg text-gray-900 mb-1">Business Permits</div>
+        <div class="text-gray-600 text-xs sm:text-sm">
           Processing and issuance of local business permits
         </div>
       </div>
       <div
-        class="bg-white rounded-2xl shadow flex flex-col items-center p-8 text-center"
+        class="bg-white rounded-2xl shadow flex flex-col items-center p-4 sm:p-6 lg:p-8 text-center"
       >
         <span
-          class="mb-4 flex items-center justify-center h-14 w-14 rounded-full bg-blue-100"
+          class="mb-3 sm:mb-4 flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 rounded-full bg-blue-100"
         >
           <svg
-            class="h-8 w-8 text-blue-500"
+            class="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-blue-500"
             fill="none"
             stroke="currentColor"
             stroke-width="1.5"
@@ -300,21 +301,21 @@
             />
           </svg>
         </span>
-        <div class="font-bold text-lg text-gray-900 mb-1">
+        <div class="font-bold text-sm sm:text-base lg:text-lg text-gray-900 mb-1">
           Community Programs
         </div>
-        <div class="text-gray-600 text-sm">
+        <div class="text-gray-600 text-xs sm:text-sm">
           Youth development, senior citizen, and livelihood programs
         </div>
       </div>
       <div
-        class="bg-white rounded-2xl shadow flex flex-col items-center p-8 text-center"
+        class="bg-white rounded-2xl shadow flex flex-col items-center p-4 sm:p-6 lg:p-8 text-center"
       >
         <span
-          class="mb-4 flex items-center justify-center h-14 w-14 rounded-full bg-blue-100"
+          class="mb-3 sm:mb-4 flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 rounded-full bg-blue-100"
         >
           <svg
-            class="h-8 w-8 text-blue-500"
+            class="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-blue-500"
             fill="none"
             stroke="currentColor"
             stroke-width="1.5"
@@ -332,19 +333,19 @@
             />
           </svg>
         </span>
-        <div class="font-bold text-lg text-gray-900 mb-1">Waste Management</div>
-        <div class="text-gray-600 text-sm">
+        <div class="font-bold text-sm sm:text-base lg:text-lg text-gray-900 mb-1">Waste Management</div>
+        <div class="text-gray-600 text-xs sm:text-sm">
           Garbage collection schedules and recycling initiatives
         </div>
       </div>
       <div
-        class="bg-white rounded-2xl shadow flex flex-col items-center p-8 text-center"
+        class="bg-white rounded-2xl shadow flex flex-col items-center p-4 sm:p-6 lg:p-8 text-center"
       >
         <span
-          class="mb-4 flex items-center justify-center h-14 w-14 rounded-full bg-blue-100"
+          class="mb-3 sm:mb-4 flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 rounded-full bg-blue-100"
         >
           <svg
-            class="h-8 w-8 text-blue-500"
+            class="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 text-blue-500"
             fill="none"
             stroke="currentColor"
             stroke-width="1.5"
@@ -358,10 +359,10 @@
             <circle cx="12" cy="12" r="9" />
           </svg>
         </span>
-        <div class="font-bold text-lg text-gray-900 mb-1">
+        <div class="font-bold text-sm sm:text-base lg:text-lg text-gray-900 mb-1">
           Public Information
         </div>
-        <div class="text-gray-600 text-sm">
+        <div class="text-gray-600 text-xs sm:text-sm">
           Announcements, bulletins, and community updates
         </div>
       </div>
@@ -369,41 +370,41 @@
   </div>
 
   <div
-    class="h-full w-full bg-white flex flex-col lg:flex-row items-center justify-center gap-8 px-4 py-16"
+    class="w-full bg-white flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8 px-4 py-8 sm:py-16"
     id="about"
   >
-    <div class="flex-1 flex flex-col gap-8 max-w-lg w-full">
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+    <div class="flex-1 flex flex-col gap-6 lg:gap-8 max-w-lg w-full">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div
-          class="bg-gray-50 rounded-xl flex flex-col items-center justify-center py-6"
+          class="bg-gray-50 rounded-xl flex flex-col items-center justify-center py-4 sm:py-6"
         >
-          <div class="text-3xl font-bold text-blue-700">12,487</div>
-          <div class="text-gray-500 text-sm">Population</div>
+          <div class="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-700">12,487</div>
+          <div class="text-gray-500 text-xs sm:text-sm">Population</div>
         </div>
         <div
-          class="bg-gray-50 rounded-xl flex flex-col items-center justify-center py-6"
+          class="bg-gray-50 rounded-xl flex flex-col items-center justify-center py-4 sm:py-6"
         >
-          <div class="text-3xl font-bold text-blue-700">3.2 km²</div>
-          <div class="text-gray-500 text-sm">Land Area</div>
+          <div class="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-700">3.2 km²</div>
+          <div class="text-gray-500 text-xs sm:text-sm">Land Area</div>
         </div>
         <div
-          class="bg-gray-50 rounded-xl flex flex-col items-center justify-center py-6"
+          class="bg-gray-50 rounded-xl flex flex-col items-center justify-center py-4 sm:py-6"
         >
-          <div class="text-3xl font-bold text-blue-700">3,245</div>
-          <div class="text-gray-500 text-sm">Households</div>
+          <div class="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-700">3,245</div>
+          <div class="text-gray-500 text-xs sm:text-sm">Households</div>
         </div>
         <div
-          class="bg-gray-50 rounded-xl flex flex-col items-center justify-center py-6"
+          class="bg-gray-50 rounded-xl flex flex-col items-center justify-center py-4 sm:py-6"
         >
-          <div class="text-3xl font-bold text-blue-700">24</div>
-          <div class="text-gray-500 text-sm">Puroks</div>
+          <div class="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-700">24</div>
+          <div class="text-gray-500 text-xs sm:text-sm">Puroks</div>
         </div>
       </div>
-      <div class="bg-gray-50 rounded-xl p-6 w-full">
-        <div class="font-semibold text-lg text-gray-900 mb-4">
+      <div class="bg-gray-50 rounded-xl p-4 sm:p-6 w-full">
+        <div class="font-semibold text-base sm:text-lg text-gray-900 mb-3 sm:mb-4">
           Office Hours & Contact
         </div>
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-3 sm:gap-4">
           <div class="flex gap-3 items-start">
             <span
               class="flex items-center justify-center h-8 w-8 rounded-full bg-blue-100 text-blue-600"
@@ -423,12 +424,12 @@
               </svg>
             </span>
             <div>
-              <div class="font-semibold text-gray-800">Office Hours</div>
-              <div class="text-gray-600 text-sm">
+              <div class="font-semibold text-gray-800 text-sm sm:text-base">Office Hours</div>
+              <div class="text-gray-600 text-xs sm:text-sm">
                 Monday to Friday: 8:00 AM - 5:00 PM
               </div>
-              <div class="text-gray-600 text-sm">Saturday: 8:00 AM - 12:00 PM</div>
-              <div class="text-gray-600 text-sm">Sunday: Closed</div>
+              <div class="text-gray-600 text-xs sm:text-sm">Saturday: 8:00 AM - 12:00 PM</div>
+              <div class="text-gray-600 text-xs sm:text-sm">Sunday: Closed</div>
             </div>
           </div>
           <div class="flex gap-3 items-start">
@@ -450,10 +451,10 @@
               </svg>
             </span>
             <div>
-              <div class="font-semibold text-gray-800">Contact Information</div>
-              <div class="text-gray-600 text-sm">Office: (02) 8123-4567</div>
-              <div class="text-gray-600 text-sm">Mobile: 0917-123-4567</div>
-              <div class="text-gray-600 text-sm">
+              <div class="font-semibold text-gray-800 text-sm sm:text-base">Contact Information</div>
+              <div class="text-gray-600 text-xs sm:text-sm">Office: (02) 8123-4567</div>
+              <div class="text-gray-600 text-xs sm:text-sm">Mobile: 0917-123-4567</div>
+              <div class="text-gray-600 text-xs sm:text-sm">
                 Email: masaguisi&#64;barangay.gov.ph
               </div>
             </div>
@@ -477,14 +478,14 @@
               </svg>
             </span>
             <div>
-              <div class="font-semibold text-gray-800">Emergency Hotlines</div>
-              <div class="text-gray-600 text-sm">
+              <div class="font-semibold text-gray-800 text-sm sm:text-base">Emergency Hotlines</div>
+              <div class="text-gray-600 text-xs sm:text-sm">
                 Barangay Patrol: 0917-888-9999
               </div>
-              <div class="text-gray-600 text-sm">
+              <div class="text-gray-600 text-xs sm:text-sm">
                 Fire Station: 0917-777-8888
               </div>
-              <div class="text-gray-600 text-sm">
+              <div class="text-gray-600 text-xs sm:text-sm">
                 Health Center: 0917-666-7777
               </div>
             </div>
@@ -493,14 +494,14 @@
       </div>
     </div>
     <div
-      class="flex-1 flex flex-col items-center justify-center w-full max-w-xl gap-4"
+      class="flex-1 flex flex-col items-center justify-center w-full max-w-xl gap-3 sm:gap-4"
     >
       <img
         src="assets/images/brand-logo.png"
         alt="Barangay Masaguisi Logo"
-        class="w-32 h-32 object-contain"
+        class="w-24 h-24 sm:w-32 sm:h-32 object-contain"
       />
-      <div class="w-full h-[360px] rounded-2xl overflow-hidden">
+      <div class="w-full h-[240px] sm:h-[300px] lg:h-[360px] rounded-2xl overflow-hidden">
         <iframe
           width="100%"
           height="100%"
