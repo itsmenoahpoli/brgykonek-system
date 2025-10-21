@@ -20,6 +20,9 @@ export class PendingApprovalComponent implements OnInit {
   successTitle = '';
   successMessage = '';
 
+  showUserDetailsModal = false;
+  selectedUser: User | null = null;
+
   constructor(private usersService: UsersService) {}
 
   ngOnInit() {
@@ -76,6 +79,16 @@ export class PendingApprovalComponent implements OnInit {
 
   onSuccessModalClosed() {
     this.showSuccessModal = false;
+  }
+
+  viewUserDetails(user: User) {
+    this.selectedUser = user;
+    this.showUserDetailsModal = true;
+  }
+
+  closeUserDetailsModal() {
+    this.showUserDetailsModal = false;
+    this.selectedUser = null;
   }
 
   getUserTypeClass(userType: string): string {
