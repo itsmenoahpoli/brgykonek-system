@@ -28,6 +28,57 @@
       </button>
     </div>
 
+    <!-- Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.828 7l2.586 2.586a2 2 0 002.828 0L12.828 7H4.828z"></path>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-gray-500">Total Notifications</p>
+            <p class="text-2xl font-semibold text-gray-900">
+              {{ (notifications$ | async)?.length || 0 }}
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-gray-500">Unread</p>
+            <p class="text-2xl font-semibold text-gray-900">
+              {{ (unreadCount$ | async) || 0 }}
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm font-medium text-gray-500">Document Requests</p>
+            <p class="text-2xl font-semibold text-gray-900">
+              {{ getDocumentRequestCount() }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Notifications List -->
     <div class="bg-white rounded-lg shadow">
       <ng-container *ngIf="(notifications$ | async) as notifications">
@@ -107,55 +158,6 @@
       </ng-container>
     </div>
 
-    <!-- Stats -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div class="bg-white rounded-lg shadow p-4">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.828 7l2.586 2.586a2 2 0 002.828 0L12.828 7H4.828z"></path>
-            </svg>
-          </div>
-          <div class="ml-3">
-            <p class="text-sm font-medium text-gray-500">Total Notifications</p>
-            <p class="text-2xl font-semibold text-gray-900">
-              {{ (notifications$ | async)?.length || 0 }}
-            </p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="bg-white rounded-lg shadow p-4">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          </div>
-          <div class="ml-3">
-            <p class="text-sm font-medium text-gray-500">Unread</p>
-            <p class="text-2xl font-semibold text-gray-900">
-              {{ (unreadCount$ | async) || 0 }}
-            </p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="bg-white rounded-lg shadow p-4">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-          </div>
-          <div class="ml-3">
-            <p class="text-sm font-medium text-gray-500">Document Requests</p>
-            <p class="text-2xl font-semibold text-gray-900">
-              {{ getDocumentRequestCount() }}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+    
   </div>
 </app-dashboard-layout>

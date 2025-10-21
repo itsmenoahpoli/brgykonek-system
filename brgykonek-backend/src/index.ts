@@ -13,6 +13,7 @@ import notificationRoutes from "./routes/notification";
 import administratorRoutes from "./routes/administrator";
 import documentRequestRoutes from "./routes/documentRequest";
 import userAccountRoutes from "./routes/userAccount";
+import sitioRoutes from "./routes/sitio";
 import { swaggerOptions } from "./config/swagger";
 import { requestLogger } from "./middleware/requestLogger";
 import { logger } from "./utils/logger";
@@ -101,6 +102,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/administrator", administratorRoutes);
 app.use("/api/documents", documentRequestRoutes);
 app.use("/api/user-accounts", userAccountRoutes);
+app.use("/api/sitios", sitioRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: "BrgyKonek API is running" });

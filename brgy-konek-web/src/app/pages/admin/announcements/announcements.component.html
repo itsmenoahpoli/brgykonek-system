@@ -191,32 +191,14 @@
         </div>
         <div *ngIf="form.get('audience')?.value === 'Specific Zone'" class="mt-4">
           <label class="block font-medium">Select Sitios</label>
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-            <label class="flex items-center">
-              <input type="checkbox" value="Maharlika" class="mr-2" />
-              Maharlika
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" value="Happy Village" class="mr-2" />
-              Happy Village
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" value="Sitio San Jose" class="mr-2" />
-              Sitio San Jose
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" value="Sitio Maligaya" class="mr-2" />
-              Sitio Maligaya
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" value="Sitio Bagong Silang" class="mr-2" />
-              Sitio Bagong Silang
-            </label>
-            <label class="flex items-center">
-              <input type="checkbox" value="Sitio Pag-asa" class="mr-2" />
-              Sitio Pag-asa
+          <div *ngIf="loadingSitios" class="text-sm text-gray-500 mt-2">Loading sitios...</div>
+          <div *ngIf="!loadingSitios && sitios.length > 0" class="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+            <label *ngFor="let sitio of sitios" class="flex items-center">
+              <input type="checkbox" [value]="sitio._id" class="mr-2" />
+              {{ sitio.name }}
             </label>
           </div>
+          <div *ngIf="!loadingSitios && sitios.length === 0" class="text-sm text-gray-500 mt-2">No sitios available</div>
         </div>
           <div>
           <label class="block font-medium">Status</label>

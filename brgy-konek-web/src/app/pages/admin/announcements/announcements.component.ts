@@ -10,6 +10,7 @@ import {
   Announcement,
 } from '../../../services/announcements.service';
 import { AuthService } from '../../../services/auth.service';
+import { SitiosService, Sitio } from '../../../services/sitios.service';
 import { DashboardLayoutComponent } from '../../../components/shared/dashboard-layout/dashboard-layout.component';
 import { TitleCasePipe } from '@angular/common';
 import { CommonModule } from '@angular/common';
@@ -48,10 +49,13 @@ export class AnnouncementsComponent {
   expandedAnnouncements = new Set<string>();
   showViewModal = false;
   selectedAnnouncement: Announcement | null = null;
+  sitios: Sitio[] = [];
+  loadingSitios = false;
   constructor(
     private announcementsService: AnnouncementsService,
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private sitiosService: SitiosService
   ) {
     this.form = this.fb.group({
       banner_image: [''],
@@ -76,6 +80,14 @@ export class AnnouncementsComponent {
         const min = String(now.getMinutes()).padStart(2, '0');
         const localDatetime = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
         this.form.patchValue({ publish_at: localDatetime });
+      }
+    });
+
+    this.form.get('audience')?.valueChanges.subscribe((audience) => {
+      console.log('Audience changed to:', audience);
+      if (audience === 'Specific Zone') {
+        console.log('Loading sitios because Specific Zone was selected');
+        this.loadSitios();
       }
     });
   }
@@ -104,6 +116,26 @@ export class AnnouncementsComponent {
   async loadAnnouncements() {
     const data = await this.announcementsService.getAnnouncements();
     this.announcements = data || [];
+  }
+
+  async loadSitios() {
+    console.log('loadSitios called, current sitios length:', this.sitios.length);
+    if (this.sitios.length > 0) return;
+    
+    this.loadingSitios = true;
+    console.log('Loading sitios...');
+    try {
+      const data = await this.sitiosService.getSitios();
+      console.log('Sitios data received:', data);
+      this.sitios = data || [];
+      console.log('Sitios array updated:', this.sitios);
+    } catch (error) {
+      console.error('Error loading sitios:', error);
+      this.sitios = [];
+    } finally {
+      this.loadingSitios = false;
+      console.log('Loading completed, sitios length:', this.sitios.length);
+    }
   }
   openModal(editAnnouncement?: Announcement) {
     if (editAnnouncement) {
