@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { UsersService, User } from '../../../services/users.service';
 import { DashboardLayoutComponent } from '../../../components/shared/dashboard-layout/dashboard-layout.component';
 import { StatusModalComponent } from '../../../components/shared/status-modal/status-modal.component';
+import { getBaseUrl } from '../../../utils/api.util';
 
 @Component({
   selector: 'app-pending-approval',
@@ -38,7 +39,7 @@ export class PendingApprovalComponent implements OnInit {
         user.user_type !== 'admin' && 
         (user.status === 'pending' || 
          (user.approved === false || user.approved === undefined))
-      );
+      ).reverse();
     } catch (error) {
       console.error('Error loading pending users:', error);
     } finally {
@@ -92,43 +93,88 @@ export class PendingApprovalComponent implements OnInit {
   }
 
   isPdfFile(filePath: string): boolean {
+    if (!filePath || filePath.trim() === '') return false;
     return filePath.toLowerCase().endsWith('.pdf');
   }
 
   getFileName(filePath: string): string {
-    if (!filePath) return 'No file';
+    if (!filePath || filePath.trim() === '') return 'No file';
     const parts = filePath.split('/');
-    return parts[parts.length - 1] || 'Unknown file';
+    const fileName = parts[parts.length - 1] || 'Unknown file';
+    return fileName.trim() === '' ? 'Unknown file' : fileName;
   }
 
   viewDocument(filePath: string) {
-    if (!filePath) return;
+    if (!filePath || filePath.trim() === '') {
+      console.error('No file path provided');
+      alert('No file available to view');
+      return;
+    }
     
-    const fullUrl = this.getFullFileUrl(filePath);
-    window.open(fullUrl, '_blank');
+    try {
+      const fullUrl = this.getFullFileUrl(filePath);
+      if (fullUrl && fullUrl !== '') {
+        const newWindow = window.open(fullUrl, '_blank');
+        if (!newWindow) {
+          alert('Please allow popups for this site to view documents');
+        }
+      } else {
+        console.error('Invalid file URL');
+        alert('Unable to generate file URL');
+      }
+    } catch (error) {
+      console.error('Error opening document:', error);
+      alert('Error opening document. Please try again.');
+    }
   }
 
   downloadDocument(filePath: string) {
-    if (!filePath) return;
+    if (!filePath || filePath.trim() === '') {
+      console.error('No file path provided');
+      alert('No file available to download');
+      return;
+    }
     
-    const fullUrl = this.getFullFileUrl(filePath);
-    const link = document.createElement('a');
-    link.href = fullUrl;
-    link.download = this.getFileName(filePath);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      const fullUrl = this.getFullFileUrl(filePath);
+      if (fullUrl && fullUrl !== '') {
+        const link = document.createElement('a');
+        link.href = fullUrl;
+        link.download = this.getFileName(filePath);
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        console.error('Invalid file URL');
+        alert('Unable to generate download URL');
+      }
+    } catch (error) {
+      console.error('Error downloading document:', error);
+      alert('Error downloading document. Please try again.');
+    }
   }
 
   private getFullFileUrl(filePath: string): string {
-    if (!filePath) return '';
+    if (!filePath || filePath.trim() === '') return '';
     
     if (filePath.startsWith('http')) {
       return filePath;
     }
     
-    const baseUrl = 'http://localhost:3000';
-    return `${baseUrl}/${filePath}`;
+    try {
+      const baseUrl = getBaseUrl();
+      if (!baseUrl || baseUrl.trim() === '') {
+        console.error('Base URL not configured');
+        return '';
+      }
+      
+      const cleanPath = filePath.startsWith('/') ? filePath.substring(1) : filePath;
+      return `${baseUrl}${cleanPath}`;
+    } catch (error) {
+      console.error('Error generating file URL:', error);
+      return '';
+    }
   }
 
   getUserTypeClass(userType: string): string {
