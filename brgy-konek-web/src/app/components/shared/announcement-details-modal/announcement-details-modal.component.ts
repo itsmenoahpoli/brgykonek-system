@@ -16,7 +16,7 @@ export class AnnouncementDetailsModalComponent {
   @Output() modalClosed = new EventEmitter<void>();
 
   getImageUrl(imagePath: string): string {
-    return imagePath ? `${environment.baseUrl}${imagePath}` : '';
+    return imagePath ? `${environment.baseUrl}${imagePath.charAt(0) === '/' ? imagePath.slice(1) : imagePath}` : '';
   }
 
   onBackdropClick(event: Event): void {
