@@ -2,19 +2,18 @@
   title="Announcements"
   subtitle="View all announcements from the barangay"
 >
-  <div
-    class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4"
-  >
-    <div class="flex gap-2 items-center w-full md:w-auto">
-      <input
-        type="text"
-        placeholder="Search announcements..."
-        class="border rounded px-3 py-2 w-full md:w-64 search-input"
-        [(ngModel)]="search"
-        (ngModelChange)="onSearchChange($event)"
-      />
+  <div class="p-2 sm:p-4 lg:p-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-3 sm:mb-4 lg:mb-6 gap-3">
+      <div class="flex gap-2 items-center w-full md:w-auto">
+        <input
+          type="text"
+          placeholder="Search announcements..."
+          class="border rounded px-3 py-2 w-full md:w-64 search-input text-sm"
+          [(ngModel)]="search"
+          (ngModelChange)="onSearchChange($event)"
+        />
+      </div>
     </div>
-  </div>
 
   <div
     *ngIf="filteredAnnouncements.length === 0"
@@ -38,7 +37,7 @@
 
   <div
     *ngIf="filteredAnnouncements.length > 0"
-    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6"
   >
     <div
       *ngFor="let announcement of filteredAnnouncements"
@@ -48,12 +47,12 @@
         <img
           [src]="getImageUrl(announcement.banner_image)"
           alt="Announcement Banner"
-          class="h-48 w-full object-cover"
+          class="h-32 sm:h-40 lg:h-48 w-full object-cover"
           *ngIf="announcement.banner_image"
         />
         <div
           *ngIf="!announcement.banner_image"
-          class="h-48 w-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center"
+          class="h-32 sm:h-40 lg:h-48 w-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center"
         >
           <svg
             class="w-16 h-16 text-blue-400"
@@ -77,33 +76,35 @@
         </div>
       </div>
 
-      <div class="p-4 flex-1 flex flex-col">
-        <h3 class="font-bold text-lg mb-2 text-gray-900 line-clamp-2">
+      <div class="p-3 sm:p-4 flex-1 flex flex-col">
+        <h3 class="font-bold text-base sm:text-lg mb-2 text-gray-900 line-clamp-2">
           {{ announcement.title }}
         </h3>
-        <h4 class="font-semibold text-sm mb-3 text-gray-700 line-clamp-1">
+        <h4 class="font-semibold text-xs sm:text-sm mb-2 sm:mb-3 text-gray-700 line-clamp-1">
           {{ announcement.header }}
         </h4>
-        <p class="text-gray-600 text-sm mb-4 flex-1 line-clamp-3">
+        <p class="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 flex-1 line-clamp-3">
           {{ announcement.body }}
         </p>
 
         <div
-          class="flex justify-between items-center pt-3 border-t border-gray-100"
+          class="flex flex-col sm:flex-row sm:justify-between sm:items-center pt-3 border-t border-gray-100 gap-2 sm:gap-0"
         >
-          <div class="text-xs text-gray-500 flex items-center gap-2">
+          <div class="text-xs text-gray-500 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
             <span>{{ announcement.created_at | date : "MMM dd, yyyy" }}</span>
-            <span *ngIf="announcement.posted_by">• Posted by {{ announcement.posted_by }}</span>
+            <span *ngIf="announcement.posted_by" class="hidden sm:inline">• Posted by {{ announcement.posted_by }}</span>
+            <span *ngIf="announcement.posted_by" class="sm:hidden">Posted by {{ announcement.posted_by }}</span>
           </div>
           <button
             (click)="openAnnouncementDetails(announcement)"
-            class="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200"
+            class="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1.5 rounded text-sm font-medium transition-colors duration-200 w-full sm:w-auto"
           >
             Read More →
           </button>
         </div>
       </div>
     </div>
+  </div>
   </div>
 
   <app-announcement-details-modal

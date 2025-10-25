@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   Router,
@@ -19,10 +19,11 @@ import { filter } from 'rxjs';
   templateUrl: './dashboard-layout.component.html',
   styleUrls: ['./dashboard-layout.component.scss'],
 })
-export class DashboardLayoutComponent {
+export class DashboardLayoutComponent implements OnInit, OnDestroy {
   @Input() title: string = '';
   @Input() subtitle: string = '';
   sidebarOpen = true;
+  isMobile = false;
   breadcrumbs: { label: string; url: string }[] = [];
   sidebarLinks: { label: string; icon: string; route: string }[] = [];
   notifications: NotificationItem[] = [];
@@ -117,6 +118,29 @@ export class DashboardLayoutComponent {
       });
     }
   }
+
+  ngOnInit() {
+    this.checkMobileView();
+  }
+
+  ngOnDestroy() {
+    // Cleanup if needed
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.checkMobileView();
+  }
+
+  private checkMobileView() {
+    this.isMobile = window.innerWidth < 1024; // lg breakpoint
+    if (this.isMobile) {
+      this.sidebarOpen = false; // Collapse sidebar on mobile
+    } else {
+      this.sidebarOpen = true; // Expand sidebar on desktop
+    }
+  }
+
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen;
   }

@@ -1,31 +1,32 @@
 <app-dashboard-layout title="Complaints">
   <!-- Filters and Actions -->
-  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-    <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-      <select [(ngModel)]="selectedStatus" class="border rounded px-2 py-1 text-sm w-full sm:w-auto">
-        <option value="">All Status</option>
-        <option *ngFor="let status of statusList" [value]="status">
-          {{ status }}
-        </option>
-      </select>
-      <select [(ngModel)]="selectedCategory" class="border rounded px-2 py-1 text-sm w-full sm:w-auto">
-        <option value="">All Categories</option>
-        <option *ngFor="let category of categoryList" [value]="category">
-          {{ category }}
-        </option>
-      </select>
+  <div class="p-2 sm:p-4 lg:p-6">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 sm:mb-4 lg:mb-6 gap-3">
+      <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        <select [(ngModel)]="selectedStatus" class="border rounded px-2 py-1 text-sm w-full sm:w-auto">
+          <option value="">All Status</option>
+          <option *ngFor="let status of statusList" [value]="status">
+            {{ status }}
+          </option>
+        </select>
+        <select [(ngModel)]="selectedCategory" class="border rounded px-2 py-1 text-sm w-full sm:w-auto">
+          <option value="">All Categories</option>
+          <option *ngFor="let category of categoryList" [value]="category">
+            {{ category }}
+          </option>
+        </select>
+      </div>
+      <button
+        class="w-full sm:w-auto bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-4 py-2 rounded flex items-center justify-center gap-2 text-sm sm:text-base transition-colors duration-200"
+        (click)="onCreateComplaint()"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span class="sm:hidden">New</span>
+        <span class="hidden sm:inline">New Complaint</span>
+      </button>
     </div>
-    <button
-      class="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded flex items-center justify-center gap-2 text-sm sm:text-base"
-      (click)="onCreateComplaint()"
-    >
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-      </svg>
-      <span class="sm:hidden">New</span>
-      <span class="hidden sm:inline">New Complaint</span>
-    </button>
-  </div>
 
   <!-- Mobile Cards View -->
   <div class="block sm:hidden space-y-4">
@@ -79,13 +80,13 @@
         <div class="flex gap-2">
           <button 
             type="button" 
-            class="flex-1 bg-blue-600 text-white px-3 py-2 rounded text-sm" 
+            class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-2 rounded text-sm transition-colors duration-200" 
             (click)="openViewModal(complaint)">
             View
           </button>
           <button
             type="button"
-            class="flex-1 bg-red-600 text-white px-3 py-2 rounded text-sm"
+            class="flex-1 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-3 py-2 rounded text-sm transition-colors duration-200"
             (click)="onDeleteComplaint(complaint)"
           >
             Delete
@@ -194,13 +195,13 @@
               <div class="flex flex-col space-y-2">
                 <button 
                   type="button" 
-                  class="bg-blue-600 text-white px-3 py-1 rounded text-sm" 
+                  class="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1 rounded text-sm transition-colors duration-200" 
                   (click)="openViewModal(complaint)">
                   View
                 </button>
                 <button
                   type="button"
-                  class="bg-red-600 text-white px-3 py-1 rounded text-sm"
+                  class="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-3 py-1 rounded text-sm transition-colors duration-200"
                   (click)="onDeleteComplaint(complaint)"
                 >
                   Delete
@@ -320,7 +321,7 @@
               ></ng-icon>
               <div class="text-gray-500 mb-2">Drag and drop files here or</div>
               <label
-                class="bg-blue-600 text-white px-3 py-1 rounded cursor-pointer"
+                class="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1 rounded cursor-pointer transition-colors duration-200"
               >
                 Browse
                 <input
@@ -356,7 +357,7 @@
               *ngIf="uploadedFiles.length > 0"
             >
               <label
-                class="bg-blue-600 text-white px-3 py-1 rounded cursor-pointer mt-2"
+                class="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1 rounded cursor-pointer mt-2 transition-colors duration-200"
               >
                 Add more files
                 <input
@@ -373,14 +374,14 @@
         <div class="flex flex-col sm:flex-row justify-between gap-3">
           <button
             type="button"
-            class="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors duration-200 text-sm sm:text-base"
+            class="w-full sm:w-auto bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200 px-4 py-2 rounded transition-colors duration-200 text-sm sm:text-base"
             (click)="closeCreateModal()"
           >
             Cancel
           </button>
           <button
             type="button"
-            class="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded text-sm sm:text-base"
+            class="w-full sm:w-auto bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-4 py-2 rounded text-sm sm:text-base transition-colors duration-200"
             (click)="submitComplaint()"
           >
             Submit
@@ -493,13 +494,14 @@
       <div class="mt-6 flex justify-end">
         <button
           type="button"
-          class="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors duration-200 text-sm sm:text-base"
+          class="w-full sm:w-auto bg-gray-50 hover:bg-gray-100 text-gray-700 border border-gray-200 px-4 py-2 rounded transition-colors duration-200 text-sm sm:text-base"
           (click)="closeViewModal()"
         >
           Close
         </button>
       </div>
     </div>
+  </div>
   </div>
 
   <app-status-modal

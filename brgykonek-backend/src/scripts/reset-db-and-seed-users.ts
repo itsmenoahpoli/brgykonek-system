@@ -19,6 +19,10 @@ const resetDatabaseAndSeedUsers = async (): Promise<void> => {
     console.log('\n🗑️  Resetting database...');
     console.log('='.repeat(50));
 
+    if (!mongoose.connection.db) {
+      throw new Error('Database connection is not established');
+    }
+
     const collections = await mongoose.connection.db.listCollections().toArray();
     
     for (const collection of collections) {
